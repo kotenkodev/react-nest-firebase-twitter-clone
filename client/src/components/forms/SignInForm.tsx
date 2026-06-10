@@ -48,7 +48,7 @@ export default function SignInForm() {
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
       toast.success("Welcome back!");
-      navigate("/home");
+      navigate("/");
     } catch (error: any) {
       console.error("Sign-in error:", error.code);
       const message =

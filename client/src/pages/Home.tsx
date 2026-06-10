@@ -1,4 +1,5 @@
 import apiClient from "@/api/apiClient";
+import TransitionLink from "@/components/TransitionLink";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -20,6 +21,13 @@ export default function Home() {
     <div>
       <title>My Feed</title>
       Home
+      <button>
+        <TransitionLink
+          to="/profile"
+          label="Go to Profile"
+          className="text-blue-500"
+        />
+      </button>
     </div>
   );
 }
