@@ -1,25 +1,6 @@
-import type { UpdateUser, User } from "@/types/user";
+import type { UpdateUser } from "@/types/user";
 import apiClient from "./apiClient";
-
-const parseDate = (value: any): Date | undefined => {
-  if (!value) return undefined;
-  if (value instanceof Date) return value;
-  if (typeof value === "object" && "_seconds" in value) {
-    return new Date(value._seconds * 1000);
-  }
-  if (typeof value === "string") {
-    return new Date(value);
-  }
-  return undefined;
-};
-
-const transformUserPayload = (rawData: any): User => {
-  return {
-    ...rawData,
-    birthDate: parseDate(rawData.birthDate),
-    createdAt: parseDate(rawData.createdAt),
-  };
-};
+import { transformUserPayload } from "@/utils/transformPayload";
 
 export const getUser = async (id?: string) => {
   try {

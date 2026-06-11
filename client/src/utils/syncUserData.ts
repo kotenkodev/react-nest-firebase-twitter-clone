@@ -1,6 +1,7 @@
 import { db } from "@/config/firebaseConfig";
 import type { User, UpdateUser } from "@/types/user";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { transformUserPayload } from "./transformPayload";
 
 export interface AuthUser {
   uid: string;
@@ -38,7 +39,7 @@ export const syncUserData = async (
 
       await setDoc(userDocRef, dbData);
 
-      return { id: user.uid, ...dbData };
+      return transformUserPayload({ id: user.uid, ...dbData });
     }
 
     const existingData = userSnapshot.data() as FirestoreUser;
@@ -48,10 +49,10 @@ export const syncUserData = async (
 
       const mergedData = { ...existingData, ...additionalData };
 
-      return { id: user.uid, ...mergedData };
+      return transformUserPayload({ id: user.uid, ...mergedData });
     }
 
-    return { id: userSnapshot.id, ...existingData };
+    return transformUserPayload({ id: userSnapshot.id, ...existingData });
   } catch (error) {
     console.error("Error syncing user data:", error);
     throw error;

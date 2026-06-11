@@ -6,10 +6,7 @@ export const uploadAvatar = async (
   file: File,
 ): Promise<string> => {
   try {
-    const storageRef = ref(
-      storage,
-      `avatars/${userId}/${Date.now()}_${file.name}`,
-    );
+    const storageRef = ref(storage, `avatars/${userId}`);
 
     const snapshot = await uploadBytes(storageRef, file);
 
