@@ -3,13 +3,10 @@ import apiClient from "./apiClient";
 
 const parseDate = (value: any): Date | undefined => {
   if (!value) return undefined;
-  // If it's already a Date object
   if (value instanceof Date) return value;
-  // If it's a Firestore Timestamp object from old implementation
   if (typeof value === "object" && "_seconds" in value) {
     return new Date(value._seconds * 1000);
   }
-  // If it's a string (ISO)
   if (typeof value === "string") {
     return new Date(value);
   }

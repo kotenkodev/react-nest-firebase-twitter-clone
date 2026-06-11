@@ -14,7 +14,6 @@ interface DatePickerProps {
 
 export function DatePicker({ value, onChange }: DatePickerProps) {
   const [open, setOpen] = useState(false);
-  console.log("DatePicker value:", value);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

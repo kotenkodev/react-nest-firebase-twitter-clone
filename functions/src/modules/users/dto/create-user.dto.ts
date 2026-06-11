@@ -6,6 +6,7 @@ import {
   MaxLength,
   IsOptional,
   IsBoolean,
+  IsUrl,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -30,7 +31,7 @@ export class CreateUserDto {
   email: string;
 
   @IsOptional()
-  @IsString()
+  @IsUrl({ require_tld: false })
   @MaxLength(250, { message: 'Bio cannot exceed 250 characters.' })
   photoURL?: string;
 

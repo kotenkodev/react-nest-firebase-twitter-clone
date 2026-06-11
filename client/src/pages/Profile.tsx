@@ -12,15 +12,19 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getInitials } from "@/utils/getInitials";
-import { Camera, Upload } from "lucide-react";
+import { Camera, Loader2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { SecurityForm } from "@/components/forms/SecurityForm";
 import { ProfileInfoForm } from "@/components/forms/ProfileInfoForm";
+import { uploadAvatar } from "@/services/storageService";
+import { updateUser } from "@/services/usersService";
+import { toast } from "sonner";
 
 export default function Profile() {
-  const user = useAuthStore((state) => state.user);
+  const { user, setUser } = useAuthStore();
   const [avatarPreview, setAvatarPreview] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAvatarClick = () => fileInputRef.current?.click();
@@ -29,6 +33,26 @@ export default function Profile() {
     if (file) {
       setAvatarPreview(URL.createObjectURL(file));
       setSelectedFile(file);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile || !user) return;
+
+    setIsUploading(true);
+    try {
+      const downloadURL = await uploadAvatar(user.id, selectedFile);
+      const updatedUser = await updateUser(user.id, { photoURL: downloadURL });
+
+      setUser(updatedUser);
+
+      toast.success("Profile picture updated!");
+      setSelectedFile(null);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -59,7 +83,7 @@ export default function Profile() {
             >
               <Avatar className="h-24 w-24 border-4 border-background shadow-sm group-hover:border-primary/50 transition-colors">
                 <AvatarImage
-                  src={avatarPreview}
+                  src={avatarPreview || user.photoURL}
                   alt="User avatar"
                   className="object-cover"
                 />
@@ -93,8 +117,14 @@ export default function Profile() {
                   size="sm"
                   variant="secondary"
                   className="mt-2"
+                  onClick={handleUpload}
+                  disabled={isUploading}
                 >
-                  <Upload className="w-4 h-4 mr-2" />
+                  {isUploading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4 mr-2" />
+                  )}
                   Upload selected file
                 </Button>
               )}

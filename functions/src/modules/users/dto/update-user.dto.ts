@@ -5,6 +5,7 @@ import {
   IsOptional,
   MaxDate,
   IsDate,
+  IsUrl,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -30,4 +31,8 @@ export class UpdateUserDto {
   @IsString()
   @MaxLength(250, { message: 'Bio must be at most 250 characters.' })
   bio?: string;
+
+  @IsOptional()
+  @IsUrl({ require_tld: false })
+  photoURL?: string;
 }

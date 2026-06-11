@@ -21,7 +21,6 @@ export type SignInUser = Pick<User, "email"> & {
   password: string;
 };
 
-export type UpdateUser = Omit<
-  User,
-  "id" | "email" | "createdAt" | "emailVerified"
+export type UpdateUser = Partial<
+  Omit<User, "id" | "email" | "createdAt" | "emailVerified">
 >;
