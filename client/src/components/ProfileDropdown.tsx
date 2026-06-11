@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { SquareArrowRightExit, User } from "lucide-react";
+import { CogIcon, SquareArrowRightExit, UserIcon } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { auth } from "@/config/firebaseConfig";
 import TransitionLink from "./TransitionLink";
@@ -56,7 +56,19 @@ export default function ProfileDropdown() {
                 className="w-full cursor-pointer flex items-center justify-between gap-2"
               >
                 Profile
-                <User className="mr-2 h-4 w-4" />
+                <UserIcon className="mr-2 h-4 w-4" />
+              </TransitionLink>
+            </div>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <div onClick={() => setIsOpen(false)}>
+              <TransitionLink
+                to="/profile/settings"
+                onClick={() => setIsOpen(false)}
+                className="w-full cursor-pointer flex items-center justify-between gap-2"
+              >
+                Settings
+                <CogIcon className="mr-2 h-4 w-4" />
               </TransitionLink>
             </div>
           </DropdownMenuItem>

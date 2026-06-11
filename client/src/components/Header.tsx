@@ -8,7 +8,7 @@ export default function Header() {
   const user = useAuthStore((state) => state.user);
 
   return (
-    <header className="flex items-center justify-between p-4 border-b dark:border-gray-700">
+    <header className="sticky top-0 flex items-center z-10 bg-white justify-between p-4 border-b dark:border-gray-700">
       <div className="flex items-center gap-6 md:gap-8">
         <TransitionLink
           to="/"
@@ -20,7 +20,7 @@ export default function Header() {
       </div>
       <div>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <div>
+          <div className="hidden sm:block text-sm text-muted-foreground">
             Welcome, {user?.firstName} {user?.lastName}
           </div>
           <div className="w-full flex-1 md:w-auto md:flex-none max-w-sm hidden sm:block">

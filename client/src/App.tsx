@@ -8,7 +8,7 @@ import DefaultLayout from "./layout/DefaultLayout";
 import MainLayout from "./layout/MainLayout";
 import NotFound from "./pages/NotFound";
 import Post from "./pages/Post";
-import Profile from "./pages/Profile";
+import Profile from "./pages/ProfileView";
 import { Toaster } from "sonner";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
@@ -17,6 +17,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import BirdLoadingBar from "./components/BirdLoadingBar";
 import AnimationLayout from "./components/AnimationLayout";
 import { getUser } from "./services/usersService";
+import ProfileSettings from "./components/ProfileSettings";
+import ProfileView from "./pages/ProfileView";
 
 function App() {
   const setUser = useAuthStore((state) => state.setUser);
@@ -67,8 +69,14 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<MainLayout />}>
                 <Route path="/" element={<Home />} />
-                <Route path="/profile" element={<Profile />} />
                 <Route path="/post/:id" element={<Post />} />
+
+                <Route path="/profile">
+                  <Route index element={<ProfileView />} />
+                  <Route path="settings" element={<ProfileSettings />} />
+                  <Route path=":id" element={<ProfileView />} />
+                </Route>
+
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Route>
