@@ -22,9 +22,10 @@ export class OwnershipGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const handler = context.getHandler();
     const options = this.reflector.get<OwnershipOptions>(
       CHECK_OWNERSHIP_KEY,
-      context.getHandler(),
+      handler,
     );
 
     if (!options) {

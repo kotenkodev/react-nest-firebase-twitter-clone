@@ -19,10 +19,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/config/firebaseConfig";
 import GoogleButton from "./GoogleButton";
 import { useState } from "react";
+import { signUp } from "@/services/authService";
 
 const formSchema = z
   .object({
@@ -59,15 +58,16 @@ export default function SignUpForm() {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      await signUp(data);
+
       toast.success("Welcome back!");
       navigate("/");
     } catch (error: any) {
-      console.error("Sign-in error:", error.code);
+      console.error("Sign-up error:", error.code);
       const message =
         error.code === "auth/invalid-credential"
           ? "Invalid email or password."
-          : "Failed to sign in. Please check your credentials.";
+          : "Failed to sign up. Please check your credentials.";
       toast.error(message);
     } finally {
       setIsLoading(false);

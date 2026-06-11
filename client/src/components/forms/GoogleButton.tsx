@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { auth, googleProvider } from "@/config/firebaseConfig";
-import { signInWithPopup } from "firebase/auth";
 import { useState } from "react";
 import { toast } from "sonner";
+import { signInWithGoogle } from "@/services/authService";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface GoogleButtonProps {
   text?: string;
@@ -14,14 +14,15 @@ export default function GoogleButton({
   onSuccess,
 }: GoogleButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const setUser = useAuthStore((state) => state.setUser);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log("Google Sign-In successful:", result);
+      const user = await signInWithGoogle();
+      setUser(user);
       toast.success("Successfully signed in!");
-      onSuccess?.(result.user);
+      onSuccess?.(user);
     } catch (error: any) {
       console.error("Error during Google Sign-In:", error.message);
       toast.error("Google Sign-In failed. Please try again.");

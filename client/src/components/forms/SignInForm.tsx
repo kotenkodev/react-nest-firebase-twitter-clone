@@ -19,10 +19,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/config/firebaseConfig";
 import GoogleButton from "./GoogleButton";
 import { useState } from "react";
+import { signIn } from "@/services/authService";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const formSchema = z.object({
   email: z.email("Please enter a valid email address."),
@@ -32,6 +32,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function SignInForm() {
+  const setUser = useAuthStore((state) => state.setUser);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -46,7 +47,8 @@ export default function SignInForm() {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      const user = await signIn(data);
+      setUser(user);
       toast.success("Welcome back!");
       navigate("/");
     } catch (error: any) {

@@ -11,7 +11,6 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(async (config) => {
   const user = auth.currentUser;
   if (user) {
-    console.log(user);
     const token = await user.getIdToken();
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -19,7 +18,6 @@ apiClient.interceptors.request.use(async (config) => {
 });
 
 apiClient.interceptors.response.use((response) => {
-  console.log(`URL: ${response.config.url}`);
   return response;
 });
 

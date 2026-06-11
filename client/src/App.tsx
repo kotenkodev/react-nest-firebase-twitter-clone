@@ -28,16 +28,22 @@ function App() {
           const idToken = await firebaseUser.getIdToken();
           const tokenResult = await firebaseUser.getIdTokenResult();
 
-          // const customUserData = await apiClient.get("/users/me", {});
-          // setUser({ ...firebaseUser, ...customUserData });
-          console.log(firebaseUser);
-          setUser({
-            ...firebaseUser,
-            idToken,
-            pictureUrl: firebaseUser.photoURL || "",
-            roles: tokenResult.claims ?? { admin: false },
-          });
-          console.log(idToken);
+          try {
+            const response = await apiClient.get("/users/me");
+            const customUserData = response.data;
+            setUser({
+              ...firebaseUser,
+              ...customUserData,
+              idToken,
+              pictureUrl: firebaseUser.photoURL || "",
+            });
+          } catch (e) {
+            console.error("Error fetching user data from backend:", e);
+            setUser({
+              ...firebaseUser,
+              photoUrl: firebaseUser.photoURL || "",
+            });
+          }
         } else {
           setUser(null);
         }

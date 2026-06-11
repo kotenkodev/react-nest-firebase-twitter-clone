@@ -1,15 +1,17 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { FIREBASE_DB } from '../firebase/firebase.module';
-import * as admin from 'firebase-admin';
+import {
+  CollectionReference,
+  FieldValue,
+  Firestore,
+} from 'firebase-admin/firestore';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersRepository {
-  private readonly collection: admin.firestore.CollectionReference;
+  private readonly collection: CollectionReference;
 
-  constructor(
-    @Inject(FIREBASE_DB) private readonly db: admin.firestore.Firestore,
-  ) {
+  constructor(@Inject(FIREBASE_DB) private readonly db: Firestore) {
     this.collection = this.db.collection('users');
   }
 
@@ -24,7 +26,7 @@ export class UsersRepository {
   async create(id: string, data: Partial<User>): Promise<void> {
     await this.collection.doc(id).set({
       ...data,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
   }
 
