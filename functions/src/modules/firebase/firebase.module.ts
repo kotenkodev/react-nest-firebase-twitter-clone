@@ -1,5 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import * as admin from 'firebase-admin';
+import { App } from 'firebase-admin/app';
 
 export const FIREBASE_AUTH = 'FIREBASE_AUTH';
 export const FIREBASE_DB = 'FIREBASE_DB';
@@ -18,14 +19,14 @@ export const FIREBASE_DB = 'FIREBASE_DB';
     },
     {
       provide: FIREBASE_AUTH,
-      useFactory: (app: admin.app.App) => {
+      useFactory: (app: App) => {
         return admin.auth(app);
       },
       inject: ['FIREBASE_APP'],
     },
     {
       provide: FIREBASE_DB,
-      useFactory: (app: admin.app.App) => {
+      useFactory: (app: App) => {
         return admin.firestore(app);
       },
       inject: ['FIREBASE_APP'],

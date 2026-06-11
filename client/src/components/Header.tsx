@@ -21,7 +21,9 @@ export default function Header() {
       </div>
       <div>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <div>{user?.displayName || user?.email}</div>
+          <div>
+            Welcome, {user?.firstName} {user?.lastName}
+          </div>
           <div className="w-full flex-1 md:w-auto md:flex-none max-w-sm hidden sm:block">
             <ProfileDropdown />
           </div>

@@ -2,8 +2,7 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
-import * as admin from 'firebase-admin';
-import { User } from '../users/entities/user.entity';
+import type { DecodedIdToken } from 'firebase-admin/auth';
 
 @Controller('auth')
 export class AuthController {
@@ -15,8 +14,9 @@ export class AuthController {
   }
 
   @Post('signup')
+  @UseGuards(FirebaseAuthGuard)
   async signUp(
-    @GetUser() user: admin.auth.DecodedIdToken,
+    @GetUser() user: DecodedIdToken,
     @Body() userData: { firstName: string; lastName: string },
   ) {
     return this.authService.syncUser(user.uid, user.email!, {
@@ -27,5 +27,23 @@ export class AuthController {
 
   @Post('signin')
   @UseGuards(FirebaseAuthGuard)
-  async signIn(@GetUser() user: User) {}
+  async signIn(
+    @GetUser() user: DecodedIdToken,
+    @Body() bodyData?: { firstName?: string; lastName?: string },
+  ) {
+    let firstName = bodyData?.firstName;
+    let lastName = bodyData?.lastName;
+
+    if (!firstName && !lastName && user.name) {
+      const [tokenFirstName, ...tokenLastNameParts] = user.name.split(' ');
+      firstName = tokenFirstName;
+      lastName = tokenLastNameParts.join(' ');
+    }
+
+    return this.authService.syncUser(user.uid, user.email!, {
+      firstName: firstName || undefined,
+      lastName: lastName || undefined,
+      photoURL: user.picture,
+    });
+  }
 }

@@ -7,18 +7,19 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import * as admin from 'firebase-admin';
 import { FIREBASE_DB } from '../../modules/firebase/firebase.module';
 import {
   CHECK_OWNERSHIP_KEY,
   OwnershipOptions,
 } from '../decorators/check-ownership.decorator';
+import { DecodedIdToken } from 'firebase-admin/auth';
+import { Firestore } from 'firebase-admin/firestore';
 
 @Injectable()
 export class OwnershipGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    @Inject(FIREBASE_DB) private readonly db: admin.firestore.Firestore,
+    @Inject(FIREBASE_DB) private readonly db: Firestore,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -33,7 +34,7 @@ export class OwnershipGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const user = request.user as admin.auth.DecodedIdToken;
+    const user = request.user as DecodedIdToken;
     const resourceId = request.params[options.idParam || 'id'];
 
     if (!user) {

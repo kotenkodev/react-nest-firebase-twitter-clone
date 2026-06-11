@@ -5,12 +5,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import * as admin from 'firebase-admin';
 import { FIREBASE_AUTH } from '../../modules/firebase/firebase.module';
+import { Auth } from 'firebase-admin/auth';
 
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
-  constructor(@Inject(FIREBASE_AUTH) private readonly auth: admin.auth.Auth) {}
+  constructor(@Inject(FIREBASE_AUTH) private readonly auth: Auth) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

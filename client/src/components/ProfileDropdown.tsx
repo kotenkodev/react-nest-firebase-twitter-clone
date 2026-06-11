@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,7 @@ import { SquareArrowRightExit, User } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { auth } from "@/config/firebaseConfig";
 import TransitionLink from "./TransitionLink";
+import { getInitials } from "@/utils/getInitials";
 
 export default function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +36,10 @@ export default function ProfileDropdown() {
       <DropdownMenu modal={false} open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Avatar className="w-8 h-8 hover:ring-2 hover:ring-primary hover:ring-offset-2">
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={user?.photoUrl} alt={user?.email} />
+            <AvatarFallback>
+              {getInitials(`${user?.firstName} ${user?.lastName}`)}
+            </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
 

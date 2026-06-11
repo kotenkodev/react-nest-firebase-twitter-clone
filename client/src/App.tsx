@@ -25,18 +25,10 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
-          const idToken = await firebaseUser.getIdToken();
-          const tokenResult = await firebaseUser.getIdTokenResult();
-
           try {
             const response = await apiClient.get("/users/me");
             const customUserData = response.data;
-            setUser({
-              ...firebaseUser,
-              ...customUserData,
-              idToken,
-              pictureUrl: firebaseUser.photoURL || "",
-            });
+            setUser(customUserData);
           } catch (e) {
             console.error("Error fetching user data from backend:", e);
             setUser({

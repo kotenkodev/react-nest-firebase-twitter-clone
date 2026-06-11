@@ -45,9 +45,16 @@ export const signUp = async (userData: CreateUserForm) => {
 
 export const signInWithGoogle = async () => {
   try {
-    await signInWithPopup(auth, googleProvider);
+    const userCredential = await signInWithPopup(auth, googleProvider);
 
-    const response = await apiClient.post(`/auth/signin`);
+    const displayName = userCredential.user.displayName || "";
+    const [firstName, ...lastNameParts] = displayName.split(" ");
+    const lastName = lastNameParts.join(" ");
+
+    const response = await apiClient.post(`/auth/signin`, {
+      firstName: firstName || undefined,
+      lastName: lastName || undefined,
+    });
 
     return response.data;
   } catch (error) {
@@ -58,7 +65,11 @@ export const signInWithGoogle = async () => {
 
 export const signIn = async (userData: SignInForm) => {
   try {
-    await signInWithEmailAndPassword(auth, userData.email, userData.password);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      userData.email,
+      userData.password,
+    );
 
     const response = await apiClient.post(`/auth/signin`);
 

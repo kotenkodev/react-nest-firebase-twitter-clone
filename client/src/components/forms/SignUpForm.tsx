@@ -22,30 +22,16 @@ import { Link, useNavigate } from "react-router-dom";
 import GoogleButton from "./GoogleButton";
 import { useState } from "react";
 import { signUp } from "@/services/authService";
+import type { signUpSchema } from "@/schemas/auth.schema";
 
-const formSchema = z
-  .object({
-    email: z.email("Please enter a valid email address."),
-    firstName: z.string().min(3, "First name must be at least 3 characters."),
-    lastName: z.string().min(3, "Last name must be at least 3 characters."),
-    password: z.string().min(6, "Password must be at least 6 characters."),
-    confirmPassword: z
-      .string()
-      .min(6, "Password must be at least 6 characters."),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: "",
       firstName: "",

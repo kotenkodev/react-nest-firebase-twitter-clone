@@ -35,7 +35,9 @@ export class AuthService {
       } as User;
     } else if (additionalData && Object.keys(additionalData).length > 0) {
       const updateData = Object.fromEntries(
-        Object.entries(additionalData).filter(([_, v]) => v !== undefined),
+        Object.entries(additionalData).filter(
+          ([_, v]) => v !== undefined && v !== '',
+        ),
       );
       if (Object.keys(updateData).length > 0) {
         await this.usersService.update(uid, updateData);

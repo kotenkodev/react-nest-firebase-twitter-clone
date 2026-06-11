@@ -23,13 +23,9 @@ import GoogleButton from "./GoogleButton";
 import { useState } from "react";
 import { signIn } from "@/services/authService";
 import { useAuthStore } from "@/store/useAuthStore";
+import { signInSchema } from "@/schemas/auth.schema";
 
-const formSchema = z.object({
-  email: z.email("Please enter a valid email address."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof signInSchema>;
 
 export default function SignInForm() {
   const setUser = useAuthStore((state) => state.setUser);
@@ -37,7 +33,7 @@ export default function SignInForm() {
   const navigate = useNavigate();
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
       password: "",
