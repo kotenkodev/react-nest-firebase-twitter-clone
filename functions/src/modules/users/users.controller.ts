@@ -4,8 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
-  Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -25,21 +24,21 @@ export class UsersController {
     return this.usersService.findOne(uid);
   }
 
+  @Get(':id')
+  async findUserById(@Param('id') id: string) {
+    return this.usersService.findOne(id);
+  }
+
   @UseGuards(FirebaseAuthGuard, OwnershipGuard)
   @CheckOwnership({
     resource: 'users',
   })
-  @Patch(':id')
+  @Put(':id')
   async updateUserById(
     @Param('id') id: string,
     @Body() userData: UpdateUserDto,
   ) {
     return this.usersService.update(id, userData);
-  }
-
-  @Get(':id')
-  async findUserById(@Param('id') id: string) {
-    return this.usersService.findOne(id);
   }
 
   @UseGuards(FirebaseAuthGuard, OwnershipGuard)

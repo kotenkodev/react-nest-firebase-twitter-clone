@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Bird, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import ProfileDropdown from "./ProfileDropdown";

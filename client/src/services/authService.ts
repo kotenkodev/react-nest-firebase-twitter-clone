@@ -4,10 +4,9 @@ import {
   sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
-  updateProfile,
 } from "firebase/auth";
-import apiClient from "./apiClient";
-import type { CreateUserForm, SignInForm } from "@/types/user";
+import { syncUserData } from "@/utils/syncUserData";
+import type { CreateUser, SignInUser } from "@/types/user";
 
 export const signOut = async () => {
   try {
@@ -17,7 +16,7 @@ export const signOut = async () => {
   }
 };
 
-export const signUp = async (userData: CreateUserForm) => {
+export const signUp = async (userData: CreateUser) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -25,18 +24,11 @@ export const signUp = async (userData: CreateUserForm) => {
       userData.password,
     );
 
-    await updateProfile(userCredential.user, {
-      displayName: `${userData.firstName} ${userData.lastName}`,
-    });
-
-    const response = await apiClient.post(`/auth/signup`, {
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-    });
-
     await sendEmailVerification(userCredential.user);
 
-    return response.data;
+    const data = await syncUserData(userCredential.user);
+
+    return data;
   } catch (error) {
     console.error("Sign-Up Error:", error);
     throw error;
@@ -47,23 +39,16 @@ export const signInWithGoogle = async () => {
   try {
     const userCredential = await signInWithPopup(auth, googleProvider);
 
-    const displayName = userCredential.user.displayName || "";
-    const [firstName, ...lastNameParts] = displayName.split(" ");
-    const lastName = lastNameParts.join(" ");
+    const data = await syncUserData(userCredential.user);
 
-    const response = await apiClient.post(`/auth/signin`, {
-      firstName: firstName || undefined,
-      lastName: lastName || undefined,
-    });
-
-    return response.data;
+    return data;
   } catch (error) {
     console.error("Sign-In with Google Error:", error);
     throw error;
   }
 };
 
-export const signIn = async (userData: SignInForm) => {
+export const signIn = async (userData: SignInUser) => {
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -71,9 +56,9 @@ export const signIn = async (userData: SignInForm) => {
       userData.password,
     );
 
-    const response = await apiClient.post(`/auth/signin`);
+    const data = await syncUserData(userCredential.user);
 
-    return response.data;
+    return data;
   } catch (error) {
     console.error("Sign-In Error:", error);
     throw error;

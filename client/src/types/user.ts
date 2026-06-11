@@ -2,33 +2,26 @@ export interface User {
   id: string;
   email: string;
   firstName: string;
-  lastName: string;
-  bio?: string;
-  birthDate?: Date;
-  location?: string;
-  photoUrl?: string;
-  emailVerified?: boolean;
-  createdAt?: string;
-}
-
-export interface CreateUserForm {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
-
-export interface UpdateUserForm {
-  email?: string;
-  firstName?: string;
   lastName?: string;
   bio?: string;
   birthDate?: Date;
-  location?: string;
-  photoUrl?: string;
+  photoURL?: string;
+  emailVerified?: boolean;
+  createdAt?: Date;
 }
 
-export interface SignInForm {
-  email: string;
+export type CreateUser = Pick<
+  User,
+  "email" | "firstName" | "lastName" | "photoURL"
+> & {
   password: string;
-}
+};
+
+export type SignInUser = Pick<User, "email"> & {
+  password: string;
+};
+
+export type UpdateUser = Omit<
+  User,
+  "id" | "email" | "createdAt" | "emailVerified"
+>;

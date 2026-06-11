@@ -6,31 +6,42 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 import { AllExceptionsFilter } from './common/filters/all-exception.filter';
 import { INestApplication } from '@nestjs/common';
-
-const server = express();
+import { Express } from 'express';
 
 const configureApp = (app: INestApplication) => {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true,
       transform: true,
     }),
   );
   app.enableCors();
 };
 
-export const createNestServer = async (expressInstance: express.Express) => {
+let cachedServer: Express | undefined;
+
+const bootstrapNestApp = async (expressInstance: Express) => {
   const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(expressInstance),
   );
   configureApp(app);
-  return app.init();
+  await app.init();
 };
 
-export const api = onRequest(async (request, response) => {
-  await createNestServer(server);
-  server(request, response);
-});
+export const api = onRequest(
+  {
+    minInstances: 1,
+    maxInstances: 1,
+  },
+  async (request, response) => {
+    if (!cachedServer) {
+      console.log('Cold start: Initializing NestJS Server...');
+      cachedServer = express();
+      await bootstrapNestApp(cachedServer);
+    }
+
+    cachedServer(request, response);
+  },
+);

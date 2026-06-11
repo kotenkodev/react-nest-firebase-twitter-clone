@@ -16,7 +16,7 @@ import { auth } from "./config/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import BirdLoadingBar from "./components/BirdLoadingBar";
 import AnimationLayout from "./components/AnimationLayout";
-import apiClient from "./services/apiClient";
+import { getUser } from "./services/usersService";
 
 function App() {
   const setUser = useAuthStore((state) => state.setUser);
@@ -26,14 +26,14 @@ function App() {
       try {
         if (firebaseUser) {
           try {
-            const response = await apiClient.get("/users/me");
-            const customUserData = response.data;
+            const response = await getUser();
+            const customUserData = response;
             setUser(customUserData);
           } catch (e) {
             console.error("Error fetching user data from backend:", e);
             setUser({
               ...firebaseUser,
-              photoUrl: firebaseUser.photoURL || "",
+              photoURL: firebaseUser.photoURL || "",
             });
           }
         } else {

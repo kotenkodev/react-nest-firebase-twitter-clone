@@ -9,10 +9,14 @@ import { useState } from "react";
 import type { User } from "@/types/user";
 import { Input } from "../ui/input";
 import type z from "zod";
+import { updateUser } from "@/services/usersService";
+import { toast } from "sonner";
+import { useAuthStore } from "@/store/useAuthStore";
 
 type FormValues = z.infer<typeof profileInfoSchema>;
 
 export function ProfileInfoForm({ user }: { user: User }) {
+  const setUser = useAuthStore((state) => state.setUser);
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({
@@ -25,7 +29,22 @@ export function ProfileInfoForm({ user }: { user: User }) {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {};
+  const onSubmit = async (data: FormValues) => {
+    setIsLoading(true);
+    try {
+      console.log(user);
+      const updatedData: User = await updateUser(user.id, data);
+
+      setUser(updatedData);
+      console.log("Updated user data:", updatedData);
+
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating user:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <form className="flex-1 sm:pb-3" onSubmit={form.handleSubmit(onSubmit)}>
@@ -97,7 +116,11 @@ export function ProfileInfoForm({ user }: { user: User }) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Date of Birth</FieldLabel>
-                <DatePicker value={field.value} onChange={field.onChange} />
+                <DatePicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={fieldState.invalid || isLoading}
+                />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

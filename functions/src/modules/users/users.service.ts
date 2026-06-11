@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +24,7 @@ export class UsersService {
     return user;
   }
 
-  async create(id: string, data: Partial<User>): Promise<void> {
+  async create(id: string, data: Partial<CreateUserDto>): Promise<void> {
     const user = await this.findById(id);
     if (user) {
       throw new ConflictException('User already exists');
@@ -30,8 +32,16 @@ export class UsersService {
     return this.usersRepository.create(id, data);
   }
 
-  async update(id: string, data: Partial<User>): Promise<void> {
-    return this.usersRepository.update(id, data);
+  async update(id: string, data: UpdateUserDto): Promise<void> {
+    const userData = { ...data };
+
+    Object.keys(userData).forEach((key) => {
+      if (userData[key] === undefined) {
+        delete userData[key];
+      }
+    });
+
+    return this.usersRepository.update(id, userData);
   }
 
   async remove(id: string): Promise<void> {

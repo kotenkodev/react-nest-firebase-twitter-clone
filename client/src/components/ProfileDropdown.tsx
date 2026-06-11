@@ -36,7 +36,7 @@ export default function ProfileDropdown() {
       <DropdownMenu modal={false} open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Avatar className="w-8 h-8 hover:ring-2 hover:ring-primary hover:ring-offset-2">
-            <AvatarImage src={user?.photoUrl} alt={user?.email} />
+            <AvatarImage src={user?.photoURL} alt={user?.email} />
             <AvatarFallback>
               {getInitials(`${user?.firstName} ${user?.lastName}`)}
             </AvatarFallback>

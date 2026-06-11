@@ -10,12 +10,11 @@ import { useState } from "react";
 interface DatePickerProps {
   value?: Date;
   onChange?: (date: Date | undefined) => void;
-  disabled?: boolean;
 }
 
-export function DatePicker({ value, onChange, disabled }: DatePickerProps) {
+export function DatePicker({ value, onChange }: DatePickerProps) {
   const [open, setOpen] = useState(false);
-
+  console.log("DatePicker value:", value);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

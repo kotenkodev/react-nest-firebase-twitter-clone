@@ -1,8 +1,6 @@
-import TransitionLink from "@/components/TransitionLink";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { DatePicker } from "@/components/ui/date-picker";
 import {
   Card,
   CardContent,
@@ -12,22 +10,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getInitials } from "@/utils/getInitials";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, Loader2, Upload } from "lucide-react";
+import { Camera, Upload } from "lucide-react";
 import { useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import z from "zod";
 import { SecurityForm } from "@/components/forms/SecurityForm";
 import { ProfileInfoForm } from "@/components/forms/ProfileInfoForm";
 

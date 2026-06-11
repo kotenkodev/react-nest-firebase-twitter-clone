@@ -22,7 +22,7 @@ import { Link, useNavigate } from "react-router-dom";
 import GoogleButton from "./GoogleButton";
 import { useState } from "react";
 import { signUp } from "@/services/authService";
-import type { signUpSchema } from "@/schemas/auth.schema";
+import { signUpSchema } from "@/schemas/auth.schema";
 
 type FormValues = z.infer<typeof signUpSchema>;
 
@@ -48,7 +48,7 @@ export default function SignUpForm() {
 
       toast.success("Welcome back!");
       navigate("/");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Sign-up error:", error.code);
       const message =
         error.code === "auth/invalid-credential"
@@ -99,7 +99,6 @@ export default function SignUpForm() {
                     <Input
                       {...field}
                       type="text"
-                      placeholder="John"
                       autoComplete="given-name"
                       disabled={isLoading}
                     />
@@ -119,7 +118,6 @@ export default function SignUpForm() {
                     <Input
                       {...field}
                       type="text"
-                      placeholder="Doe"
                       autoComplete="family-name"
                       disabled={isLoading}
                     />
