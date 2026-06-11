@@ -1,27 +1,38 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { animatePageOut } from "../utils/animations";
 
 interface TransitionLinkProps {
   to: string;
-  label: string;
+  children: React.ReactNode;
   className?: string;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export default function TransitionLink({
   to,
-  label,
+  children,
   className,
+  onClick,
 }: TransitionLinkProps) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (onClick) {
+      onClick(e);
+    }
+    if (location.pathname === to) {
+      e.preventDefault();
+      return;
+    }
+
     e.preventDefault();
     animatePageOut(to, navigate);
   };
 
   return (
-    <a href={to} onClick={handleClick} className={className}>
-      {label}
-    </a>
+    <Link to={to} onClick={handleClick} className={className}>
+      {children}
+    </Link>
   );
 }

@@ -3,7 +3,7 @@ import TransitionLink from "@/components/TransitionLink";
 export default function Profile() {
   return (
     <div>
-      <title>Profile</title>
+      <title>Profile / Birb</title>
       Profile
       <button>
         <TransitionLink

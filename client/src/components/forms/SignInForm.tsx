@@ -71,7 +71,7 @@ export default function SignInForm() {
       </CardHeader>
 
       <CardContent className="grid gap-6">
-        <GoogleButton onSuccess={() => navigate("/home")} />
+        <GoogleButton onSuccess={() => navigate("/")} />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">

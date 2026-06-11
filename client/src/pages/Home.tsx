@@ -1,4 +1,4 @@
-import apiClient from "@/api/apiClient";
+import apiClient from "@/services/apiClient";
 import TransitionLink from "@/components/TransitionLink";
 import { useEffect } from "react";
 
@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div>
-      <title>My Feed</title>
+      <title>Feed / Birb</title>
       Home
       <button>
         <TransitionLink

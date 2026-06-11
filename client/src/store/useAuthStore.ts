@@ -2,10 +2,10 @@ import type { User } from "@/types/user";
 import { create } from "zustand";
 
 interface AuthState {
-  user: User;
+  user: User | null;
   isLoading: boolean;
   error: string | null;
-  setUser: (user: User) => void;
+  setUser: (user: User | null) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
 }

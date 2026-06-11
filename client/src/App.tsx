@@ -16,6 +16,7 @@ import { auth } from "./config/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import BirdLoadingBar from "./components/BirdLoadingBar";
 import AnimationLayout from "./components/AnimationLayout";
+import apiClient from "./services/apiClient";
 
 function App() {
   const setUser = useAuthStore((state) => state.setUser);
@@ -27,11 +28,16 @@ function App() {
           const idToken = await firebaseUser.getIdToken();
           const tokenResult = await firebaseUser.getIdTokenResult();
 
+          // const customUserData = await apiClient.get("/users/me", {});
+          // setUser({ ...firebaseUser, ...customUserData });
+          console.log(firebaseUser);
           setUser({
+            ...firebaseUser,
             idToken,
             pictureUrl: firebaseUser.photoURL || "",
             roles: tokenResult.claims ?? { admin: false },
           });
+          console.log(idToken);
         } else {
           setUser(null);
         }

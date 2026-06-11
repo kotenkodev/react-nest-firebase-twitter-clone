@@ -1,7 +1,7 @@
 export default function NotFound() {
   return (
     <div>
-      <title>Not Found</title>
+      <title>Birb - Not Found</title>
       NotFound
     </div>
   );

@@ -1,7 +1,7 @@
 export default function Post() {
   return (
     <div>
-      <title>Post</title>
+      <title>PostName / Birb</title>
       Post
     </div>
   );
