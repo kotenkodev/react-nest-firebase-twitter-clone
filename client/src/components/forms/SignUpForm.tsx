@@ -18,12 +18,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import GoogleButton from "./GoogleButton";
 import { useState } from "react";
 import { signUp } from "@/services/authService";
 import { signUpSchema } from "@/schemas/auth.schema";
 import { useAuthStore } from "@/store/useAuthStore";
+import TransitionLink from "../TransitionLink";
 
 type FormValues = z.infer<typeof signUpSchema>;
 
@@ -209,12 +210,12 @@ export default function SignUpForm() {
 
       <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-sm text-muted-foreground pt-0">
         <span>Already have an account?</span>
-        <Link
+        <TransitionLink
           to="/signin"
           className="font-medium text-primary hover:underline underline-offset-4"
         >
           Sign In
-        </Link>
+        </TransitionLink>
       </CardFooter>
     </Card>
   );

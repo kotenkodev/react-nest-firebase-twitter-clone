@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import TransitionLink from "@/components/TransitionLink";
 
 dayjs.extend(relativeTime);
 
@@ -79,7 +79,7 @@ export default function Post({ isModal }: PostProps) {
         )}
 
         <div className="space-y-4">
-          <Link
+          <TransitionLink
             to="/profile/123"
             className="flex items-center gap-3 w-fit self-start no-underline group"
           >
@@ -103,13 +103,13 @@ export default function Post({ isModal }: PostProps) {
                 {dayjs(post.createdAt).fromNow()}
               </span>
             </div>
-          </Link>
+          </TransitionLink>
 
           <div className="space-y-3 pt-2">
             <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground/90 leading-tight">
               {post.title}
             </h2>
-            <p className="text-base md:text-lg text-foreground/90 break-words leading-relaxed whitespace-pre-wrap tracking-normal">
+            <p className="text-base md:text-lg text-foreground/90 wrap-break-word leading-relaxed whitespace-pre-wrap tracking-normal">
               {post.content}
             </p>
           </div>
@@ -135,7 +135,7 @@ export default function Post({ isModal }: PostProps) {
         </div>
       </div>
 
-      <div className="lg:col-span-2 border-t lg:border-t-0 lg:border-l lg:pl-8 pt-8 lg:pt-0 h-full min-h-[300px]">
+      <div className="lg:col-span-2 border-t lg:border-t-0 lg:border-l lg:pl-8 pt-8 lg:pt-0 h-full min-h-75">
         <h3 className="font-bold text-xl tracking-tight mb-4 text-foreground">
           Comments ({post.commentsCount})
         </h3>

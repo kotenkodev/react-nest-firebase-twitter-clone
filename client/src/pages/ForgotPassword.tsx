@@ -26,10 +26,11 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import type z from "zod";
 import { ChevronLeft, Mail, Lock, CheckCircle2 } from "lucide-react";
+import TransitionLink from "@/components/TransitionLink";
 
 type ResetFormValues = z.infer<typeof forgetPasswordSchema>;
 type SendEmailValues = z.infer<typeof sendResetEmailSchema>;
@@ -170,7 +171,11 @@ export default function ForgotPassword() {
                   )}
                 />
               </FieldGroup>
-              <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full mt-2"
+                disabled={isLoading}
+              >
                 {isLoading ? "Updating..." : "Update Password"}
               </Button>
             </form>
@@ -219,13 +224,13 @@ export default function ForgotPassword() {
         </CardContent>
 
         <CardFooter className="flex justify-center border-t bg-muted/50 py-4">
-          <Link
+          <TransitionLink
             to="/signin"
             className="flex items-center text-sm font-medium text-primary hover:underline underline-offset-4"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
             Back to Sign In
-          </Link>
+          </TransitionLink>
         </CardFooter>
       </Card>
     </Container>

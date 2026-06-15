@@ -18,12 +18,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import GoogleButton from "./GoogleButton";
 import { useState } from "react";
 import { signIn } from "@/services/authService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { signInSchema } from "@/schemas/auth.schema";
+import TransitionLink from "../TransitionLink";
 
 type FormValues = z.infer<typeof signInSchema>;
 
@@ -116,12 +117,12 @@ export default function SignInForm() {
                 <Field data-invalid={fieldState.invalid}>
                   <div className="flex items-center justify-between">
                     <FieldLabel>Password</FieldLabel>
-                    <Link
+                    <TransitionLink
                       to="/forgot-password"
                       className="text-xs text-primary hover:underline underline-offset-4"
                     >
                       Forgot password?
-                    </Link>
+                    </TransitionLink>
                   </div>
                   <Input
                     {...field}
@@ -150,12 +151,12 @@ export default function SignInForm() {
 
       <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-sm text-muted-foreground">
         <span>Don't have an account?</span>
-        <Link
+        <TransitionLink
           to="/signup"
           className="font-medium text-primary hover:underline underline-offset-4"
         >
           Sign Up
-        </Link>
+        </TransitionLink>
       </CardFooter>
     </Card>
   );
