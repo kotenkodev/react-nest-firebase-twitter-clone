@@ -10,8 +10,8 @@ service firebase.storage {
                    && request.auth.uid == userId
                    // Force the file to be an image
                    && request.resource.contentType.matches('image/.*')
-                   // Strictly enforce a 5MB size limit on the server
-                   && request.resource.size < 5 * 1024 * 1024;
+                   // Strictly enforce a 10MB size limit on the server
+                   && request.resource.size < 10 * 1024 * 1024;
     }
   }
 }

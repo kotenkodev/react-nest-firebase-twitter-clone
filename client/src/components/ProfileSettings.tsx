@@ -1,5 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import {
   Card,
@@ -11,50 +9,16 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAuthStore } from "@/store/useAuthStore";
-import { getInitials } from "@/utils/getInitials";
-import { Camera, Loader2, Upload } from "lucide-react";
-import { useRef, useState } from "react";
 import { SecurityForm } from "@/components/forms/SecurityForm";
 import { ProfileInfoForm } from "@/components/forms/ProfileInfoForm";
-import { uploadAvatar } from "@/services/storageService";
-import { updateUser } from "@/services/usersService";
 import { toast } from "sonner";
+import { AccountModal } from "./AccountModal";
+import AvatarUpload from "./AvatarUpload";
+import { deleteUser } from "@/services/usersService";
+import { deleteAccount } from "@/services/authService";
 
 export default function Profile() {
   const { user, setUser } = useAuthStore();
-  const [avatarPreview, setAvatarPreview] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleAvatarClick = () => fileInputRef.current?.click();
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setAvatarPreview(URL.createObjectURL(file));
-      setSelectedFile(file);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile || !user) return;
-
-    setIsUploading(true);
-    try {
-      const downloadURL = await uploadAvatar(user.id, selectedFile);
-      const updatedUser = await updateUser(user.id, { photoURL: downloadURL });
-
-      setUser(updatedUser);
-
-      toast.success("Profile picture updated!");
-      setSelectedFile(null);
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Failed to upload image. Please try again.");
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   if (!user) {
     return (
@@ -62,6 +26,18 @@ export default function Profile() {
         <p className="text-center text-muted-foreground">User not found.</p>
       </Container>
     );
+  }
+
+  async function handleDeleteAccount() {
+    try {
+      const response = await deleteUser(user.id);
+      await deleteAccount();
+
+      toast.success("Account deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete account. Please try again.");
+    } finally {
+    }
   }
 
   return (
@@ -76,60 +52,7 @@ export default function Profile() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row items-center gap-6 py-4">
-            <div
-              className="relative inline-block cursor-pointer group shrink-0"
-              onClick={handleAvatarClick}
-            >
-              <Avatar className="h-24 w-24 border-4 border-background shadow-sm group-hover:border-primary/50 transition-colors">
-                <AvatarImage
-                  src={avatarPreview || user.photoURL}
-                  alt="User avatar"
-                  className="object-cover"
-                />
-                <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                  {getInitials(`${user.firstName} ${user.lastName}`)}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera className="h-8 w-8 text-white" />
-              </div>
-
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/png, image/jpeg, image/webp"
-              />
-            </div>
-
-            <div className="space-y-2 text-center sm:text-left flex-1">
-              <h3 className="font-medium">Profile Picture</h3>
-              <p className="text-sm text-muted-foreground max-w-sm">
-                Click the avatar to upload a new image. Recommended size is
-                256x256px.
-              </p>
-              {selectedFile && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="secondary"
-                  className="mt-2"
-                  onClick={handleUpload}
-                  disabled={isUploading}
-                >
-                  {isUploading ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Upload className="w-4 h-4 mr-2" />
-                  )}
-                  Upload selected file
-                </Button>
-              )}
-            </div>
-          </div>
+          <AvatarUpload user={user} setUser={setUser} />
 
           <Separator />
 
@@ -148,9 +71,15 @@ export default function Profile() {
           <Separator />
         </CardContent>
         <CardFooter>
-          <div>Danger Zone</div>
-
-          <Button variant="destructive">Delete Account</Button>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div>
+              <h3 className="font-medium">Danger Zone</h3>
+              <p className="text-sm text-muted-foreground">
+                Permanently delete your account and all associated data.
+              </p>
+            </div>
+            <AccountModal onDeleteAccount={handleDeleteAccount} />
+          </div>
         </CardFooter>
       </Card>
     </Container>
