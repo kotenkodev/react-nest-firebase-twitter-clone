@@ -32,7 +32,7 @@ export class UsersService {
     return this.usersRepository.create(id, data);
   }
 
-  async update(id: string, data: UpdateUserDto): Promise<void> {
+  async update(id: string, data: UpdateUserDto): Promise<User> {
     const userData = { ...data };
 
     Object.keys(userData).forEach((key) => {

@@ -8,7 +8,6 @@ import DefaultLayout from "./layout/DefaultLayout";
 import MainLayout from "./layout/MainLayout";
 import NotFound from "./pages/NotFound";
 import Post from "./pages/Post";
-import Profile from "./pages/ProfileView";
 import { Toaster } from "sonner";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
@@ -27,15 +26,33 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
+          const currentStoreUser = useAuthStore.getState().user;
+          if (
+            currentStoreUser?.id === firebaseUser.uid &&
+            currentStoreUser.firstName
+          ) {
+            setLoading(false);
+            return;
+          }
+
           try {
             const response = await getUser();
-            const customUserData = response;
-            setUser(customUserData);
+            setUser(response);
           } catch (e) {
             console.error("Error fetching user data from backend:", e);
+
+            const [firstName = "", ...lastNameParts] = (
+              firebaseUser.displayName || ""
+            ).split(" ");
+            const lastName = lastNameParts.join(" ");
+
             setUser({
-              ...firebaseUser,
+              id: firebaseUser.uid,
+              email: firebaseUser.email || "",
+              firstName: firstName || "User",
+              lastName: lastName,
               photoURL: firebaseUser.photoURL || "",
+              emailVerified: firebaseUser.emailVerified,
             });
           }
         } else {

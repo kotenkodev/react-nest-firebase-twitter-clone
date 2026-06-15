@@ -14,8 +14,6 @@ import { ProfileInfoForm } from "@/components/forms/ProfileInfoForm";
 import { toast } from "sonner";
 import { AccountModal } from "./AccountModal";
 import AvatarUpload from "./AvatarUpload";
-import { deleteUser } from "@/services/usersService";
-import { deleteAccount } from "@/services/authService";
 
 export default function Profile() {
   const { user, setUser } = useAuthStore();
@@ -30,8 +28,8 @@ export default function Profile() {
 
   async function handleDeleteAccount() {
     try {
-      const response = await deleteUser(user.id);
-      await deleteAccount();
+      // const response = await deleteUser(user.id);
+      // await deleteAccount();
 
       toast.success("Account deleted successfully!");
     } catch (error) {

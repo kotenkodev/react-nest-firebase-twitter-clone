@@ -21,7 +21,7 @@ export default function GoogleButton({
     try {
       const user = await signInWithGoogle();
       setUser(user);
-      toast.success("Successfully signed in!");
+      toast.success("Successfully signed in! Welcome back!");
       onSuccess?.(user);
     } catch (error: any) {
       console.error("Error during Google Sign-In:", error.message);

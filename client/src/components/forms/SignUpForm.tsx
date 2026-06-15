@@ -23,10 +23,12 @@ import GoogleButton from "./GoogleButton";
 import { useState } from "react";
 import { signUp } from "@/services/authService";
 import { signUpSchema } from "@/schemas/auth.schema";
+import { useAuthStore } from "@/store/useAuthStore";
 
 type FormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpForm() {
+  const setUser = useAuthStore((state) => state.setUser);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -44,16 +46,19 @@ export default function SignUpForm() {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      await signUp(data);
+      const user = await signUp(data);
+      setUser(user);
 
-      toast.success("Welcome back!");
+      toast.success("Successfully signed up! Welcome aboard!");
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign-up error:", error.code);
       const message =
-        error.code === "auth/invalid-credential"
-          ? "Invalid email or password."
-          : "Failed to sign up. Please check your credentials.";
+        error.code === "auth/email-already-in-use"
+          ? "An account with this email already exists. Please sign in instead."
+          : error.code === "auth/invalid-credential"
+            ? "Invalid email or password."
+            : "Failed to sign up. Please check your credentials.";
       toast.error(message);
     } finally {
       setIsLoading(false);

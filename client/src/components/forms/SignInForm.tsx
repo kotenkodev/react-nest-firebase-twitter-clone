@@ -45,11 +45,13 @@ export default function SignInForm() {
     try {
       const user = await signIn(data);
       setUser(user);
-      toast.success("Welcome back!");
+
+      toast.success("Successfully signed in! Welcome back!");
       navigate("/");
     } catch (error: any) {
       console.error("Sign-in error:", error.code);
       const message =
+        error.code === "auth/wrong-password" ||
         error.code === "auth/invalid-credential"
           ? "Invalid email or password."
           : "Failed to sign in. Please check your credentials.";
