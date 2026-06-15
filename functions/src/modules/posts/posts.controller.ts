@@ -32,8 +32,8 @@ export class PostsController {
 
   @UseGuards(FirebaseAuthGuard)
   @Post()
-  async create(@GetUser('uid') uid: string, @Body() dto: CreatePostDto) {
-    return this.postsService.create(uid, dto);
+  async create(@GetUser('uid') userId: string, @Body() dto: CreatePostDto) {
+    return this.postsService.create(userId, dto);
   }
 
   @UseGuards(FirebaseAuthGuard, OwnershipGuard)
@@ -45,7 +45,6 @@ export class PostsController {
   @Patch(':id')
   async updatePostById(
     @Param('id') id: string,
-
     @Body() postData: UpdatePostDto,
   ) {
     return this.postsService.update(id, postData);

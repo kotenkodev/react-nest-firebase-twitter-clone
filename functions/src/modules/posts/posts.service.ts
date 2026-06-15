@@ -3,10 +3,14 @@ import { PostsRepository } from './posts.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './entities/post.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { UsersRepository } from '../users/users.repository';
 
 @Injectable()
 export class PostsService {
-  constructor(private readonly postsRepository: PostsRepository) {}
+  constructor(
+    private readonly postsRepository: PostsRepository,
+    private readonly userRepository: UsersRepository,
+  ) {}
 
   async findOne(id: string): Promise<Post> {
     const post = await this.postsRepository.findOne(id);
@@ -23,9 +27,19 @@ export class PostsService {
   async create(uid: string, dto: CreatePostDto): Promise<Post> {
     const { id, ...postData } = dto;
 
+    const user = await this.userRepository.findOne(uid);
+    if (!user) {
+      throw new NotFoundException(`User with UID ${uid} not found`);
+    }
+
     return this.postsRepository.create(id, {
       ...postData,
       authorId: uid,
+      author: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        photoURL: user.photoURL,
+      },
     });
   }
 

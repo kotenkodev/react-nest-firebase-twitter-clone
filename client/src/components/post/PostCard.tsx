@@ -40,13 +40,15 @@ export default function PostCard({ post }: { post: Post }) {
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       {post.photoURL && (
-        <img
-          src={post.photoURL}
-          alt="Post media"
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.02]"
-        />
+        <div className="relative w-full flex justify-center overflow-hidden">
+          <img
+            src={post.photoURL}
+            alt="Post media"
+            className="max-h-80 w-auto max-w-full object-contain transition-transform duration-300 hover:scale-[1.02]"
+          />
+        </div>
       )}
       <CardHeader>
         <TransitionLink
