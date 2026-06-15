@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import PostDialog from "@/components/post/PostDialog";
 import { VerifyNotification } from "@/components/VerifyNotification";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Outlet } from "react-router-dom";
@@ -15,6 +16,8 @@ export default function MainLayout() {
       <main className="flex-1 w-full">
         <Outlet />
       </main>
+
+      <PostDialog />
     </div>
   );
 }

@@ -13,15 +13,18 @@ import {
   CogIcon,
   MenuIcon,
   SquareArrowRightExit,
+  StickyNotePlusIcon,
   UserIcon,
 } from "lucide-react";
 import TransitionLink from "./TransitionLink";
 import { signOut } from "@/services/authService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useState } from "react";
+import { useUIStore } from "@/store/useUIStore";
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const { setPostDialogOpen } = useUIStore();
   const { setUser, setLoading, setError } = useAuthStore();
 
   const handleSignOut = async () => {
@@ -79,8 +82,21 @@ export function MobileMenu() {
             <span>Settings</span>
           </TransitionLink>
 
+          <button
+            type="button"
+            onClick={() => {
+              setPostDialogOpen(true);
+              setIsOpen(false);
+            }}
+            className={navItemStyles}
+          >
+            <StickyNotePlusIcon className="h-5 w-5" />
+            <span>Create Post</span>
+          </button>
+
           <div className="pt-4 mt-4 border-t">
-            <div
+            <button
+              type="button"
               onClick={() => {
                 handleSignOut();
                 setIsOpen(false);
@@ -89,7 +105,7 @@ export function MobileMenu() {
             >
               <SquareArrowRightExit className="h-5 w-5" />
               <span>Logout</span>
-            </div>
+            </button>
           </div>
         </div>
 

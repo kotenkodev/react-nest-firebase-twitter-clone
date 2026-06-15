@@ -8,14 +8,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { CogIcon, SquareArrowRightExit, UserIcon } from "lucide-react";
+import {
+  CogIcon,
+  SquareArrowRightExit,
+  StickyNotePlusIcon,
+  UserIcon,
+} from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import TransitionLink from "./TransitionLink";
 import { getInitials } from "@/utils/getInitials";
 import { signOut } from "@/services/authService";
+import { useUIStore } from "@/store/useUIStore";
 
 export default function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const { setPostDialogOpen } = useUIStore();
   const { user, setUser, setLoading, setError } = useAuthStore();
 
   const handleSignOut = async () => {
@@ -81,6 +88,19 @@ export default function ProfileDropdown() {
               <CogIcon className="h-4 w-4 opacity-70" />
               <span>Settings</span>
             </TransitionLink>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="p-0 mt-1">
+            <button
+              type="button"
+              className="flex w-full items-center gap-3 cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              onClick={() => {
+                setPostDialogOpen(true);
+                setIsOpen(false);
+              }}
+            >
+              <StickyNotePlusIcon className="h-4 w-4 opacity-70" />
+              <span>Create Post</span>
+            </button>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="my-2" />
