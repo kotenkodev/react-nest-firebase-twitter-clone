@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
@@ -20,9 +20,13 @@ import ProfileSettings from "./pages/ProfileSettings";
 import ProfileView from "./pages/ProfileView";
 import ForgotPassword from "./pages/ForgotPassword";
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const background = location.state && location.state.background;
+
   const setUser = useAuthStore((state) => state.setUser);
   const { setLoading, isLoading } = useAuthStore((state) => state);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
@@ -75,36 +79,49 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AnimationLayout />}>
-            <Route element={<PublicRoute />}>
-              <Route element={<DefaultLayout />}>
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-              </Route>
+      <Routes location={background || location}>
+        <Route element={<AnimationLayout />}>
+          <Route element={<PublicRoute />}>
+            <Route element={<DefaultLayout />}>
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
             </Route>
-            <Route element={<ProtectedRoute />}>
-              <Route element={<MainLayout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/post/:id" element={<Post />} />
-
-                <Route path="/profile">
-                  <Route index element={<ProfileView />} />
-                  <Route path="settings" element={<ProfileSettings />} />
-                  <Route path=":id" element={<ProfileView />} />
-                </Route>
-
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Route>
-            <Route path="*" element={<NotFound />} />
           </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<Home />} />
+
+              <Route path="/post/:id" element={<Post />} />
+
+              <Route path="/profile">
+                <Route index element={<ProfileView />} />
+                <Route path="settings" element={<ProfileSettings />} />
+                <Route path=":id" element={<ProfileView />} />
+              </Route>
+
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+
+      {background && (
+        <Routes>
+          <Route path="/post/:id" element={<Post isModal />} />
         </Routes>
-      </BrowserRouter>
-      <Toaster />
+      )}
     </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+      <Toaster />
+    </BrowserRouter>
   );
 }
 

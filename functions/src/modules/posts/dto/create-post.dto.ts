@@ -1,22 +1,26 @@
 import {
-  IsEmail,
   IsString,
   IsNotEmpty,
-  MinLength,
-  Matches,
   IsOptional,
+  IsUrl,
+  MinLength,
+  MaxLength,
 } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
+  @MinLength(0)
+  @MaxLength(150)
   title: string;
 
   @IsString()
   @IsNotEmpty()
-  description: string;
+  @MinLength(0)
+  @MaxLength(5000)
+  content: string;
 
-  @IsString()
   @IsOptional()
-  pictureUrl: string;
+  @IsUrl()
+  photoURL?: string;
 }

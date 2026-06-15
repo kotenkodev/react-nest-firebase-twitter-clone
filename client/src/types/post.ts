@@ -4,6 +4,11 @@ export interface Post {
   content: string;
   photoURL?: string;
   authorId: string;
+  author?: {
+    firstName: string;
+    lastName: string;
+    photoURL: string;
+  };
   commentsCount: number;
   dislikesCount: number;
   likesCount: number;

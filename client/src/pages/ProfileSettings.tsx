@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAuthStore } from "@/store/useAuthStore";
-import { SecurityForm } from "@/components/forms/SecurityForm";
-import { ProfileInfoForm } from "@/components/forms/ProfileInfoForm";
+import { SecurityForm } from "@/components/profile/SecurityForm";
+import { ProfileInfoForm } from "@/components/profile/ProfileInfoForm";
 import { toast } from "sonner";
-import { AccountModal } from "../components/AccountModal";
-import AvatarUpload from "../components/AvatarUpload";
+import { AccountModal } from "../components/profile/AccountModal";
+import AvatarUpload from "../components/profile/AvatarUpload";
 
 export default function Profile() {
   const { user, setUser } = useAuthStore();

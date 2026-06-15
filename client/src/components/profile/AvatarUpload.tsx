@@ -1,8 +1,8 @@
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getInitials } from "@/utils/getInitials";
 import { Camera, Loader2, Upload } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { updateUser } from "@/services/usersService";
 import { uploadAvatar } from "@/services/storageService";
 import { useRef, useState } from "react";
