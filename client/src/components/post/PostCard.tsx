@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getInitials } from "@/utils/getInitials";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { Button } from "../ui/button";
 
 dayjs.extend(relativeTime);
 
@@ -24,8 +25,10 @@ export default function PostCard({ post }: { post: Post }) {
 
   const location = useLocation();
 
-  const likedStyles = "bg-green-100 text-green-800 hover:bg-green-200";
-  const dislikedStyles = "bg-red-100 text-red-800 hover:bg-red-200";
+  const likedStyles =
+    "bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer";
+  const dislikedStyles =
+    "bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer";
 
   function handleReactionClick(reaction: "like" | "dislike") {
     try {
@@ -45,8 +48,11 @@ export default function PostCard({ post }: { post: Post }) {
         />
       )}
       <CardHeader>
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 border shadow-sm">
+        <Link
+          to={`/profile/${post.authorId}`}
+          className="flex items-center gap-3 w-fit self-start no-underline group"
+        >
+          <Avatar className="h-10 w-10 border shadow-sm group-hover:opacity-90 transition-opacity">
             <AvatarImage
               src={post.author?.photoURL}
               alt={post.author?.firstName}
@@ -59,14 +65,14 @@ export default function PostCard({ post }: { post: Post }) {
           </Avatar>
 
           <div className="flex flex-col">
-            <span className="text-sm font-semibold tracking-tight text-foreground">
+            <span className="text-sm font-semibold tracking-tight text-foreground group-hover:underline">
               {post.author?.firstName} {post.author?.lastName}
             </span>
             <span className="text-xs text-muted-foreground">
               {dayjs(post.createdAt).fromNow()}
             </span>
           </div>
-        </div>
+        </Link>
 
         <CardTitle>
           <p
@@ -81,13 +87,14 @@ export default function PostCard({ post }: { post: Post }) {
             {post.content}
           </p>
           {post.content.length > 150 && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => setContentExpanded(!contentExpanded)}
-              className="text-xs font-semibold text-primary hover:underline mt-2 block"
+              className="text-xs font-semibold text-primary hover:underline"
             >
               {contentExpanded ? "Show less" : "Show more"}
-            </button>
+            </Button>
           )}
         </CardDescription>
       </CardHeader>

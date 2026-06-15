@@ -36,12 +36,13 @@ export function VerifyNotification() {
         </div>
       </div>
 
-      <AlertAction className="w-full sm:w-auto shrink-0">
+      {/* FIXED: Handled width constraints and alignments for premium mobile responsiveness */}
+      <AlertAction className="w-fit shrink-0 pl-8 sm:pl-0 self-start sm:self-auto">
         <Button
           onClick={handleSendVerificationEmail}
           size="sm"
           variant="outline"
-          className="w-full sm:w-auto bg-transparent border-amber-300 hover:bg-amber-100 text-amber-900 dark:border-amber-700 dark:hover:bg-amber-900 dark:text-amber-50"
+          className="bg-transparent border-amber-300 hover:bg-amber-100 text-amber-900 dark:border-amber-700 dark:hover:bg-amber-900 dark:text-amber-50"
         >
           Send Email
         </Button>

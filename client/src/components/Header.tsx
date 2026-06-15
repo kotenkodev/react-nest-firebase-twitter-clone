@@ -1,8 +1,8 @@
-import { Bird, Menu } from "lucide-react";
-import { Button } from "./ui/button";
+import { Bird } from "lucide-react";
 import ProfileDropdown from "./ProfileDropdown";
 import { useAuthStore } from "@/store/useAuthStore";
 import TransitionLink from "./TransitionLink";
+import { MobileMenu } from "./MobileMenu";
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
@@ -27,12 +27,7 @@ export default function Header() {
             <ProfileDropdown />
           </div>
 
-          <nav className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="h-9 w-9 md:hidden">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
-          </nav>
+          <MobileMenu />
         </div>
       </div>
     </header>
