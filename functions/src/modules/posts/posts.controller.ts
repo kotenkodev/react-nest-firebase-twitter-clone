@@ -15,6 +15,8 @@ import { CheckOwnership } from '../../common/decorators/check-ownership.decorato
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from '../../common/decorators/get-user.decorator';
+import { GetResource } from 'src/common/decorators/get-resource.decorator';
+import { Post as PostEntity } from './entities/post.entity';
 
 @Controller('posts')
 export class PostsController {
@@ -35,6 +37,7 @@ export class PostsController {
   // @Patch(':id')
   // async updatePostById(
   //   @Param('id') id: string,
+  //   @GetResource() post: PostEntity,
   //   @Body() postData: UpdatePostDto,
   // ) {
   //   return this.postsService.update(id, postData);

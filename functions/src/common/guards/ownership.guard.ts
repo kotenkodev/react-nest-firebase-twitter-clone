@@ -56,7 +56,7 @@ export class OwnershipGuard implements CanActivate {
       );
     }
 
-    const data = doc.data();
+    const data = { id: doc.id, ...doc.data() };
 
     if (options.resource === 'users') {
       if (doc.id !== user.uid) {
@@ -70,6 +70,7 @@ export class OwnershipGuard implements CanActivate {
       throw new ForbiddenException('You do not own this resource');
     }
 
+    request.resource = data;
     return true;
   }
 }
