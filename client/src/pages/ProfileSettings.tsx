@@ -12,8 +12,8 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { SecurityForm } from "@/components/forms/SecurityForm";
 import { ProfileInfoForm } from "@/components/forms/ProfileInfoForm";
 import { toast } from "sonner";
-import { AccountModal } from "./AccountModal";
-import AvatarUpload from "./AvatarUpload";
+import { AccountModal } from "../components/AccountModal";
+import AvatarUpload from "../components/AvatarUpload";
 
 export default function Profile() {
   const { user, setUser } = useAuthStore();

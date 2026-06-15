@@ -22,8 +22,8 @@ export const securitySchema = z
   .object({
     currentPassword: z
       .string()
-      .min(6, "Password must be at least 6 characters.")
-      .max(64, { message: "Current password cannot exceed 64 characters." }),
+      .max(64, { message: "Current password cannot exceed 64 characters." })
+      .optional(),
     newPassword: z
       .string()
       .min(6, "Password must be at least 6 characters.")

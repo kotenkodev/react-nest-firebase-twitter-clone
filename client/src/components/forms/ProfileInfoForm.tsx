@@ -32,11 +32,9 @@ export function ProfileInfoForm({ user }: { user: User }) {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      console.log(user);
       const updatedData: User = await updateUser(user.id, data);
 
       setUser(updatedData);
-      console.log("Updated user data:", updatedData);
 
       toast.success("Profile updated successfully!");
     } catch (error) {
