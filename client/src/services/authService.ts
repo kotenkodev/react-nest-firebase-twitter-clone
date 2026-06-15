@@ -1,5 +1,7 @@
 import { auth, googleProvider } from "@/config/firebaseConfig";
 import {
+  applyActionCode,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
@@ -95,6 +97,7 @@ export const updateUserPassword = async (
 
     await reauthenticateWithCredential(user, credential);
     await updatePassword(user, newPassword);
+    await signOut();
   } catch (error) {
     console.error("Password Update Error:", error);
     throw error;
@@ -113,11 +116,44 @@ export const createUserPassword = async (newPassword: string) => {
   }
 };
 
-export const forgotPassword = async (email: string) => {
+export const sendNewEmailVerification = async () => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No authenticated user found.");
+
+    await sendEmailVerification(user);
+  } catch (error) {
+    console.error("Email Verification Error:", error);
+    throw error;
+  }
+};
+
+export const completeEmailVerification = async (oobCode: string) => {
+  try {
+    await applyActionCode(auth, oobCode);
+  } catch (error) {
+    console.error("Email Verification Error:", error);
+    throw error;
+  }
+};
+
+export const sendNewPasswordResetEmail = async (email: string) => {
   try {
     await sendPasswordResetEmail(auth, email);
   } catch (error) {
     console.error("Password Reset Error:", error);
+    throw error;
+  }
+};
+
+export const completePasswordReset = async (
+  oobCode: string,
+  newPassword: string,
+) => {
+  try {
+    await confirmPasswordReset(auth, oobCode, newPassword);
+  } catch (error) {
+    console.error("Password Reset Confirmation Error:", error);
     throw error;
   }
 };

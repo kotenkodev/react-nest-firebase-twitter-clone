@@ -16,8 +16,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import BirdLoadingBar from "./components/BirdLoadingBar";
 import AnimationLayout from "./components/AnimationLayout";
 import { getUser } from "./services/usersService";
-import ProfileSettings from "./components/ProfileSettings";
+import ProfileSettings from "./pages/ProfileSettings";
 import ProfileView from "./pages/ProfileView";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
   const setUser = useAuthStore((state) => state.setUser);
@@ -81,6 +82,7 @@ function App() {
               <Route element={<DefaultLayout />}>
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
               </Route>
             </Route>
             <Route element={<ProtectedRoute />}>

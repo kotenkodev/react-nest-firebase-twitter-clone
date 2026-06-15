@@ -18,12 +18,15 @@ export function SecurityForm() {
   const [hasPasswordProvider, setHasPasswordProvider] = useState(false);
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      setHasPasswordProvider(
-        user.providerData.some((p) => p.providerId === "password"),
-      );
-    }
+    const checkPasswordProvider = () => {
+      const user = auth.currentUser;
+      if (user) {
+        setHasPasswordProvider(
+          user.providerData.some((p) => p.providerId === "password"),
+        );
+      }
+    };
+    checkPasswordProvider();
   }, []);
 
   const form = useForm<FormValues>({
@@ -54,7 +57,7 @@ export function SecurityForm() {
       }
       toast.success(
         hasPasswordProvider
-          ? "Password updated successfully!"
+          ? "Password updated successfully! Sign in again with your new password."
           : "Password created successfully! You can now sign in with your email and password.",
       );
       form.reset({

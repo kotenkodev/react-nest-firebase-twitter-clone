@@ -66,7 +66,7 @@ export default function Profile() {
             <SecurityForm />
           </div>
 
-          <Separator />
+          <Separator className="block mt-3" />
         </CardContent>
         <CardFooter>
           <div className="flex flex-col sm:flex-row items-center gap-4">
