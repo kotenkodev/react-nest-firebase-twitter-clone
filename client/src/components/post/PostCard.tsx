@@ -16,6 +16,7 @@ import { getInitials } from "@/utils/getInitials";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "../ui/button";
+import TransitionLink from "../TransitionLink";
 
 dayjs.extend(relativeTime);
 
@@ -48,7 +49,7 @@ export default function PostCard({ post }: { post: Post }) {
         />
       )}
       <CardHeader>
-        <Link
+        <TransitionLink
           to={`/profile/${post.authorId}`}
           className="flex items-center gap-3 w-fit self-start no-underline group"
         >
@@ -72,7 +73,7 @@ export default function PostCard({ post }: { post: Post }) {
               {dayjs(post.createdAt).fromNow()}
             </span>
           </div>
-        </Link>
+        </TransitionLink>
 
         <CardTitle>
           <p
