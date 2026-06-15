@@ -13,4 +13,9 @@ export interface Post {
   dislikesCount: number;
   likesCount: number;
   createdAt: Date;
+  updatedAt: Date;
 }
+
+export type CreatePost = Pick<Post, "id" | "title" | "content" | "photoURL">;
+
+export type UpdatePost = Partial<Pick<Post, "title" | "content" | "photoURL">>;

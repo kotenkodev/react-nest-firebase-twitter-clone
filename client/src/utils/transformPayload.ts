@@ -1,3 +1,4 @@
+import type { Post } from "@/types/post";
 import type { User } from "@/types/user";
 
 const parseDate = (value: any): Date | undefined => {
@@ -17,5 +18,13 @@ export const transformUserPayload = (rawData: any): User => {
     ...rawData,
     birthDate: parseDate(rawData.birthDate),
     createdAt: parseDate(rawData.createdAt),
+  };
+};
+
+export const transformPostPayload = (rawData: any): Post => {
+  return {
+    ...rawData,
+    createdAt: parseDate(rawData.createdAt) || new Date(),
+    updatedAt: parseDate(rawData.updatedAt) || new Date(),
   };
 };

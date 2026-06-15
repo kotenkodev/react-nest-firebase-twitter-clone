@@ -5,9 +5,14 @@ import {
   IsUrl,
   MinLength,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreatePostDto {
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(0)
@@ -21,6 +26,7 @@ export class CreatePostDto {
   content: string;
 
   @IsOptional()
-  @IsUrl()
+  @ValidateIf((o, v) => v !== '' && v !== null)
+  @IsUrl({ require_tld: false })
   photoURL?: string;
 }

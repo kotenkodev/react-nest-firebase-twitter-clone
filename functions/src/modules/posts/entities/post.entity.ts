@@ -1,4 +1,4 @@
-export class Post {
+export interface Post {
   id: string;
   title: string;
   content: string;
@@ -8,4 +8,5 @@ export class Post {
   dislikesCount: number;
   likesCount: number;
   createdAt: Date;
+  updatedAt: Date;
 }

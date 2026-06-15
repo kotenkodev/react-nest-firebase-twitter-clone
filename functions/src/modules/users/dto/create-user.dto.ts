@@ -32,7 +32,6 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsUrl({ require_tld: false })
-  @MaxLength(250, { message: 'Bio cannot exceed 250 characters.' })
   photoURL?: string;
 
   @IsOptional()

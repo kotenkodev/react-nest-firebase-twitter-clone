@@ -9,4 +9,5 @@ export interface User {
   birthDate?: Date;
   emailVerified?: boolean;
   createdAt: Date;
+  updatedAt: Date;
 }
