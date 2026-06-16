@@ -21,7 +21,6 @@ service firebase.storage {
     match /posts/{postId} {
       allow read: if true; 
 
-      // CREATE: Check the incoming file's metadata stamp
       allow create: if isAuthenticated() 
                     && request.resource.metadata.authorId == request.auth.uid
                     && isValidImage(100);

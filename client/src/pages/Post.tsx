@@ -115,10 +115,10 @@ export default function Post({ isModal }: PostProps) {
             </TransitionLink>
 
             <div className="space-y-3 pt-2">
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground/90 leading-tight">
+              <h2 className="break-all text-2xl md:text-3xl font-extrabold tracking-tight text-foreground/90 leading-tight">
                 {post.title}
               </h2>
-              <p className="text-base md:text-lg text-foreground/90 wrap-break-word leading-relaxed whitespace-pre-wrap tracking-normal">
+              <p className="break-all text-base md:text-lg text-foreground/90 wrap-break-word leading-relaxed whitespace-pre-wrap tracking-normal">
                 {post.content}
               </p>
             </div>
@@ -181,9 +181,10 @@ export default function Post({ isModal }: PostProps) {
       <Card className="shadow-md border-muted/80 overflow-hidden rounded-xl">
         <CardHeader className="pb-6 border-b border-muted bg-muted/10">
           <CardTitle className="text-3xl font-extrabold tracking-tight">
-            {isLoading
-              ? "Loading Post..."
-              : `Viewing Post by ${post?.author?.firstName} ${post?.author?.lastName}`}
+            {isLoading && "Loading Post..."}
+            {post
+              ? `Viewing Post by ${post?.author?.firstName} ${post?.author?.lastName}`
+              : "Post not found"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 md:p-8 pt-8">{renderContent()}</CardContent>

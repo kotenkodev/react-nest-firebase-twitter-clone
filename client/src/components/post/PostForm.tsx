@@ -1,6 +1,6 @@
 import { postSchema } from "@/schemas/post.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
@@ -8,30 +8,35 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { createPost } from "@/services/postsService";
+import { createPost, updatePost } from "@/services/postsService";
 import { uploadPostImage } from "@/services/storageService";
 import { collection, doc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { ImagePlus, Loader2, X } from "lucide-react";
+import type { Post } from "@/types/post";
 
 type FormValues = z.infer<typeof postSchema>;
 
 type PostFormProps = {
   onSuccess?: () => void;
+  post?: Post | null;
 };
 
-export default function PostForm({ onSuccess }: PostFormProps) {
+export default function PostForm({ onSuccess, post }: PostFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    post?.photoURL || null,
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isEditMode = Boolean(post);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(postSchema),
     defaultValues: {
-      title: "",
-      content: "",
-      photoURL: "",
+      title: post?.title || "",
+      content: post?.content || "",
+      photoURL: post?.photoURL || "",
     },
   });
 
@@ -52,23 +57,27 @@ export default function PostForm({ onSuccess }: PostFormProps) {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      // 1. Generate a new Post ID on the client side
       const newPostRef = doc(collection(db, "posts"));
       const postId = newPostRef.id;
 
       let photoURL = data.photoURL;
 
-      // 2. If a file is selected, upload it to /posts/{postId}
       if (selectedFile) {
         photoURL = await uploadPostImage(postId, selectedFile);
       }
 
-      // 3. Create the post record via the backend API
-      await createPost({
-        ...data,
-        id: postId,
-        photoURL: photoURL || undefined,
-      });
+      if (isEditMode) {
+        await updatePost(post.id, {
+          ...data,
+          photoURL: photoURL,
+        });
+      } else {
+        await createPost({
+          ...data,
+          id: postId,
+          photoURL: photoURL,
+        });
+      }
 
       toast.success("Post created successfully!");
       form.reset();
@@ -81,6 +90,20 @@ export default function PostForm({ onSuccess }: PostFormProps) {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const initPost = () => {
+      if (post) {
+        form.reset({
+          title: post.title,
+          content: post.content,
+          photoURL: post.photoURL,
+        });
+        setPreviewUrl(post.photoURL || null);
+      }
+    };
+    initPost();
+  }, [post, form]);
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -111,7 +134,7 @@ export default function PostForm({ onSuccess }: PostFormProps) {
                 {...field}
                 placeholder="Tell your story..."
                 disabled={isLoading}
-                className="resize-none min-h-[120px]"
+                className="resize-none min-h-30"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -143,7 +166,9 @@ export default function PostForm({ onSuccess }: PostFormProps) {
               className="border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors border-muted-foreground/25"
             >
               <ImagePlus className="w-8 h-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Click to upload image</p>
+              <p className="text-sm text-muted-foreground">
+                Click to upload image
+              </p>
             </div>
           )}
           <input
@@ -166,8 +191,10 @@ export default function PostForm({ onSuccess }: PostFormProps) {
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
+              {isEditMode ? "Updating..." : "Creating..."}
             </>
+          ) : isEditMode ? (
+            "Update Post"
           ) : (
             "Create Post"
           )}

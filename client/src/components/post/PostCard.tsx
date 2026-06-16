@@ -6,7 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { MessageCircleIcon, ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
+import {
+  DeleteIcon,
+  EditIcon,
+  MessageCircleIcon,
+  ThumbsDownIcon,
+  ThumbsUpIcon,
+} from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Link, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -17,12 +23,18 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "../ui/button";
 import TransitionLink from "../TransitionLink";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useUIStore } from "@/store/useUIStore";
+import { deletePost } from "@/services/postsService";
 
 dayjs.extend(relativeTime);
 
 export default function PostCard({ post }: { post: Post }) {
   const [titleExpanded, setTitleExpanded] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
+  const { user } = useAuthStore();
+  const { setPostDialogOpen, setEditingPost } = useUIStore();
+  const isOwner = post.authorId === user?.id;
 
   const location = useLocation();
 
@@ -31,13 +43,35 @@ export default function PostCard({ post }: { post: Post }) {
   const dislikedStyles =
     "bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer";
 
-  function handleReactionClick(reaction: "like" | "dislike") {
+  function handleLikeClick(like: "like" | "dislike") {
     try {
-      toast.success(`You ${reaction}d the post!`);
+      toast.success(`You ${like}d the post!`);
     } catch (error) {
-      console.error(`Error handling ${reaction}:`, error);
+      console.error(`Error handling ${like}:`, error);
     }
   }
+
+  const openEditDialog = (post: Post) => {
+    try {
+      setEditingPost(post);
+      setPostDialogOpen(true);
+    } catch (error) {
+      console.error("Error opening edit dialog:", error);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    try {
+      // confrim dialog...
+
+      await deletePost(post.id);
+
+      toast.success("Post deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      toast.error("Failed to delete post. Please try again.");
+    }
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -80,13 +114,15 @@ export default function PostCard({ post }: { post: Post }) {
         <CardTitle>
           <p
             onClick={() => setTitleExpanded(!titleExpanded)}
-            className={titleExpanded ? "" : "line-clamp-1 wrap-break-word"}
+            className={`cursor-pointer break-all ${titleExpanded ? "whitespace-pre-wrap" : "line-clamp-1"}`}
           >
             {post.title}
           </p>
         </CardTitle>
         <CardDescription>
-          <p className={contentExpanded ? "" : "line-clamp-3"}>
+          <p
+            className={`break-all ${contentExpanded ? "whitespace-pre-wrap" : "line-clamp-3"}`}
+          >
             {post.content}
           </p>
           {post.content.length > 150 && (
@@ -101,29 +137,43 @@ export default function PostCard({ post }: { post: Post }) {
           )}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-end gap-4">
-        <Link to={`/post/${post.id}`} state={{ background: location }}>
-          <Badge variant="secondary">
-            <MessageCircleIcon className="w-5 h-5" />
-            {post.commentsCount}
+      <CardContent className="flex justify-between">
+        <div className="flex items-center gap-4">
+          {isOwner && (
+            <>
+              <Button variant="secondary" onClick={() => openEditDialog(post)}>
+                <EditIcon className="w-5 h-5" />
+              </Button>
+              <Button variant="secondary" onClick={handleDeletePost}>
+                <DeleteIcon className="w-5 h-5" />
+              </Button>
+            </>
+          )}
+        </div>
+        <div className="flex items-center gap-4">
+          <Link to={`/post/${post.id}`} state={{ background: location }}>
+            <Badge variant="secondary">
+              <MessageCircleIcon className="w-5 h-5" />
+              {post.commentsCount}
+            </Badge>
+          </Link>
+          <Badge
+            onClick={() => handleLikeClick("like")}
+            className={likedStyles}
+            variant="secondary"
+          >
+            <ThumbsUpIcon className="w-5 h-5" />
+            {post.likesCount}
           </Badge>
-        </Link>
-        <Badge
-          onClick={() => handleReactionClick("like")}
-          className={likedStyles}
-          variant="secondary"
-        >
-          <ThumbsUpIcon className="w-5 h-5" />
-          {post.likesCount}
-        </Badge>
-        <Badge
-          onClick={() => handleReactionClick("dislike")}
-          className={dislikedStyles}
-          variant="secondary"
-        >
-          <ThumbsDownIcon className="w-5 h-5" />
-          {post.dislikesCount}
-        </Badge>
+          <Badge
+            onClick={() => handleLikeClick("dislike")}
+            className={dislikedStyles}
+            variant="secondary"
+          >
+            <ThumbsDownIcon className="w-5 h-5" />
+            {post.dislikesCount}
+          </Badge>
+        </div>
       </CardContent>
     </Card>
   );
