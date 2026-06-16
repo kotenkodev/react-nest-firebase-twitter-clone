@@ -20,7 +20,7 @@ export class UsersService {
     return user;
   }
 
-  async create(id: string, data: Partial<CreateUserDto>): Promise<User> {
+  async create(id: string, data: Partial<CreateUserDto>): Promise<User | null> {
     const user = await this.usersRepository.findOne(id);
     if (user) {
       throw new ConflictException('User already exists');
@@ -28,7 +28,7 @@ export class UsersService {
     return this.usersRepository.create(id, data);
   }
 
-  async update(id: string, data: UpdateUserDto): Promise<User> {
+  async update(id: string, data: UpdateUserDto): Promise<User | null> {
     const userData = { ...data };
 
     Object.keys(userData).forEach((key) => {

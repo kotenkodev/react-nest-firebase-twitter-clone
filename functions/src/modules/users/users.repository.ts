@@ -21,17 +21,17 @@ export class UsersRepository {
     return mapToEntity(doc);
   }
 
-  async create(id: string, data: Partial<User>): Promise<User> {
+  async create(id: string, data: Partial<User>): Promise<User | null> {
     await this.collection.doc(id).set({
       ...data,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
     const doc = await this.collection.doc(id).get();
-    return mapToEntity(doc)!;
+    return mapToEntity(doc);
   }
 
-  async update(id: string, data: Partial<User>): Promise<User> {
+  async update(id: string, data: Partial<User>): Promise<User | null> {
     const docRef = this.collection.doc(id);
     await docRef.update({
       ...data,
@@ -39,7 +39,7 @@ export class UsersRepository {
     });
 
     const updatedDoc = await docRef.get();
-    return mapToEntity(updatedDoc)!;
+    return mapToEntity(updatedDoc);
   }
 
   async delete(id: string): Promise<void> {

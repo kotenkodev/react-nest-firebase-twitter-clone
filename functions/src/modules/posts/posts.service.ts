@@ -1,15 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './entities/post.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
+import { LikesService } from '../likes/likes.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     private readonly postsRepository: PostsRepository,
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => LikesService))
+    private readonly likesService: LikesService,
   ) {}
 
   async findOne(id: string): Promise<Post> {
@@ -24,7 +32,7 @@ export class PostsService {
     return this.postsRepository.findAll();
   }
 
-  async create(uid: string, dto: CreatePostDto): Promise<Post> {
+  async create(uid: string, dto: CreatePostDto): Promise<Post | null> {
     const { id, ...postData } = dto;
 
     const user = await this.usersService.findOne(uid);
@@ -43,7 +51,7 @@ export class PostsService {
     });
   }
 
-  async update(id: string, data: UpdatePostDto): Promise<Post> {
+  async update(id: string, data: UpdatePostDto): Promise<Post | null> {
     return this.postsRepository.update(id, data);
   }
 

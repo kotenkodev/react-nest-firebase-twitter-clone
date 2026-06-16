@@ -30,7 +30,7 @@ export class PostsRepository {
     return mapToEntity(doc);
   }
 
-  async create(id: string, data: Partial<Post>): Promise<Post> {
+  async create(id: string, data: Partial<Post>): Promise<Post | null> {
     await this.collection.doc(id).set({
       ...data,
       likesCount: 0,
@@ -40,10 +40,10 @@ export class PostsRepository {
       updatedAt: FieldValue.serverTimestamp(),
     });
     const doc = await this.collection.doc(id).get();
-    return mapToEntity(doc)!;
+    return mapToEntity(doc);
   }
 
-  async update(id: string, data: Partial<Post>): Promise<Post> {
+  async update(id: string, data: Partial<Post>): Promise<Post | null> {
     const docRef = this.collection.doc(id);
 
     await docRef.update({
@@ -52,7 +52,7 @@ export class PostsRepository {
     });
 
     const updatedDoc = await docRef.get();
-    return mapToEntity(updatedDoc)!;
+    return mapToEntity(updatedDoc);
   }
 
   async delete(id: string): Promise<void> {
