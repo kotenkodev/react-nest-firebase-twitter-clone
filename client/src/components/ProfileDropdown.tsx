@@ -22,7 +22,7 @@ import { useUIStore } from "@/store/useUIStore";
 
 export default function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const { setPostDialogOpen } = useUIStore();
+  const { setPostDialogOpen, setEditingPost } = useUIStore();
   const { user, setUser, setLoading, setError } = useAuthStore();
 
   const handleSignOut = async () => {
@@ -94,6 +94,7 @@ export default function ProfileDropdown() {
               type="button"
               className="flex w-full items-center gap-3 cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
               onClick={() => {
+                setEditingPost(null);
                 setPostDialogOpen(true);
                 setIsOpen(false);
               }}

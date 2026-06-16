@@ -1,32 +1,32 @@
 import {
-  IsString,
-  IsNotEmpty,
   IsOptional,
+  IsString,
   IsUrl,
-  MinLength,
   MaxLength,
   ValidateIf,
+  Validate,
 } from 'class-validator';
+import { PostValidationConstraint } from './post.validator';
 
 export class CreatePostDto {
+  @Validate(PostValidationConstraint)
+  _validation?: boolean;
+
   @IsString()
-  @IsNotEmpty()
   id: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @MinLength(0)
   @MaxLength(150)
-  title: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(0)
-  @MaxLength(5000)
-  content: string;
+  title?: string;
 
   @IsOptional()
-  @ValidateIf((o, v) => v !== '' && v !== null)
+  @IsString()
+  @MaxLength(5000)
+  content?: string;
+
+  @ValidateIf((object, value) => value !== '')
+  @IsOptional()
   @IsUrl({ require_tld: false })
   photoURL?: string;
 }

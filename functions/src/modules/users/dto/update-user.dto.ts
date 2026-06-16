@@ -1,26 +1,17 @@
+import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { CreateUserDto } from './create-user.dto';
 import {
-  IsString,
-  MinLength,
-  MaxLength,
-  IsOptional,
-  MaxDate,
   IsDate,
-  IsUrl,
+  IsOptional,
+  IsString,
+  MaxDate,
+  MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class UpdateUserDto {
-  @IsOptional()
-  @IsString()
-  @MinLength(3)
-  @MaxLength(50)
-  firstName?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  lastName?: string;
-
+export class UpdateUserDto extends PartialType(
+  OmitType(CreateUserDto, ['id', 'email'] as const),
+) {
   @IsOptional()
   @Type(() => Date)
   @IsDate()
@@ -31,8 +22,4 @@ export class UpdateUserDto {
   @IsString()
   @MaxLength(250, { message: 'Bio must be at most 250 characters.' })
   bio?: string;
-
-  @IsOptional()
-  @IsUrl({ require_tld: false })
-  photoURL?: string;
 }

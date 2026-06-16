@@ -1,19 +1,20 @@
 import { postSchema } from "@/schemas/post.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { createPost, updatePost } from "@/services/postsService";
 import { uploadPostImage } from "@/services/storageService";
 import { collection, doc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import type { Post } from "@/types/post";
+import ImageUploader from "../profile/ImageUploader";
+import { CountedTextarea } from "../CountedTextarea";
 
 type FormValues = z.infer<typeof postSchema>;
 
@@ -22,13 +23,13 @@ type PostFormProps = {
   post?: Post | null;
 };
 
+const MAX_CONTENT_LENGTH = postSchema.shape.content.maxLength;
+
 export default function PostForm({ onSuccess, post }: PostFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(
-    post?.photoURL || null,
-  );
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImageRemoved, setIsImageRemoved] = useState(false);
+
   const isEditMode = Boolean(post);
 
   const form = useForm<FormValues>({
@@ -40,33 +41,21 @@ export default function PostForm({ onSuccess, post }: PostFormProps) {
     },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  };
-
-  const removeImage = () => {
-    setSelectedFile(null);
-    setPreviewUrl(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      const newPostRef = doc(collection(db, "posts"));
-      const postId = newPostRef.id;
+      const postId =
+        isEditMode && post ? post.id : doc(collection(db, "posts")).id;
 
       let photoURL = data.photoURL;
 
       if (selectedFile) {
         photoURL = await uploadPostImage(postId, selectedFile);
+      } else if (isImageRemoved) {
+        photoURL = "";
       }
 
-      if (isEditMode) {
+      if (isEditMode && post) {
         await updatePost(post.id, {
           ...data,
           photoURL: photoURL,
@@ -79,118 +68,107 @@ export default function PostForm({ onSuccess, post }: PostFormProps) {
         });
       }
 
-      toast.success("Post created successfully!");
-      form.reset();
-      removeImage();
+      toast.success(`Post ${isEditMode ? "updated" : "created"} successfully!`);
       onSuccess?.();
     } catch (error: any) {
-      console.error("Failed to create post:", error);
-      toast.error("Failed to create post. Please try again.");
+      console.error("Failed to save post:", error);
+      toast.error(
+        `Failed to ${isEditMode ? "update" : "create"} post. Please try again.`,
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    const initPost = () => {
-      if (post) {
-        form.reset({
-          title: post.title,
-          content: post.content,
-          photoURL: post.photoURL,
-        });
-        setPreviewUrl(post.photoURL || null);
-      }
-    };
-    initPost();
-  }, [post, form]);
-
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <FieldGroup className="space-y-4">
-        <Controller
-          name="title"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Title</FieldLabel>
-              <Input
-                {...field}
-                type="text"
-                placeholder="What's the title?"
-                disabled={isLoading}
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name="content"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Content</FieldLabel>
-              <Textarea
-                {...field}
-                placeholder="Tell your story..."
-                disabled={isLoading}
-                className="resize-none min-h-30"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+      <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-start">
+        <div className="w-full">
+          <ImageUploader
+            defaultImage={post?.photoURL}
+            fallbackText={"-"}
+            title="Post Photo (Optional)"
+            variant="rectangle"
+            description="Click the image to upload a new photo for your post."
+            onFileSelect={(file) => {
+              setSelectedFile(file);
+              setIsImageRemoved(false);
+              form.setValue("hasPendingImage", !!file, {
+                shouldValidate: true,
+              });
+            }}
+            onRemove={() => {
+              setSelectedFile(null);
+              setIsImageRemoved(true);
 
-        <div className="space-y-2">
-          <FieldLabel>Post Image</FieldLabel>
-          {previewUrl ? (
-            <div className="relative group rounded-lg overflow-hidden border bg-muted aspect-video">
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={removeImage}
+              form.setValue("hasPendingImage", false, { shouldValidate: true });
+              form.setValue("photoURL", "", { shouldValidate: true });
+            }}
+          />
+        </div>
+
+        <div className="flex flex-col h-full gap-5 py-4">
+          <Controller
+            name="title"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel className="text-base font-semibold">
+                  Title
+                </FieldLabel>
+                <Input
+                  {...field}
+                  type="text"
+                  placeholder="What's the title?"
+                  disabled={isLoading}
+                  className="text-lg py-6"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="content"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field
+                data-invalid={fieldState.invalid}
+                className="flex-1 flex flex-col"
               >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ) : (
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors border-muted-foreground/25"
-            >
-              <ImagePlus className="w-8 h-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                Click to upload image
-              </p>
-            </div>
-          )}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-            accept="image/*"
-            disabled={isLoading}
+                <FieldLabel className="text-base font-semibold">
+                  Content
+                </FieldLabel>
+
+                <CountedTextarea
+                  {...field}
+                  maxLength={MAX_CONTENT_LENGTH}
+                  placeholder="Tell your story..."
+                  disabled={isLoading}
+                  className="flex-1 min-h-75 max-h-75 overflow-y-auto resize-none text-base leading-relaxed pb-8"
+                />
+
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
           />
         </div>
       </FieldGroup>
 
-      <div className="flex justify-end pt-2">
+      <div className="flex justify-end pt-6 border-t">
         <Button
           type="submit"
+          size="lg"
           className="w-full sm:w-auto font-semibold px-8"
           disabled={isLoading}
         >
           {isLoading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
               {isEditMode ? "Updating..." : "Creating..."}
             </>
           ) : isEditMode ? (

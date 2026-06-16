@@ -10,7 +10,11 @@ interface UIState {
 
 export const useUIStore = create<UIState>((set) => ({
   isPostDialogOpen: false,
-  setPostDialogOpen: (isOpen) => set({ isPostDialogOpen: isOpen }),
+  setPostDialogOpen: (isOpen) =>
+    set((state) => ({
+      isPostDialogOpen: isOpen,
+      editingPost: isOpen ? state.editingPost : null,
+    })),
   editingPost: null,
   setEditingPost: (post) => set({ editingPost: post }),
 }));

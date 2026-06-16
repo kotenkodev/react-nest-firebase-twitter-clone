@@ -21,9 +21,8 @@ export class CreateUserDto {
   firstName: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'Last name is required.' })
-  @MaxLength(50, { message: 'Last name cannot exceed 50 characters.' })
   @IsOptional()
+  @MaxLength(50, { message: 'Last name cannot exceed 50 characters.' })
   lastName: string;
 
   @IsEmail({}, { message: 'Please provide a valid email address.' })

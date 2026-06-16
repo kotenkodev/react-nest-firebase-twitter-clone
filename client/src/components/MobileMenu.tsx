@@ -24,7 +24,7 @@ import { useUIStore } from "@/store/useUIStore";
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const { setPostDialogOpen } = useUIStore();
+  const { setPostDialogOpen, setEditingPost } = useUIStore();
   const { setUser, setLoading, setError } = useAuthStore();
 
   const handleSignOut = async () => {
@@ -85,6 +85,7 @@ export function MobileMenu() {
           <button
             type="button"
             onClick={() => {
+              setEditingPost(null);
               setPostDialogOpen(true);
               setIsOpen(false);
             }}

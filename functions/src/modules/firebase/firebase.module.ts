@@ -27,7 +27,9 @@ export const FIREBASE_DB = 'FIREBASE_DB';
     {
       provide: FIREBASE_DB,
       useFactory: (app: App) => {
-        return admin.firestore(app);
+        const db = admin.firestore(app);
+        db.settings({ ignoreUndefinedProperties: true });
+        return db;
       },
       inject: ['FIREBASE_APP'],
     },

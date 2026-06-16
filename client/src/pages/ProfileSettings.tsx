@@ -13,18 +13,13 @@ import { SecurityForm } from "@/components/profile/SecurityForm";
 import { ProfileInfoForm } from "@/components/profile/ProfileInfoForm";
 import { toast } from "sonner";
 import { AccountModal } from "../components/profile/AccountModal";
-import AvatarUpload from "../components/profile/AvatarUpload";
+import ImageUploader from "../components/profile/ImageUploader";
+import { getInitials } from "@/utils/getInitials";
+import { uploadAvatar } from "@/services/storageService";
+import { updateUser } from "@/services/usersService";
 
 export default function Profile() {
   const { user, setUser } = useAuthStore();
-
-  if (!user) {
-    return (
-      <Container className="mt-10">
-        <p className="text-center text-muted-foreground">User not found.</p>
-      </Container>
-    );
-  }
 
   async function handleDeleteAccount() {
     try {
@@ -36,6 +31,29 @@ export default function Profile() {
       toast.error("Failed to delete account. Please try again.");
     } finally {
     }
+  }
+
+  const handleUpload = async (file: File) => {
+    if (!file || !user) return;
+
+    try {
+      const downloadURL = await uploadAvatar(user.id, file);
+      const updatedUser = await updateUser(user.id, { photoURL: downloadURL });
+
+      setUser(updatedUser);
+      toast.success("Profile picture updated!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload image. Please try again.");
+    }
+  };
+
+  if (!user) {
+    return (
+      <Container className="mt-10">
+        <p className="text-center text-muted-foreground">User not found.</p>
+      </Container>
+    );
   }
 
   return (
@@ -50,7 +68,14 @@ export default function Profile() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AvatarUpload user={user} setUser={setUser} />
+          <ImageUploader
+            defaultImage={user.photoURL}
+            fallbackText={getInitials(`${user.firstName} ${user.lastName}`)}
+            title="Profile Picture"
+            variant="avatar"
+            description="Click the avatar to upload a new image. Recommended size is 256x256px."
+            onUpload={handleUpload}
+          />
 
           <Separator />
 

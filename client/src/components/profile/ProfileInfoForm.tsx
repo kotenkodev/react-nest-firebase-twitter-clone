@@ -12,8 +12,11 @@ import type z from "zod";
 import { updateUser } from "@/services/usersService";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
+import { CountedTextarea } from "../CountedTextarea";
 
 type FormValues = z.infer<typeof profileInfoSchema>;
+
+const MAX_BIO_LENGTH = profileInfoSchema.shape.bio.maxLength;
 
 export function ProfileInfoForm({ user }: { user: User }) {
   const setUser = useAuthStore((state) => state.setUser);
@@ -92,15 +95,13 @@ export function ProfileInfoForm({ user }: { user: User }) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Bio</FieldLabel>
-                <Textarea
+                <CountedTextarea
                   {...field}
-                  placeholder="Tell us a little about yourself..."
+                  maxLength={MAX_BIO_LENGTH}
+                  placeholder="Tell your story..."
                   disabled={isLoading}
-                  className="resize-none h-24"
+                  className="flex-1 min-h-40 max-h-40 resize-none text-base leading-relaxed pb-8"
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Maximum 250 characters.
-                </p>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
