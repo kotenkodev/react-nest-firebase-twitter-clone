@@ -63,4 +63,33 @@ export class LikesRepository {
   async delete(id: string): Promise<void> {
     await this.collection.doc(id).delete();
   }
+
+  async deleteLikesByPostId(id: string): Promise<void> {
+    const query = this.collection.where('postId', '==', id);
+    const snapshot = await query.get();
+
+    if (snapshot.empty) return;
+
+    const MAX_BATCH_SIZE = 500;
+    const batchPromises: Promise<any>[] = [];
+    let currentBatch = this.db.batch();
+    let operationCount = 0;
+
+    snapshot.docs.forEach((doc) => {
+      currentBatch.delete(doc.ref);
+      operationCount++;
+
+      if (operationCount === MAX_BATCH_SIZE) {
+        batchPromises.push(currentBatch.commit());
+        currentBatch = this.db.batch();
+        operationCount = 0;
+      }
+    });
+
+    if (operationCount > 0) {
+      batchPromises.push(currentBatch.commit());
+    }
+
+    await Promise.all(batchPromises);
+  }
 }

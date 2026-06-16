@@ -6,24 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import {
-  DeleteIcon,
-  EditIcon,
-  MessageCircleIcon,
-  ThumbsDownIcon,
-  ThumbsUpIcon,
-} from "lucide-react";
-import { Badge } from "../ui/badge";
+import { EditIcon, TrashIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { getInitials } from "@/utils/getInitials";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "../ui/button";
-import TransitionLink from "../TransitionLink";
-
-dayjs.extend(relativeTime);
+import { PostAuthor } from "./PostAuthor";
+import { PostReactions } from "./PostReactions";
 
 type PostCardProps = {
   post: Post;
@@ -48,9 +36,9 @@ export default function PostCard({
   const location = useLocation();
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden shadow-sm border-muted/60 hover:border-muted-foreground/20 transition-colors">
       {post.photoURL && (
-        <div className="relative w-full flex justify-center overflow-hidden">
+        <div className="relative w-full flex justify-center overflow-hidden bg-muted/20">
           <Link to={`/post/${post.id}`} state={{ background: location }}>
             <img
               src={post.photoURL}
@@ -60,104 +48,75 @@ export default function PostCard({
           </Link>
         </div>
       )}
-      <CardHeader>
-        <TransitionLink
-          to={`/profile/${post.authorId}`}
-          className="flex items-center gap-3 w-fit self-start no-underline group"
-        >
-          <Avatar className="h-10 w-10 border shadow-sm group-hover:opacity-90 transition-opacity">
-            <AvatarImage
-              src={post.author?.photoURL}
-              alt={post.author?.firstName}
-            />
-            <AvatarFallback className="bg-secondary text-secondary-foreground text-xs font-semibold">
-              {getInitials(
-                `${post.author?.firstName} ${post.author?.lastName}`,
-              )}
-            </AvatarFallback>
-          </Avatar>
+      <CardHeader className="space-y-4">
+        <PostAuthor
+          authorId={post.authorId}
+          firstName={post.author?.firstName}
+          lastName={post.author?.lastName}
+          photoURL={post.author?.photoURL}
+          createdAt={post.createdAt}
+        />
 
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold tracking-tight text-foreground group-hover:underline">
-              {post.author?.firstName} {post.author?.lastName}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {dayjs(post.createdAt).fromNow()}
-            </span>
-          </div>
-        </TransitionLink>
-
-        <CardTitle>
-          <p
-            onClick={() => setTitleExpanded(!titleExpanded)}
-            className={`cursor-pointer break-all ${titleExpanded ? "whitespace-pre-wrap" : "line-clamp-1"}`}
-          >
-            {post.title}
-          </p>
-        </CardTitle>
-        <CardDescription>
-          <p
-            className={`break-all ${contentExpanded ? "whitespace-pre-wrap" : "line-clamp-3"}`}
-          >
-            {post.content}
-          </p>
-          {post.content.length > 150 && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setContentExpanded(!contentExpanded)}
-              className="text-xs font-semibold text-primary hover:underline"
+        <div className="space-y-2">
+          <CardTitle>
+            <p
+              onClick={() => setTitleExpanded(!titleExpanded)}
+              className={`cursor-pointer break-all text-xl font-bold tracking-tight ${titleExpanded ? "whitespace-pre-wrap" : "line-clamp-1"}`}
             >
-              {contentExpanded ? "Show less" : "Show more"}
-            </Button>
-          )}
-        </CardDescription>
+              {post.title}
+            </p>
+          </CardTitle>
+          <CardDescription>
+            <p
+              className={`break-all text-base text-foreground/80 leading-relaxed ${contentExpanded ? "whitespace-pre-wrap" : "line-clamp-3"}`}
+            >
+              {post.content}
+            </p>
+            {post.content.length > 150 && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setContentExpanded(!contentExpanded)}
+                className="h-auto p-0 mt-1 text-xs font-bold text-primary hover:bg-transparent hover:underline"
+              >
+                {contentExpanded ? "Show less" : "Show more"}
+              </Button>
+            )}
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent className="flex justify-between">
-        <div className="flex items-center gap-4">
+      <CardContent className="flex justify-between items-center pt-0">
+        <div className="flex items-center gap-2">
           {isOwner && (
             <>
-              <Button variant="secondary" onClick={() => onEdit(post)}>
-                <EditIcon className="w-5 h-5" />
+              <Button
+                size="icon-sm"
+                className="bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-100 cursor-pointer shadow-none"
+                variant="secondary"
+                onClick={() => onEdit(post)}
+              >
+                <EditIcon className="w-4 h-4" />
               </Button>
-              <Button variant="secondary" onClick={() => onDelete(post.id)}>
-                <DeleteIcon className="w-5 h-5" />
+              <Button
+                size="icon-sm"
+                className="bg-red-50 text-red-700 hover:bg-red-100 border-red-100 cursor-pointer shadow-none"
+                variant="secondary"
+                onClick={() => onDelete(post.id)}
+              >
+                <TrashIcon className="w-4 h-4" />
               </Button>
             </>
           )}
         </div>
-        <div className="flex items-center gap-4">
-          <Link to={`/post/${post.id}`} state={{ background: location }}>
-            <Badge variant="secondary">
-              <MessageCircleIcon className="w-5 h-5" />
-              {post.commentsCount}
-            </Badge>
-          </Link>
-          <Badge
-            onClick={() => onLike(post.id, "like")}
-            className={
-              reactionType === "like"
-                ? "bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer"
-                : "cursor-pointer"
-            }
-            variant="secondary"
-          >
-            <ThumbsUpIcon className="w-5 h-5" />
-            {post.likesCount}
-          </Badge>
-          <Badge
-            onClick={() => onLike(post.id, "dislike")}
-            className={
-              reactionType === "dislike"
-                ? "bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer"
-                : "cursor-pointer"
-            }
-            variant="secondary"
-          >
-            <ThumbsDownIcon className="w-5 h-5" />
-            {post.dislikesCount}
-          </Badge>
-        </div>
+
+        <PostReactions
+          postId={post.id}
+          likesCount={post.likesCount}
+          dislikesCount={post.dislikesCount}
+          commentsCount={post.commentsCount}
+          userLike={reactionType}
+          onLike={onLike}
+        />
       </CardContent>
     </Card>
   );

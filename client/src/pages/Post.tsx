@@ -7,12 +7,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useNavigate, useParams } from "react-router-dom";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getInitials } from "@/utils/getInitials";
-import { Badge } from "@/components/ui/badge";
-import { ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import TransitionLink from "@/components/TransitionLink";
@@ -22,8 +16,8 @@ import type { Post } from "@/types/post";
 import { BirdSpinner } from "@/components/ui/bird-spinner";
 import { buttonVariants } from "@/components/ui/button";
 import { likePost } from "@/services/likesService";
-
-dayjs.extend(relativeTime);
+import { PostAuthor } from "@/components/post/PostAuthor";
+import { PostReactions } from "@/components/post/PostReactions";
 
 type PostProps = {
   isModal?: boolean;
@@ -37,12 +31,11 @@ export default function Post({ isModal }: PostProps) {
 
   const handleClose = () => navigate(-1);
 
-  const handleLikeClick = async (like: "like" | "dislike") => {
+  const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
     if (!post) return;
 
     const previousPost = { ...post };
 
-    if (!previousPost) return;
     setPost((current) => {
       if (!current) return current;
 
@@ -63,10 +56,10 @@ export default function Post({ isModal }: PostProps) {
     });
 
     try {
-      await likePost(post.id, { type: like });
+      await likePost(postId, { type: like });
       toast.success(`You ${like}d the post!`);
     } catch (error) {
-      setPost((current) => (current ? { ...current, ...previousPost } : null));
+      setPost(previousPost);
       console.error(`Error handling ${like}:`, error);
       toast.error("Failed to update reaction.");
     }
@@ -77,7 +70,6 @@ export default function Post({ isModal }: PostProps) {
       try {
         setIsLoading(true);
         const data = await getPost(id!);
-        console.log("Fetched post data:", data);
         setPost(data);
       } catch (error) {
         console.error("Error fetching post:", error);
@@ -131,77 +123,44 @@ export default function Post({ isModal }: PostProps) {
       <div className="grid gap-8 grid-cols-1 lg:grid-cols-5 items-start">
         <div className="lg:col-span-3 space-y-6">
           {post.photoURL && (
-            <div className="relative w-full flex justify-center overflow-hidden">
+            <div className="relative w-full flex justify-center overflow-hidden rounded-xl border bg-muted/20">
               <img
                 src={post.photoURL}
                 alt="Post media"
-                className="max-h-80 w-auto max-w-full object-contain transition-transform duration-300"
+                className="max-h-125 w-auto max-w-full object-contain transition-transform duration-300"
               />
             </div>
           )}
 
-          <div className="space-y-4">
-            <TransitionLink
-              to={`/profile/${post.authorId}`}
-              className="flex items-center gap-3 w-fit self-start no-underline group"
-            >
-              <Avatar className="h-12 w-12 border-2 shadow-sm shrink-0">
-                <AvatarImage
-                  src={post.author?.photoURL}
-                  alt={post.author?.firstName}
-                />
-                <AvatarFallback className="bg-secondary text-secondary-foreground text-sm font-bold">
-                  {getInitials(
-                    `${post.author?.firstName} ${post.author?.lastName}`,
-                  )}
-                </AvatarFallback>
-              </Avatar>
+          <div className="space-y-6">
+            <PostAuthor
+              authorId={post.authorId}
+              firstName={post.author?.firstName}
+              lastName={post.author?.lastName}
+              photoURL={post.author?.photoURL}
+              createdAt={post.createdAt}
+              avatarSize="lg"
+            />
 
-              <div className="flex flex-col justify-center">
-                <span className="text-base font-bold tracking-tight text-foreground leading-tight">
-                  {post.author?.firstName} {post.author?.lastName}
-                </span>
-                <span className="text-xs text-muted-foreground mt-0.5">
-                  {dayjs(post.createdAt).fromNow()}
-                </span>
-              </div>
-            </TransitionLink>
-
-            <div className="space-y-3 pt-2">
-              <h2 className="break-all text-2xl md:text-3xl font-extrabold tracking-tight text-foreground/90 leading-tight">
+            <div className="space-y-4">
+              <h2 className="break-all text-3xl md:text-4xl font-extrabold tracking-tight text-foreground leading-tight">
                 {post.title}
               </h2>
-              <p className="break-all text-base md:text-lg text-foreground/90 wrap-break-word leading-relaxed whitespace-pre-wrap tracking-normal">
+              <p className="break-all text-lg md:text-xl text-foreground/90 wrap-break-word leading-relaxed whitespace-pre-wrap tracking-normal">
                 {post.content}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pt-4 border-t border-muted justify-end">
-            <Badge
-              onClick={() => handleLikeClick("like")}
-              className={
-                post.userLike === "like"
-                  ? "bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer"
-                  : "cursor-pointer"
-              }
-              variant="secondary"
-            >
-              <ThumbsUpIcon className="w-4 h-4" />
-              <span className="font-semibold">{post.likesCount}</span>
-            </Badge>
-            <Badge
-              onClick={() => handleLikeClick("dislike")}
-              className={
-                post.userLike === "dislike"
-                  ? "bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer"
-                  : "cursor-pointer"
-              }
-              variant="secondary"
-            >
-              <ThumbsDownIcon className="w-4 h-4" />
-              <span className="font-semibold">{post.dislikesCount}</span>
-            </Badge>
+          <div className="flex items-center justify-end pt-6 border-t border-muted">
+            <PostReactions
+              postId={post.id}
+              likesCount={post.likesCount}
+              dislikesCount={post.dislikesCount}
+              userLike={post.userLike}
+              onLike={handleLikeClick}
+              showComments={false}
+            />
           </div>
         </div>
 
@@ -223,8 +182,8 @@ export default function Post({ isModal }: PostProps) {
     return (
       <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
         <DialogContent className="max-w-full w-[95vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl overflow-y-auto max-h-[92vh] p-6 md:p-8 rounded-xl gap-0">
-          <DialogHeader className="mb-4">
-            <DialogTitle className="text-xl font-bold tracking-tight">
+          <DialogHeader className="mb-4 text-left">
+            <DialogTitle className="text-2xl font-bold tracking-tight">
               Post Thread
             </DialogTitle>
             <DialogDescription className="sr-only">
@@ -238,14 +197,15 @@ export default function Post({ isModal }: PostProps) {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto py-2 px-4 md:py-6">
-      <Card className="shadow-md border-muted/80 overflow-hidden rounded-xl">
-        <CardHeader className="pb-6 border-b border-muted bg-muted/10">
-          <CardTitle className="text-3xl font-extrabold tracking-tight">
-            {isLoading && "Loading Post..."}
-            {post
-              ? `Viewing Post by ${post?.author?.firstName} ${post?.author?.lastName}`
-              : "Post Not Found"}
+    <div className="container max-w-7xl mx-auto py-2 px-4 md:py-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <Card className="shadow-md border-muted/80 overflow-hidden rounded-2xl">
+        <CardHeader className="pb-6 border-b border-muted bg-muted/5">
+          <CardTitle className="text-2xl md:text-3xl font-bold tracking-tight">
+            {isLoading
+              ? "Loading Post..."
+              : !post
+                ? "Post Not Found"
+                : "Post Thread"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 md:p-8 pt-8">{renderContent()}</CardContent>

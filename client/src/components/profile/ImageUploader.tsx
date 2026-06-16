@@ -66,7 +66,6 @@ export default function ImageUploader({
       toast.success("Image uploaded successfully!");
 
       setSelectedFile(null);
-      setPreviewUrl("");
       if (fileInputRef.current) fileInputRef.current.value = "";
       if (onFileSelect) onFileSelect(null);
       if (onRemove) onRemove();

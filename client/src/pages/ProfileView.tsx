@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/container";
 import ProfileCard from "@/components/ProfileCard";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getUser } from "@/services/usersService";
 import type { User } from "@/types/user";
 import {
@@ -48,6 +48,10 @@ export default function Profile() {
     fetchUser();
   }, [id, user?.id]);
 
+  const fetchUserPosts = useCallback(() => {
+    return getPosts();
+  }, []);
+
   if (isLoading) {
     return (
       <Container className="flex items-center justify-center min-h-[50vh]">
@@ -67,8 +71,9 @@ export default function Profile() {
         </div>
         <div className="space-y-2">
           <h3 className="text-2xl font-bold tracking-tight">User not found</h3>
-          <p className="text-muted-foreground max-w-[300px] mx-auto">
-            The profile you're looking for doesn't exist or has moved to another branch.
+          <p className="text-muted-foreground max-w-75 mx-auto">
+            The profile you're looking for doesn't exist or has moved to another
+            branch.
           </p>
         </div>
         <TransitionLink
@@ -82,27 +87,29 @@ export default function Profile() {
   }
 
   return (
-    <Container className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="sticky top-20">
+    <Container className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <aside className="lg:col-span-4 lg:sticky top-26">
         <ProfileCard user={userProfile} />
-      </div>
-      <div>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold tracking-tight">Posts</CardTitle>
+      </aside>
+
+      <main className="lg:col-span-8 space-y-6">
+        <Card className="border-muted/60 shadow-sm overflow-hidden">
+          <CardHeader className="pb-4 border-b border-muted bg-muted/10">
+            <CardTitle className="text-2xl font-bold tracking-tight">
+              Posts
+            </CardTitle>
             <CardDescription>
-              View all posts made by {userProfile.firstName}{" "}
-              {userProfile.lastName}.
+              Check out what {userProfile.firstName} has been sharing lately.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="p-0 sm:p-6 md:p-8">
             <PostList
-              fetchAction={() => getPosts()}
-              emptyMessage="No posts to show"
+              fetchAction={fetchUserPosts}
+              emptyMessage={`${userProfile.firstName} hasn't posted anything yet.`}
             />
           </CardContent>
         </Card>
-      </div>
+      </main>
     </Container>
   );
 }

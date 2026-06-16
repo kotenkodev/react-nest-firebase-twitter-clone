@@ -89,6 +89,7 @@ export class PostsService {
   }
 
   async remove(id: string): Promise<void> {
-    return this.postsRepository.delete(id);
+    await this.postsRepository.delete(id);
+    await this.likesService.deletePostLikes(id);
   }
 }

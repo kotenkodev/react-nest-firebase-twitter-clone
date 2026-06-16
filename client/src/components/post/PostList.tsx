@@ -7,7 +7,17 @@ import PostCard from "./PostCard";
 import { likePost } from "@/services/likesService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { PostCardSkeleton } from "./PostCardSkeleton";
-import { SquarePenIcon } from "lucide-react";
+import { SquarePenIcon, Trash2Icon } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 
 type PostListProps = {
   fetchAction: () => Promise<Post[]>;
@@ -21,6 +31,9 @@ export default function PostList({
   const { user } = useAuthStore();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [postToDelete, setPostToDelete] = useState<Post | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   const { setPostDialogOpen, setEditingPost } = useUIStore();
 
   const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
@@ -70,17 +83,20 @@ export default function PostList({
     }
   };
 
-  const handleDeletePost = async (postId: string) => {
+  const handleDeleteConfirm = async () => {
+    if (!postToDelete) return;
+    
+    setIsDeleting(true);
     try {
-      // confirm dialog...
-      await deletePost(postId);
-
-      // Remove the deleted post from the screen instantly
-      setPosts((current) => current.filter((p) => p.id !== postId));
+      await deletePost(postToDelete.id);
+      setPosts((current) => current.filter((p) => p.id !== postToDelete.id));
       toast.success("Post deleted successfully!");
     } catch (error) {
       console.error("Error deleting post:", error);
       toast.error("Failed to delete post. Please try again.");
+    } finally {
+      setIsDeleting(false);
+      setPostToDelete(null);
     }
   };
 
@@ -89,7 +105,6 @@ export default function PostList({
       setIsLoading(true);
       try {
         const data = await fetchAction();
-        console.log("Fetched posts:", data);
         setPosts(data);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -130,22 +145,59 @@ export default function PostList({
   }
 
   return (
-    <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
-      {posts.map((post) => (
-        <li
-          key={post.id}
-          className="list-none w-full animate-in fade-in slide-in-from-bottom-4 duration-500"
-        >
-          <PostCard
-            post={post}
-            onLike={handleLikeClick}
-            onEdit={openEditDialog}
-            onDelete={handleDeletePost}
-            userLike={post.userLike}
-            currentUserId={user?.id}
-          />
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
+        {posts.map((post) => (
+          <li
+            key={post.id}
+            className="list-none w-full animate-in fade-in slide-in-from-bottom-4 duration-500"
+          >
+            <PostCard
+              post={post}
+              onLike={handleLikeClick}
+              onEdit={openEditDialog}
+              onDelete={() => setPostToDelete(post)}
+              userLike={post.userLike}
+              currentUserId={user?.id}
+            />
+          </li>
+        ))}
+      </ul>
+
+      <AlertDialog
+        open={Boolean(postToDelete)}
+        onOpenChange={(open) => !open && setPostToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-4 mb-2">
+              <div className="bg-destructive/10 p-2.5 rounded-full">
+                <Trash2Icon className="w-5 h-5 text-destructive" />
+              </div>
+              <AlertDialogTitle>Delete Post?</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-base">
+              This action cannot be undone. This will permanently delete your
+              post "<span className="font-semibold text-foreground">{postToDelete?.title}</span>" 
+              and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-2">
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteConfirm();
+              }}
+              variant="destructive"
+              className="px-6"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Post"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

@@ -36,20 +36,14 @@ const bootstrapNestApp = async (expressInstance: Express) => {
   await app.init();
 };
 
-export const api = onRequest(
-  {
-    minInstances: 1,
-    maxInstances: 1,
-  },
-  async (request, response) => {
-    if (!cachedServer) {
-      console.log('Cold start: Initializing NestJS Server...');
-      cachedServer = express();
-      await bootstrapNestApp(cachedServer);
-    }
+export const api = onRequest(async (request, response) => {
+  if (!cachedServer) {
+    console.log('Cold start: Initializing NestJS Server...');
+    cachedServer = express();
+    await bootstrapNestApp(cachedServer);
+  }
 
-    cachedServer(request, response);
-  },
-);
+  cachedServer(request, response);
+});
 
 export { updatePostReactionCount } from './triggers/like.trigger';
