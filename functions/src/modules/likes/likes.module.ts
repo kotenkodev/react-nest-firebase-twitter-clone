@@ -1,9 +1,12 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { LikesController } from './likes.controller';
-import { LikesRepository } from './dto/likes.repository';
+import { LikesRepository } from './likes.repository';
+import { UsersModule } from '../users/users.module';
+import { PostsModule } from '../posts/posts.module';
 
 @Module({
+  imports: [forwardRef(() => PostsModule), UsersModule],
   providers: [LikesService, LikesRepository],
   controllers: [LikesController],
   exports: [LikesService],

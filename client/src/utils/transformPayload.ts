@@ -1,3 +1,4 @@
+import type { Like } from "@/types/like";
 import type { Post } from "@/types/post";
 import type { User } from "@/types/user";
 
@@ -26,5 +27,12 @@ export const transformPostPayload = (rawData: any): Post => {
     ...rawData,
     createdAt: parseDate(rawData.createdAt) || new Date(),
     updatedAt: parseDate(rawData.updatedAt) || new Date(),
+  };
+};
+
+export const transformLikePayload = (rawData: any): Like => {
+  return {
+    ...rawData,
+    createdAt: parseDate(rawData.createdAt) || new Date(),
   };
 };

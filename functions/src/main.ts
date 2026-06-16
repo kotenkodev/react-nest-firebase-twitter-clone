@@ -1,3 +1,9 @@
+import * as admin from 'firebase-admin';
+
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
+
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
@@ -45,3 +51,5 @@ export const api = onRequest(
     cachedServer(request, response);
   },
 );
+
+export { updatePostReactionCount } from './triggers/like.trigger';

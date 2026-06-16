@@ -1,7 +1,7 @@
 import { SetMetadata } from '@nestjs/common';
 
 export interface OwnershipOptions {
-  resource: 'posts' | 'users' | 'comments';
+  resource: 'posts' | 'users' | 'likes' | 'comments';
   idParam?: string;
   ownerField?: string;
 }

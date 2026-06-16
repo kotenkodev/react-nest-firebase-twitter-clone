@@ -7,5 +7,6 @@ export interface Like {
   id: string;
   type: LikeType;
   userId: string;
+  postId: string;
   createdAt: Date;
 }
