@@ -17,6 +17,10 @@ export class LikesService {
     return `${userId}_${postId}`;
   }
 
+  async findManyByIds(ids: string[]): Promise<(Like | null)[]> {
+    return this.likesRepository.findManyByIds(ids);
+  }
+
   async upsert(
     userId: string,
     postId: string,

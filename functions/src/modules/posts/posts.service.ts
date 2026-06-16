@@ -28,8 +28,21 @@ export class PostsService {
     return post;
   }
 
-  async findAll(): Promise<Post[]> {
-    return this.postsRepository.findAll();
+  async findAll(
+    userId: string,
+    lastDocId?: string,
+    limit: number = 10,
+  ): Promise<Post[]> {
+    const posts = await this.postsRepository.findAll(limit, lastDocId);
+
+    const likes = await this.likesService.findManyByIds(
+      posts.map((post) => `${userId}_${post.id}`),
+    );
+
+    return posts.map((post, index) => ({
+      ...post,
+      userLike: likes[index]?.type || null,
+    }));
   }
 
   async create(uid: string, dto: CreatePostDto): Promise<Post | null> {

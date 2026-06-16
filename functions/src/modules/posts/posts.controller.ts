@@ -1,11 +1,14 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -25,9 +28,14 @@ export class PostsController {
     return this.postsService.findOne(id);
   }
 
+  @UseGuards(FirebaseAuthGuard)
   @Get()
-  async findAll() {
-    return this.postsService.findAll();
+  async findAll(
+    @GetUser('uid') userId: string,
+    @Query('lastDocId') lastDocId?: string,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ) {
+    return this.postsService.findAll(userId, lastDocId, limit);
   }
 
   @UseGuards(FirebaseAuthGuard)

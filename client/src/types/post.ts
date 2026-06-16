@@ -14,7 +14,7 @@ export interface Post {
   likesCount: number;
   createdAt: Date;
   updatedAt: Date;
-  userReaction?: "like" | "dislike" | null;
+  userLike?: "like" | "dislike" | null;
 }
 
 export type CreatePost = Pick<Post, "id" | "title" | "content" | "photoURL">;

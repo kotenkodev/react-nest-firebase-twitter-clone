@@ -14,4 +14,5 @@ export interface Post {
   likesCount: number;
   createdAt: Date;
   updatedAt: Date;
+  userLike?: 'like' | 'dislike' | null;
 }

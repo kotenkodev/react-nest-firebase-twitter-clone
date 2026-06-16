@@ -16,12 +16,22 @@ export class PostsRepository {
     this.collection = this.db.collection('posts');
   }
 
-  async findAll(): Promise<Post[]> {
-    const snapshot = await this.collection
+  async findAll(limit: number, lastDocId?: string): Promise<Post[]> {
+    let query = this.collection
       .orderBy('likesCount', 'desc')
       .orderBy('commentsCount', 'asc')
       .orderBy('createdAt', 'desc')
-      .get();
+      .limit(limit);
+
+    if (lastDocId) {
+      const lastDoc = await this.collection.doc(lastDocId).get();
+
+      if (lastDoc.exists) {
+        query = query.startAfter(lastDoc);
+      }
+    }
+
+    const snapshot = await query.get();
     return snapshot.docs.map((doc) => mapToEntity<Post>(doc)!);
   }
 

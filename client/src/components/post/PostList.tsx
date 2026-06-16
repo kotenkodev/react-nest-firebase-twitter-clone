@@ -24,37 +24,38 @@ export default function PostList({
   const { setPostDialogOpen, setEditingPost } = useUIStore();
 
   const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
+    const previousPost = posts.find((p) => p.id === postId);
+
+    if (!previousPost) return;
     setPosts((current) =>
       current.map((post) => {
-        if (post.id === postId) {
-          const isSameReaction = post.userReaction === like;
-          const newReaction = isSameReaction ? null : like;
+        if (post.id !== postId) return post;
 
-          const likesCount =
+        const isSameReaction = post.userLike === like;
+        const newReaction = isSameReaction ? null : like;
+
+        return {
+          ...post,
+          userLike: newReaction,
+          likesCount:
             post.likesCount +
             (newReaction === "like" ? 1 : 0) -
-            (post.userReaction === "like" ? 1 : 0);
-
-          const dislikesCount =
+            (post.userLike === "like" ? 1 : 0),
+          dislikesCount:
             post.dislikesCount +
             (newReaction === "dislike" ? 1 : 0) -
-            (post.userReaction === "dislike" ? 1 : 0);
-
-          return {
-            ...post,
-            userReaction: newReaction,
-            likesCount,
-            dislikesCount,
-          };
-        } else {
-          return post;
-        }
+            (post.userLike === "dislike" ? 1 : 0),
+        };
       }),
     );
+
     try {
       await likePost(postId, { type: like });
       toast.success(`You ${like}d the post!`);
     } catch (error) {
+      setPosts((current) =>
+        current.map((post) => (post.id === postId ? previousPost : post)),
+      );
       console.error(`Error handling ${like}:`, error);
       toast.error("Failed to update reaction.");
     }
@@ -88,6 +89,7 @@ export default function PostList({
       setIsLoading(true);
       try {
         const data = await fetchAction();
+        console.log("Fetched posts:", data);
         setPosts(data);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -139,7 +141,7 @@ export default function PostList({
             onLike={handleLikeClick}
             onEdit={openEditDialog}
             onDelete={handleDeletePost}
-            reactionType={post.userReaction}
+            reactionType={post.userLike}
             currentUserId={user?.id}
           />
         </li>
