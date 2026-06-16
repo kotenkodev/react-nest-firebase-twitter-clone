@@ -1,0 +1,149 @@
+import { toast } from "sonner";
+import { deletePost } from "@/services/postsService";
+import { useUIStore } from "@/store/useUIStore";
+import type { Post } from "@/types/post";
+import { useEffect, useState } from "react";
+import PostCard from "./PostCard";
+import { likePost } from "@/services/likesService";
+import { useAuthStore } from "@/store/useAuthStore";
+import { PostCardSkeleton } from "./PostCardSkeleton";
+import { BookOpenIcon, SquarePenIcon } from "lucide-react";
+
+type PostListProps = {
+  fetchAction: () => Promise<Post[]>;
+  emptyMessage?: string;
+};
+
+export default function PostList({
+  fetchAction,
+  emptyMessage = "No posts found.",
+}: PostListProps) {
+  const { user } = useAuthStore();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { setPostDialogOpen, setEditingPost } = useUIStore();
+
+  const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
+    setPosts((current) =>
+      current.map((post) => {
+        if (post.id === postId) {
+          const isSameReaction = post.userReaction === like;
+          const newReaction = isSameReaction ? null : like;
+
+          const likesCount =
+            post.likesCount +
+            (newReaction === "like" ? 1 : 0) -
+            (post.userReaction === "like" ? 1 : 0);
+
+          const dislikesCount =
+            post.dislikesCount +
+            (newReaction === "dislike" ? 1 : 0) -
+            (post.userReaction === "dislike" ? 1 : 0);
+
+          return {
+            ...post,
+            userReaction: newReaction,
+            likesCount,
+            dislikesCount,
+          };
+        } else {
+          return post;
+        }
+      }),
+    );
+    try {
+      await likePost(postId, { type: like });
+      toast.success(`You ${like}d the post!`);
+    } catch (error) {
+      console.error(`Error handling ${like}:`, error);
+      toast.error("Failed to update reaction.");
+    }
+  };
+
+  const openEditDialog = (post: Post) => {
+    try {
+      setEditingPost(post);
+      setPostDialogOpen(true);
+    } catch (error) {
+      console.error("Error opening edit dialog:", error);
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      // confirm dialog...
+      await deletePost(postId);
+
+      // Remove the deleted post from the screen instantly
+      setPosts((current) => current.filter((p) => p.id !== postId));
+      toast.success("Post deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      toast.error("Failed to delete post. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setIsLoading(true);
+      try {
+        const data = await fetchAction();
+        setPosts(data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+        toast.error("Failed to load posts. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPosts();
+  }, [fetchAction]);
+
+  if (isLoading) {
+    return (
+      <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <li key={index} className="list-none w-full">
+            <PostCardSkeleton />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center border-2 border-dashed rounded-xl bg-muted/20">
+        <div className="bg-secondary/50 p-4 rounded-full mb-4">
+          <SquarePenIcon className="w-8 h-8" />
+        </div>
+        <h3 className="text-lg font-semibold tracking-tight text-foreground">
+          {emptyMessage}
+        </h3>
+        <p className="text-sm text-muted-foreground mt-2 max-w-sm">
+          Check back later to see new updates.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
+      {posts.map((post) => (
+        <li
+          key={post.id}
+          className="list-none w-full animate-in fade-in slide-in-from-bottom-4 duration-500"
+        >
+          <PostCard
+            post={post}
+            onLike={handleLikeClick}
+            onEdit={openEditDialog}
+            onDelete={handleDeletePost}
+            reactionType={post.userReaction}
+            currentUserId={user?.id}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+}

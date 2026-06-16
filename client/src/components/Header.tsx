@@ -1,4 +1,4 @@
-import { Bird } from "lucide-react";
+import { BirdIcon } from "lucide-react";
 import ProfileDropdown from "./ProfileDropdown";
 import { useAuthStore } from "@/store/useAuthStore";
 import TransitionLink from "./TransitionLink";
@@ -14,7 +14,7 @@ export default function Header() {
           to="/"
           className="flex items-center space-x-2 font-bold"
         >
-          <Bird />
+          <BirdIcon />
           <span className="inline-block">Birb</span>
         </TransitionLink>
       </div>

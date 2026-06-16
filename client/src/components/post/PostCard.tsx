@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Link, useLocation } from "react-router-dom";
-import { toast } from "sonner";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getInitials } from "@/utils/getInitials";
@@ -23,55 +22,30 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "../ui/button";
 import TransitionLink from "../TransitionLink";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useUIStore } from "@/store/useUIStore";
-import { deletePost } from "@/services/postsService";
 
 dayjs.extend(relativeTime);
 
-export default function PostCard({ post }: { post: Post }) {
+type PostCardProps = {
+  post: Post;
+  currentUserId?: string;
+  onLike: (postId: string, type: "like" | "dislike") => void;
+  onEdit: (post: Post) => void;
+  onDelete: (postId: string) => void;
+  reactionType?: "like" | "dislike" | null;
+};
+
+export default function PostCard({
+  post,
+  currentUserId,
+  onLike,
+  onEdit,
+  onDelete,
+  reactionType,
+}: PostCardProps) {
   const [titleExpanded, setTitleExpanded] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
-  const { user } = useAuthStore();
-  const { setPostDialogOpen, setEditingPost } = useUIStore();
-  const isOwner = post.authorId === user?.id;
-
+  const isOwner = post.authorId === currentUserId;
   const location = useLocation();
-
-  const likedStyles =
-    "bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer";
-  const dislikedStyles =
-    "bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer";
-
-  function handleLikeClick(like: "like" | "dislike") {
-    try {
-      toast.success(`You ${like}d the post!`);
-    } catch (error) {
-      console.error(`Error handling ${like}:`, error);
-    }
-  }
-
-  const openEditDialog = (post: Post) => {
-    try {
-      setEditingPost(post);
-      setPostDialogOpen(true);
-    } catch (error) {
-      console.error("Error opening edit dialog:", error);
-    }
-  };
-
-  const handleDeletePost = async () => {
-    try {
-      // confrim dialog...
-
-      await deletePost(post.id);
-
-      toast.success("Post deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting post:", error);
-      toast.error("Failed to delete post. Please try again.");
-    }
-  };
 
   return (
     <Card className="overflow-hidden">
@@ -141,10 +115,10 @@ export default function PostCard({ post }: { post: Post }) {
         <div className="flex items-center gap-4">
           {isOwner && (
             <>
-              <Button variant="secondary" onClick={() => openEditDialog(post)}>
+              <Button variant="secondary" onClick={() => onEdit(post)}>
                 <EditIcon className="w-5 h-5" />
               </Button>
-              <Button variant="secondary" onClick={handleDeletePost}>
+              <Button variant="secondary" onClick={() => onDelete(post.id)}>
                 <DeleteIcon className="w-5 h-5" />
               </Button>
             </>
@@ -158,16 +132,24 @@ export default function PostCard({ post }: { post: Post }) {
             </Badge>
           </Link>
           <Badge
-            onClick={() => handleLikeClick("like")}
-            className={likedStyles}
+            onClick={() => onLike(post.id, "like")}
+            className={
+              reactionType === "like"
+                ? "bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer"
+                : "cursor-pointer"
+            }
             variant="secondary"
           >
             <ThumbsUpIcon className="w-5 h-5" />
             {post.likesCount}
           </Badge>
           <Badge
-            onClick={() => handleLikeClick("dislike")}
-            className={dislikedStyles}
+            onClick={() => onLike(post.id, "dislike")}
+            className={
+              reactionType === "dislike"
+                ? "bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer"
+                : "cursor-pointer"
+            }
             variant="secondary"
           >
             <ThumbsDownIcon className="w-5 h-5" />
