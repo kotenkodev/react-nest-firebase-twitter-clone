@@ -10,7 +10,7 @@ export default function BirdLoadingAnimation({
   return (
     <div
       id="bird-loader"
-      className={`fixed inset-0 z-60 w-full h-screen pointer-events-none flex flex-col items-center justify-center ${
+      className={`fixed inset-0 z-999 w-full h-screen pointer-events-none flex flex-col items-center justify-center ${
         withBackground ? "bg-neutral-950" : ""
       }`}
     >

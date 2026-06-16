@@ -19,6 +19,9 @@ import TransitionLink from "@/components/TransitionLink";
 import { getPost } from "@/services/postsService";
 import { PostDetailSkeleton } from "@/components/post/PostDetailSkeleton";
 import type { Post } from "@/types/post";
+import { BirdSpinner } from "@/components/ui/bird-spinner";
+import { buttonVariants } from "@/components/ui/button";
+import { likePost } from "@/services/likesService";
 
 dayjs.extend(relativeTime);
 
@@ -34,25 +37,47 @@ export default function Post({ isModal }: PostProps) {
 
   const handleClose = () => navigate(-1);
 
-  const likedStyles =
-    "bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer select-none transition-colors";
-  const dislikedStyles =
-    "bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer select-none transition-colors";
+  const handleLikeClick = async (like: "like" | "dislike") => {
+    if (!post) return;
 
-  function handleReactionClick(reaction: "like" | "dislike") {
+    const previousPost = { ...post };
+
+    if (!previousPost) return;
+    setPost((current) => {
+      if (!current) return current;
+
+      const isSameReaction = current.userLike === like;
+      const newReaction = isSameReaction ? null : like;
+      return {
+        ...current,
+        userLike: newReaction,
+        likesCount:
+          current.likesCount +
+          (newReaction === "like" ? 1 : 0) -
+          (current.userLike === "like" ? 1 : 0),
+        dislikesCount:
+          current.dislikesCount +
+          (newReaction === "dislike" ? 1 : 0) -
+          (current.userLike === "dislike" ? 1 : 0),
+      };
+    });
+
     try {
-      toast.success(`You ${reaction}d the post!`);
+      await likePost(post.id, { type: like });
+      toast.success(`You ${like}d the post!`);
     } catch (error) {
-      console.error(`Error handling ${reaction}:`, error);
+      setPost((current) => (current ? { ...current, ...previousPost } : null));
+      console.error(`Error handling ${like}:`, error);
+      toast.error("Failed to update reaction.");
     }
-  }
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         setIsLoading(true);
         const data = await getPost(id!);
-
+        console.log("Fetched post data:", data);
         setPost(data);
       } catch (error) {
         console.error("Error fetching post:", error);
@@ -72,7 +97,35 @@ export default function Post({ isModal }: PostProps) {
 
   const renderContent = () => {
     if (isLoading) return <PostDetailSkeleton />;
-    if (!post) return <p>Post not found.</p>;
+
+    if (!post) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12 text-center space-y-6 animate-in fade-in zoom-in duration-500">
+          <div className="relative">
+            <h3 className="text-8xl font-black text-muted-foreground/5 absolute -top-8 left-1/2 -translate-x-1/2 select-none">
+              404
+            </h3>
+            <BirdSpinner size={64} label="" className="relative z-10" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-bold tracking-tight">
+              Post not found
+            </h3>
+            <p className="text-muted-foreground max-w-75 mx-auto">
+              This post might have been deleted or moved to another nest.
+            </p>
+          </div>
+          {!isModal && (
+            <TransitionLink
+              to="/"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Back to Home
+            </TransitionLink>
+          )}
+        </div>
+      );
+    }
 
     return (
       <div className="grid gap-8 grid-cols-1 lg:grid-cols-5 items-start">
@@ -82,7 +135,7 @@ export default function Post({ isModal }: PostProps) {
               <img
                 src={post.photoURL}
                 alt="Post media"
-                className="max-h-80 w-auto max-w-full object-contain transition-transform duration-300 hover:scale-[1.02]"
+                className="max-h-80 w-auto max-w-full object-contain transition-transform duration-300"
               />
             </div>
           )}
@@ -126,16 +179,24 @@ export default function Post({ isModal }: PostProps) {
 
           <div className="flex items-center gap-3 pt-4 border-t border-muted justify-end">
             <Badge
-              onClick={() => handleReactionClick("like")}
-              className={`${likedStyles} flex items-center gap-1.5 px-4 py-2 text-sm rounded-full shadow-sm`}
+              onClick={() => handleLikeClick("like")}
+              className={
+                post.userLike === "like"
+                  ? "bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer"
+                  : "cursor-pointer"
+              }
               variant="secondary"
             >
               <ThumbsUpIcon className="w-4 h-4" />
               <span className="font-semibold">{post.likesCount}</span>
             </Badge>
             <Badge
-              onClick={() => handleReactionClick("dislike")}
-              className={`${dislikedStyles} flex items-center gap-1.5 px-4 py-2 text-sm rounded-full shadow-sm`}
+              onClick={() => handleLikeClick("dislike")}
+              className={
+                post.userLike === "dislike"
+                  ? "bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer"
+                  : "cursor-pointer"
+              }
               variant="secondary"
             >
               <ThumbsDownIcon className="w-4 h-4" />
@@ -144,7 +205,7 @@ export default function Post({ isModal }: PostProps) {
           </div>
         </div>
 
-        <div className="lg:col-span-2 border-t lg:border-t-0 lg:border-l lg:pl-8 pt-8 lg:pt-0 h-full min-h-[300px]">
+        <div className="lg:col-span-2 border-t lg:border-t-0 lg:border-l lg:pl-8 pt-8 lg:pt-0 h-full min-h-75">
           <h3 className="font-bold text-xl tracking-tight mb-4 text-foreground">
             Comments ({post.commentsCount})
           </h3>
@@ -184,7 +245,7 @@ export default function Post({ isModal }: PostProps) {
             {isLoading && "Loading Post..."}
             {post
               ? `Viewing Post by ${post?.author?.firstName} ${post?.author?.lastName}`
-              : "Post not found"}
+              : "Post Not Found"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 md:p-8 pt-8">{renderContent()}</CardContent>

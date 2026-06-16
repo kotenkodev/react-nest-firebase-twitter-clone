@@ -20,23 +20,43 @@ export class PostsService {
     private readonly likesService: LikesService,
   ) {}
 
-  async findOne(id: string): Promise<Post> {
+  async findOne(id: string, userId?: string): Promise<Post> {
     const post = await this.postsRepository.findOne(id);
     if (!post) {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
-    return post;
+
+    if (!userId) {
+      return {
+        ...post,
+        userLike: null,
+      };
+    }
+
+    const like = await this.likesService.findOne(userId, id);
+
+    return {
+      ...post,
+      userLike: like?.type || null,
+    };
   }
 
   async findAll(
-    userId: string,
+    userId?: string,
     lastDocId?: string,
     limit: number = 10,
   ): Promise<Post[]> {
     const posts = await this.postsRepository.findAll(limit, lastDocId);
 
+    if (!userId || posts.length === 0) {
+      return posts.map((post) => ({
+        ...post,
+        userLike: null,
+      }));
+    }
+
     const likes = await this.likesService.findManyByIds(
-      posts.map((post) => `${userId}_${post.id}`),
+      posts.map((post) => ({ userId, postId: post.id })),
     );
 
     return posts.map((post, index) => ({

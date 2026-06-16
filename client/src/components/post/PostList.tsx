@@ -7,7 +7,7 @@ import PostCard from "./PostCard";
 import { likePost } from "@/services/likesService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { PostCardSkeleton } from "./PostCardSkeleton";
-import { BookOpenIcon, SquarePenIcon } from "lucide-react";
+import { SquarePenIcon } from "lucide-react";
 
 type PostListProps = {
   fetchAction: () => Promise<Post[]>;
@@ -141,7 +141,7 @@ export default function PostList({
             onLike={handleLikeClick}
             onEdit={openEditDialog}
             onDelete={handleDeletePost}
-            reactionType={post.userLike}
+            userLike={post.userLike}
             currentUserId={user?.id}
           />
         </li>

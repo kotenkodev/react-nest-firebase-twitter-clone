@@ -31,7 +31,7 @@ type PostCardProps = {
   onLike: (postId: string, type: "like" | "dislike") => void;
   onEdit: (post: Post) => void;
   onDelete: (postId: string) => void;
-  reactionType?: "like" | "dislike" | null;
+  userLike?: "like" | "dislike" | null;
 };
 
 export default function PostCard({
@@ -40,7 +40,7 @@ export default function PostCard({
   onLike,
   onEdit,
   onDelete,
-  reactionType,
+  userLike: reactionType,
 }: PostCardProps) {
   const [titleExpanded, setTitleExpanded] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
@@ -51,11 +51,13 @@ export default function PostCard({
     <Card className="overflow-hidden">
       {post.photoURL && (
         <div className="relative w-full flex justify-center overflow-hidden">
-          <img
-            src={post.photoURL}
-            alt="Post media"
-            className="max-h-80 w-auto max-w-full object-contain transition-transform duration-300 hover:scale-[1.02]"
-          />
+          <Link to={`/post/${post.id}`} state={{ background: location }}>
+            <img
+              src={post.photoURL}
+              alt="Post media"
+              className="max-h-80 w-auto max-w-full object-contain transition-transform duration-300 hover:scale-[1.02]"
+            />
+          </Link>
         </div>
       )}
       <CardHeader>

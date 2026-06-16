@@ -18,17 +18,19 @@ import { CheckOwnership } from '../../common/decorators/check-ownership.decorato
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from '../../common/decorators/get-user.decorator';
+import { FirebaseOptionalAuthGuard } from 'src/common/guards/firebase-optional-auth.guard';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  @UseGuards(FirebaseOptionalAuthGuard)
   @Get(':id')
-  async findPostById(@Param('id') id: string) {
-    return this.postsService.findOne(id);
+  async findPostById(@Param('id') id: string, @GetUser('uid') userId?: string) {
+    return this.postsService.findOne(id, userId);
   }
 
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseOptionalAuthGuard)
   @Get()
   async findAll(
     @GetUser('uid') userId: string,

@@ -6,6 +6,8 @@ export const GetUser = createParamDecorator(
     const request = ctx.switchToHttp().getRequest();
     const user = request.user as DecodedIdToken;
 
+    if (!user) return null;
+
     return data ? user?.[data] : user;
   },
 );
