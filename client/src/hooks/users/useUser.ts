@@ -9,7 +9,6 @@ export const useUser = (id?: string) => {
     queryFn: () => {
       return getUser(id!);
     },
-    staleTime: 1000 * 60 * 5,
   });
 
   return { user: data, error, isPending };

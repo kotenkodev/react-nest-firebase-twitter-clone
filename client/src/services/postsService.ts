@@ -1,30 +1,41 @@
 import type { CreatePost, Post, UpdatePost } from "@/types/post.types";
 import apiClient from "./apiClient";
 import { transformPostPayload } from "@/utils/transformPayload";
+import type { PostFilters } from "@/lib/queryKeys";
 
 export type PaginatedPostsResponse = {
   posts: Post[];
   nextCursor: string | null;
 };
 
-export const getPosts = async ({
-  pageParam,
-  userId,
-}: {
-  pageParam?: string;
+type GetPostsParams = PostFilters & {
+  cursor?: string;
   userId?: string;
-}): Promise<PaginatedPostsResponse> => {
+  limit?: number;
+};
+
+export const getPosts = async ({
+  cursor,
+  userId,
+  search,
+  sortBy,
+  limit = 10,
+}: GetPostsParams): Promise<PaginatedPostsResponse> => {
   try {
-    const limit = 1;
+    limit = 1;
+
     const response = await apiClient.get("posts", {
       params: {
-        lastDocId: pageParam,
+        lastDocId: cursor,
         user: userId,
+        search,
+        sortBy,
         limit,
       },
     });
 
     const posts = response.data.map(transformPostPayload);
+
     const nextCursor =
       posts.length === limit ? posts[posts.length - 1].id : null;
 

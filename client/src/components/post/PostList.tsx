@@ -7,21 +7,22 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { PostCardSkeleton } from "./PostCardSkeleton";
 import { SquarePenIcon } from "lucide-react";
 import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import { useToggleLike } from "@/hooks/posts/useToggleLike";
-import { postKeys } from "@/lib/queryKeys";
 import { useDeletePost } from "@/hooks/posts/useDeletePost";
+import { usePosts } from "@/hooks/posts/usePosts";
 
 type PostListProps = {
-  fetchAction: (context: {
-    pageParam?: string;
-  }) => Promise<{ posts: Post[]; nextCursor?: string | null }>;
+  userId?: string;
+  search?: string;
+  sortBy?: "newest" | "popular";
   emptyMessage?: string;
 };
 
 export default function PostList({
-  fetchAction,
+  userId,
+  search,
+  sortBy,
   emptyMessage = "No posts found.",
 }: PostListProps) {
   const { user } = useAuthStore();
@@ -33,22 +34,13 @@ export default function PostList({
   const { toggleLike } = useToggleLike();
 
   const {
-    data,
+    posts,
     error,
     fetchNextPage,
     hasNextPage,
-    isFetching,
     isFetchingNextPage,
     status,
-  } = useInfiniteQuery({
-    queryKey: postKeys.feed(),
-    queryFn: fetchAction,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    initialPageParam: undefined as string | undefined,
-    staleTime: 1000 * 60,
-  });
-
-  const posts = data?.pages.flatMap((page) => page.posts) || [];
+  } = usePosts({ userId, search, sortBy });
 
   const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
     toggleLike(

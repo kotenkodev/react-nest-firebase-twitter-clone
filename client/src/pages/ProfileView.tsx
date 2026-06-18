@@ -82,7 +82,8 @@ export default function Profile() {
           </CardHeader>
           <CardContent className="p-0 sm:p-6 md:p-8">
             <PostList
-              fetchAction={() => getPosts({ userId: user.id })}
+              userId={user.id}
+              sortBy="newest"
               emptyMessage={`${user.firstName} hasn't posted anything yet.`}
             />
           </CardContent>

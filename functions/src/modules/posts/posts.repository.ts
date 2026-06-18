@@ -21,17 +21,21 @@ export class PostsRepository {
     lastDocId?: string,
     searchText?: string,
     userId?: string,
+    sortBy?: 'newest' | 'popular',
   ): Promise<Post[]> {
-    let query = this.collection
-      .orderBy('likesCount', 'desc')
-      .orderBy('commentsCount', 'asc')
-      .orderBy('createdAt', 'desc')
-      .limit(limit);
+    let query = this.collection.limit(limit);
 
     if (searchText) {
+      // algolia
+    }
+
+    if (sortBy === 'newest') {
+      query = query.orderBy('createdAt', 'desc');
+    } else if (sortBy === 'popular') {
       query = query
-        .where('content', '>=', searchText)
-        .where('content', '<=', searchText + '\uf8ff');
+        .orderBy('likesCount', 'desc')
+        .orderBy('commentsCount', 'asc')
+        .orderBy('createdAt', 'desc');
     }
 
     console.log(

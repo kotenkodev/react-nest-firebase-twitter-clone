@@ -38,6 +38,7 @@ export class PostsController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
     @Query('search') searchText?: string,
     @Query('user') userId?: string,
+    @Query('sortBy') sortBy?: 'newest' | 'popular',
   ) {
     return this.postsService.findAll(
       currentUserId,
@@ -45,6 +46,7 @@ export class PostsController {
       limit,
       searchText,
       userId,
+      sortBy,
     );
   }
 

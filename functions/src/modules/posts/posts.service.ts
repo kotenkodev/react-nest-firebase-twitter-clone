@@ -47,12 +47,14 @@ export class PostsService {
     limit: number = 10,
     searchText?: string,
     userId?: string,
+    sortBy?: 'newest' | 'popular',
   ): Promise<Post[]> {
     const posts = await this.postsRepository.findAll(
       limit,
       lastDocId,
       searchText,
       userId,
+      sortBy,
     );
 
     if (!currentUserId || posts.length === 0) {
