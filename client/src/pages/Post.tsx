@@ -16,12 +16,16 @@ import { useToggleLike } from "@/hooks/posts/useToggleLike";
 import ItemNotFound from "@/components/ItemNotFound";
 import { toast } from "sonner";
 import { usePost } from "@/hooks/posts/usePost";
+import { useAuthStore } from "@/store/useAuthStore";
+import CommentList from "@/components/comment/CommentList";
+import CommentInput from "@/components/comment/CommentInput";
 
 type PostProps = {
   isModal?: boolean;
 };
 
 export default function Post({ isModal }: PostProps) {
+  const { user } = useAuthStore();
   const { id } = useParams();
   const navigate = useNavigate();
   const { toggleLike } = useToggleLike();
@@ -33,7 +37,13 @@ export default function Post({ isModal }: PostProps) {
     toggleLike(
       { postId, likeType: like },
       {
-        onError: () => toast.error("Failed to toggle like. Please try again."),
+        onError: () => {
+          if (user) {
+            toast.error("Failed to toggle like. Please try again.");
+          } else {
+            toast.error("You must be signed in to like or dislike a post.");
+          }
+        },
       },
     );
   };
@@ -109,10 +119,9 @@ export default function Post({ isModal }: PostProps) {
             Comments ({post.commentsCount})
           </h3>
           <div className="rounded-xl border border-dashed border-muted p-8 text-center bg-muted/20">
-            <p className="text-sm text-muted-foreground italic">
-              Comments stream coming soon...
-            </p>
+            <CommentList postId={post.id} />
           </div>
+          <CommentInput postId={post.id} className="mt-4" />
         </div>
       </div>
     );

@@ -46,7 +46,13 @@ export default function PostList({
     toggleLike(
       { postId, likeType: like },
       {
-        onError: () => toast.error("Failed to toggle like. Please try again."),
+        onError: () => {
+          if (user) {
+            toast.error("Failed to toggle like. Please try again.");
+          } else {
+            toast.error("You must be signed in to like or dislike a post.");
+          }
+        },
       },
     );
   };

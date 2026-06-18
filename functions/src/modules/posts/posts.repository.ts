@@ -23,7 +23,11 @@ export class PostsRepository {
     userId?: string,
     sortBy?: 'newest' | 'popular',
   ): Promise<Post[]> {
-    let query = this.collection.limit(limit);
+    let query: FirebaseFirestore.Query = this.collection;
+
+    if (userId) {
+      query = query.where('authorId', '==', userId);
+    }
 
     if (searchText) {
       // algolia
@@ -38,15 +42,6 @@ export class PostsRepository {
         .orderBy('createdAt', 'desc');
     }
 
-    console.log(
-      `Searching for posts with searchText: ${searchText}, userId: ${userId}, lastDocId: ${lastDocId}, limit: ${limit}`,
-      query,
-    );
-
-    if (userId) {
-      query = query.where('authorId', '==', userId);
-    }
-
     if (lastDocId) {
       const lastDoc = await this.collection.doc(lastDocId).get();
 
@@ -54,6 +49,8 @@ export class PostsRepository {
         query = query.startAfter(lastDoc);
       }
     }
+
+    query = query.limit(limit);
 
     const snapshot = await query.get();
     return snapshot.docs.map((doc) => mapToEntity<Post>(doc)!);
@@ -64,6 +61,20 @@ export class PostsRepository {
     return mapToEntity(doc);
   }
 
+  async findManyByIds(ids: string[]): Promise<(Post | null)[]> {
+    if (!ids || ids.length === 0) {
+      return [];
+    }
+
+    const refs = ids.map((id) => this.collection.doc(id));
+
+    const snapshots = await this.db.getAll(...refs);
+
+    return snapshots.map((snap) => {
+      return snap.exists ? mapToEntity<Post>(snap) : null;
+    });
+  }
+
   async create(id: string, data: Partial<Post>): Promise<Post | null> {
     await this.collection.doc(id).set({
       ...data,
@@ -71,7 +82,6 @@ export class PostsRepository {
       dislikesCount: 0,
       commentsCount: 0,
       createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
     });
     const doc = await this.collection.doc(id).get();
     return mapToEntity(doc);

@@ -8,12 +8,13 @@ export interface Comment {
     lastName?: string;
     photoURL?: string;
   };
-  isDeleted: boolean;
+  isEdited?: boolean;
+  isDeleted?: boolean;
   replyCount: number;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
-export type CreateComment = Pick<Comment, "id" | "content">;
+export type CreateComment = Pick<Comment, "content" | "parentId">;
 
 export type UpdateComment = Pick<Comment, "content">;

@@ -10,6 +10,8 @@ import { Post } from './entities/post.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
 import { LikesService } from '../likes/likes.service';
+import { ALGOLIA } from '../algolia/algolia.module';
+import type { Algoliasearch } from 'algoliasearch';
 
 @Injectable()
 export class PostsService {
@@ -18,6 +20,7 @@ export class PostsService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => LikesService))
     private readonly likesService: LikesService,
+    @Inject(ALGOLIA) private readonly algolia: Algoliasearch,
   ) {}
 
   async findOne(id: string, userId?: string): Promise<Post> {
@@ -74,17 +77,17 @@ export class PostsService {
     }));
   }
 
-  async create(uid: string, dto: CreatePostDto): Promise<Post | null> {
+  async create(userId: string, dto: CreatePostDto): Promise<Post | null> {
     const { id, ...postData } = dto;
 
-    const user = await this.usersService.findOne(uid);
+    const user = await this.usersService.findOne(userId);
     if (!user) {
-      throw new NotFoundException(`User with UID ${uid} not found`);
+      throw new NotFoundException(`User with UID ${userId} not found`);
     }
 
     return this.postsRepository.create(id, {
       ...postData,
-      authorId: uid,
+      authorId: userId,
       author: {
         firstName: user.firstName,
         lastName: user.lastName,

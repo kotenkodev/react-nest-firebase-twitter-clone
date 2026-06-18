@@ -10,8 +10,8 @@ export interface Comment {
     lastName?: string;
     photoURL?: string;
   };
-  isDeleted: boolean;
-  isEdited: boolean;
+  isDeleted?: boolean;
+  isEdited?: boolean;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
