@@ -12,6 +12,13 @@ export const postKeys = {
   single: (postId: string) => ["post", postId] as const,
 };
 
+export const commentKeys = {
+  all: ["comments"] as const,
+  list: (postId: string) => [...commentKeys.all, "list", postId] as const,
+  replies: (parentId: string) =>
+    [...commentKeys.all, "replies", parentId] as const,
+};
+
 export const userKeys = {
   single: (userId: string) => ["user", userId] as const,
 };

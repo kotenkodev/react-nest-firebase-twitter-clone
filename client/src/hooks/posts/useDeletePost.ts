@@ -9,8 +9,9 @@ export const useDeletePost = () => {
     mutationFn: async (postId: string) => {
       await deletePostApi(postId);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: postKeys.feed() });
+    onSuccess: (_, postId) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+      queryClient.invalidateQueries({ queryKey: postKeys.single(postId) });
     },
     onError: (error) => {
       console.error("Error deleting post:", error);
