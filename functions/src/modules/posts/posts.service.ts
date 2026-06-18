@@ -42,13 +42,20 @@ export class PostsService {
   }
 
   async findAll(
-    userId?: string,
+    currentUserId?: string,
     lastDocId?: string,
     limit: number = 10,
+    searchText?: string,
+    userId?: string,
   ): Promise<Post[]> {
-    const posts = await this.postsRepository.findAll(limit, lastDocId);
+    const posts = await this.postsRepository.findAll(
+      limit,
+      lastDocId,
+      searchText,
+      userId,
+    );
 
-    if (!userId || posts.length === 0) {
+    if (!currentUserId || posts.length === 0) {
       return posts.map((post) => ({
         ...post,
         userLike: null,
@@ -56,7 +63,7 @@ export class PostsService {
     }
 
     const likes = await this.likesService.findManyByIds(
-      posts.map((post) => ({ userId, postId: post.id })),
+      posts.map((post) => ({ userId: currentUserId, postId: post.id })),
     );
 
     return posts.map((post, index) => ({

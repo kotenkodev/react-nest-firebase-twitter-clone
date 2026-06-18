@@ -16,12 +16,32 @@ export class PostsRepository {
     this.collection = this.db.collection('posts');
   }
 
-  async findAll(limit: number, lastDocId?: string): Promise<Post[]> {
+  async findAll(
+    limit: number,
+    lastDocId?: string,
+    searchText?: string,
+    userId?: string,
+  ): Promise<Post[]> {
     let query = this.collection
       .orderBy('likesCount', 'desc')
       .orderBy('commentsCount', 'asc')
       .orderBy('createdAt', 'desc')
       .limit(limit);
+
+    if (searchText) {
+      query = query
+        .where('content', '>=', searchText)
+        .where('content', '<=', searchText + '\uf8ff');
+    }
+
+    console.log(
+      `Searching for posts with searchText: ${searchText}, userId: ${userId}, lastDocId: ${lastDocId}, limit: ${limit}`,
+      query,
+    );
+
+    if (userId) {
+      query = query.where('authorId', '==', userId);
+    }
 
     if (lastDocId) {
       const lastDoc = await this.collection.doc(lastDocId).get();

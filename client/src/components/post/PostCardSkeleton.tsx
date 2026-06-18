@@ -10,17 +10,17 @@ export function PostCardSkeleton({ hasImage = true }: PostCardSkeletonProps) {
   return (
     <Card className="p-0 overflow-hidden">
       <CardHeader className="p-0">
-        <PostSkeletonContent 
-          hasImage={hasImage} 
-          className="p-6" 
-          avatarSize="md"
+        <PostSkeletonContent
+          hasImage={hasImage}
+          className="p-4"
+          avatarSize="sm"
         />
       </CardHeader>
 
-      <CardContent className="flex items-center justify-end gap-4 pt-0 pb-6 pr-6">
-        <Skeleton className="h-8 w-16 rounded-full" />
-        <Skeleton className="h-8 w-16 rounded-full" />
-        <Skeleton className="h-8 w-16 rounded-full" />
+      <CardContent className="flex items-center justify-end gap-2 pt-0 pb-4 pr-4">
+        <Skeleton className="h-7 w-14 rounded-full" />
+        <Skeleton className="h-7 w-14 rounded-full" />
+        <Skeleton className="h-7 w-14 rounded-full" />
       </CardContent>
     </Card>
   );

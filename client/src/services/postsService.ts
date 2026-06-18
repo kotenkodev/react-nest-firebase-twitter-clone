@@ -9,19 +9,20 @@ export type PaginatedPostsResponse = {
 
 export const getPosts = async ({
   pageParam,
+  userId,
 }: {
   pageParam?: string;
+  userId?: string;
 }): Promise<PaginatedPostsResponse> => {
   try {
     const limit = 1;
     const response = await apiClient.get("posts", {
       params: {
         lastDocId: pageParam,
+        user: userId,
         limit,
       },
     });
-
-    console.log("Fetched posts:", response.data);
 
     const posts = response.data.map(transformPostPayload);
     const nextCursor =

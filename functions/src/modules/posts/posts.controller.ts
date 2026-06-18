@@ -33,12 +33,19 @@ export class PostsController {
   @UseGuards(FirebaseOptionalAuthGuard)
   @Get()
   async findAll(
-    @GetUser('uid') userId: string,
+    @GetUser('uid') currentUserId: string,
     @Query('lastDocId') lastDocId?: string,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
     @Query('search') searchText?: string,
+    @Query('user') userId?: string,
   ) {
-    return this.postsService.findAll(userId, lastDocId, limit);
+    return this.postsService.findAll(
+      currentUserId,
+      lastDocId,
+      limit,
+      searchText,
+      userId,
+    );
   }
 
   @UseGuards(FirebaseAuthGuard)

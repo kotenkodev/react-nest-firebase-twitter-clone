@@ -7,7 +7,6 @@ export const likePost = async (
   data: CreateLike,
 ): Promise<Like> => {
   try {
-    console.log("Creating like with data:", data);
     const response = await apiClient.post(`posts/${postId}/likes`, data);
     return transformLikePayload(response.data);
   } catch (error) {

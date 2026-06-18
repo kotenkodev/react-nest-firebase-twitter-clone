@@ -1,7 +1,7 @@
 import { BirdSpinner } from "@/components/ui/bird-spinner";
 import { Container } from "@/components/ui/container";
 import TransitionLink from "@/components/TransitionLink";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -25,15 +25,10 @@ export default function NotFound() {
         </p>
       </div>
 
-      <TransitionLink
-        to="/"
-        className={buttonVariants({
-          variant: "default",
-          size: "lg",
-          className: "px-10 font-bold",
-        })}
-      >
-        Fly back home
+      <TransitionLink to="/">
+        <Button size="lg" className="px-10 font-bold">
+          Fly back home
+        </Button>
       </TransitionLink>
     </Container>
   );
