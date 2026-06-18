@@ -1,26 +1,21 @@
 import { toast } from "sonner";
 import { deletePost } from "@/services/postsService";
 import { useUIStore } from "@/store/useUIStore";
-import type { Post } from "@/types/post";
+import type { Post } from "@/types/post.types";
 import { useEffect, useState } from "react";
 import PostCard from "./PostCard";
 import { likePost } from "@/services/likesService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { PostCardSkeleton } from "./PostCardSkeleton";
-import { SquarePenIcon, Trash2Icon } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "../ui/alert-dialog";
+import { Loader2Icon, SquarePenIcon } from "lucide-react";
+import { useInView } from "react-intersection-observer";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 
 type PostListProps = {
-  fetchAction: () => Promise<Post[]>;
+  fetchAction: (context: {
+    pageParam?: string;
+  }) => Promise<{ posts: Post[]; nextCursor?: string | null }>;
   emptyMessage?: string;
 };
 
@@ -29,46 +24,69 @@ export default function PostList({
   emptyMessage = "No posts found.",
 }: PostListProps) {
   const { user } = useAuthStore();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [postToDelete, setPostToDelete] = useState<Post | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  
   const { setPostDialogOpen, setEditingPost } = useUIStore();
 
+  const { ref, inView } = useInView({ threshold: 0 });
+  const queryClient = useQueryClient();
+
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["posts"],
+    queryFn: fetchAction,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: undefined as string | undefined,
+  });
+
+  const posts = data?.pages.flatMap((page) => page.posts) || [];
+
   const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
-    const previousPost = posts.find((p) => p.id === postId);
+    await queryClient.cancelQueries({ queryKey: ["posts"] });
 
-    if (!previousPost) return;
-    setPosts((current) =>
-      current.map((post) => {
-        if (post.id !== postId) return post;
+    const previousData = queryClient.getQueryData(["posts"]);
 
-        const isSameReaction = post.userLike === like;
-        const newReaction = isSameReaction ? null : like;
+    queryClient.setQueryData(["posts"], (oldData: any) => {
+      if (!oldData) return oldData;
 
-        return {
-          ...post,
-          userLike: newReaction,
-          likesCount:
-            post.likesCount +
-            (newReaction === "like" ? 1 : 0) -
-            (post.userLike === "like" ? 1 : 0),
-          dislikesCount:
-            post.dislikesCount +
-            (newReaction === "dislike" ? 1 : 0) -
-            (post.userLike === "dislike" ? 1 : 0),
-        };
-      }),
-    );
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page: any) => ({
+          ...page,
+          posts: page.posts.map((post: Post) => {
+            if (post.id !== postId) return post;
+
+            const isSameReaction = post.userLike === like;
+            const newReaction = isSameReaction ? null : like;
+
+            return {
+              ...post,
+              userLike: newReaction,
+              likesCount:
+                post.likesCount +
+                (newReaction === "like" ? 1 : 0) -
+                (post.userLike === "like" ? 1 : 0),
+              dislikesCount:
+                post.dislikesCount +
+                (newReaction === "dislike" ? 1 : 0) -
+                (post.userLike === "dislike" ? 1 : 0),
+            };
+          }),
+        })),
+      };
+    });
 
     try {
       await likePost(postId, { type: like });
-      toast.success(`You ${like}d the post!`);
     } catch (error) {
-      setPosts((current) =>
-        current.map((post) => (post.id === postId ? previousPost : post)),
-      );
+      queryClient.setQueryData(["posts"], previousData);
       console.error(`Error handling ${like}:`, error);
       toast.error("Failed to update reaction.");
     }
@@ -85,11 +103,22 @@ export default function PostList({
 
   const handleDeleteConfirm = async () => {
     if (!postToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       await deletePost(postToDelete.id);
-      setPosts((current) => current.filter((p) => p.id !== postToDelete.id));
+
+      queryClient.setQueryData(["posts"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            posts: page.posts.filter((p: Post) => p.id !== postToDelete.id),
+          })),
+        };
+      });
+
       toast.success("Post deleted successfully!");
     } catch (error) {
       console.error("Error deleting post:", error);
@@ -101,22 +130,12 @@ export default function PostList({
   };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      try {
-        const data = await fetchAction();
-        setPosts(data);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-        toast.error("Failed to load posts. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchPosts();
-  }, [fetchAction]);
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (isLoading) {
+  if (status === "pending" || status === "loading") {
     return (
       <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
         {Array.from({ length: 3 }).map((_, index) => (
@@ -128,7 +147,7 @@ export default function PostList({
     );
   }
 
-  if (posts.length === 0) {
+  if (status === "success" && posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center border-2 border-dashed rounded-xl bg-muted/20">
         <div className="bg-secondary/50 p-4 rounded-full mb-4">
@@ -164,40 +183,19 @@ export default function PostList({
         ))}
       </ul>
 
-      <AlertDialog
-        open={Boolean(postToDelete)}
-        onOpenChange={(open) => !open && setPostToDelete(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <div className="flex items-center gap-4 mb-2">
-              <div className="bg-destructive/10 p-2.5 rounded-full">
-                <Trash2Icon className="w-5 h-5 text-destructive" />
-              </div>
-              <AlertDialogTitle>Delete Post?</AlertDialogTitle>
-            </div>
-            <AlertDialogDescription className="text-base">
-              This action cannot be undone. This will permanently delete your
-              post "<span className="font-semibold text-foreground">{postToDelete?.title}</span>" 
-              and all associated data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-2">
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault();
-                handleDeleteConfirm();
-              }}
-              variant="destructive"
-              className="px-6"
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Delete Post"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <div ref={ref} className="h-10 flex justify-center mt-4">
+        {isFetchingNextPage && <Loader2Icon className="animate-spin" />}
+      </div>
+
+      <ConfirmDeleteDialog
+        isOpen={Boolean(postToDelete)}
+        onClose={() => setPostToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title="Delete Post?"
+        itemName={postToDelete?.title}
+        itemType="post"
+      />
     </>
   );
 }

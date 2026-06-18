@@ -58,7 +58,9 @@
     },
     "singleProjectMode": true
   },
-  "extensions": {},
+  "extensions": {
+    "firestore-algolia-search": "algolia/firestore-algolia-search@1.2.11"
+  },
   "database": {
     "rules": "database.rules.json"
   },

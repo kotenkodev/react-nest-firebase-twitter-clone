@@ -12,7 +12,7 @@ import { uploadPostImage } from "@/services/storageService";
 import { collection, doc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Loader2Icon } from "lucide-react";
-import type { Post } from "@/types/post";
+import type { Post } from "@/types/post.types";
 import ImageUploader from "../profile/ImageUploader";
 import { CountedTextarea } from "../CountedTextarea";
 

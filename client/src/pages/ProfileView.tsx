@@ -3,7 +3,7 @@ import ProfileCard from "@/components/ProfileCard";
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { getUser } from "@/services/usersService";
-import type { User } from "@/types/user";
+import type { User } from "@/types/user.types";
 import {
   Card,
   CardContent,
@@ -48,8 +48,8 @@ export default function Profile() {
     fetchUser();
   }, [id, user?.id]);
 
-  const fetchUserPosts = useCallback(() => {
-    return getPosts();
+  const fetchUserPosts = useCallback(({ pageParam }: { pageParam?: string }) => {
+    return getPosts({ pageParam });
   }, []);
 
   if (isLoading) {

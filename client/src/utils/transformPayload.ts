@@ -1,6 +1,6 @@
-import type { Like } from "@/types/like";
-import type { Post } from "@/types/post";
-import type { User } from "@/types/user";
+import type { Like } from "@/types/like.types";
+import type { Post } from "@/types/post.types";
+import type { User } from "@/types/user.types";
 
 const parseDate = (value: any): Date | undefined => {
   if (!value) return undefined;

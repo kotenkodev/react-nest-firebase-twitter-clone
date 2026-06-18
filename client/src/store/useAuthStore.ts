@@ -1,4 +1,4 @@
-import type { User } from "@/types/user";
+import type { User } from "@/types/user.types";
 import { create } from "zustand";
 
 interface AuthState {

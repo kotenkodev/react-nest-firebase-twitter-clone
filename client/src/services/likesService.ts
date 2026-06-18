@@ -1,4 +1,4 @@
-import type { CreateLike, Like } from "@/types/like";
+import type { CreateLike, Like } from "@/types/like.types";
 import apiClient from "./apiClient";
 import { transformLikePayload } from "@/utils/transformPayload";
 

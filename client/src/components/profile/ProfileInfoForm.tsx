@@ -6,7 +6,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { DatePicker } from "../ui/date-picker";
 import { Textarea } from "../ui/textarea";
 import { useState } from "react";
-import type { User } from "@/types/user";
+import type { User } from "@/types/user.types";
 import { Input } from "../ui/input";
 import type z from "zod";
 import { updateUser } from "@/services/usersService";

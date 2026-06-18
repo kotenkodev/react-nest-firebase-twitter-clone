@@ -13,7 +13,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { syncUserData } from "@/utils/syncUserData";
-import type { CreateUser, SignInUser } from "@/types/user";
+import type { CreateUser, SignInUser } from "@/types/user.types";
 
 export const signOut = async () => {
   try {

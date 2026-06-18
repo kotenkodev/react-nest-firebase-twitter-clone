@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import TransitionLink from "@/components/TransitionLink";
 import { getPost } from "@/services/postsService";
 import { PostDetailSkeleton } from "@/components/post/PostDetailSkeleton";
-import type { Post } from "@/types/post";
+import type { Post } from "@/types/post.types";
 import { BirdSpinner } from "@/components/ui/bird-spinner";
 import { buttonVariants } from "@/components/ui/button";
 import { likePost } from "@/services/likesService";

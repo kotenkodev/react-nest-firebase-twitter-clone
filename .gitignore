@@ -70,3 +70,5 @@ node_modules/
 
 .agents
 skills-lock.json
+
+/extensions/firestore-algolia-search.env

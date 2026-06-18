@@ -1,11 +1,36 @@
-import type { CreatePost, Post, UpdatePost } from "@/types/post";
+import type { CreatePost, Post, UpdatePost } from "@/types/post.types";
 import apiClient from "./apiClient";
 import { transformPostPayload } from "@/utils/transformPayload";
 
-export const getPosts = async (): Promise<Post[]> => {
+export type PaginatedPostsResponse = {
+  posts: Post[];
+  nextCursor: string | null;
+};
+
+export const getPosts = async ({
+  pageParam,
+}: {
+  pageParam?: string;
+}): Promise<PaginatedPostsResponse> => {
   try {
-    const response = await apiClient.get("posts");
-    return response.data.map(transformPostPayload);
+    const limit = 1;
+    const response = await apiClient.get("posts", {
+      params: {
+        lastDocId: pageParam,
+        limit,
+      },
+    });
+
+    console.log("Fetched posts:", response.data);
+
+    const posts = response.data.map(transformPostPayload);
+    const nextCursor =
+      posts.length === limit ? posts[posts.length - 1].id : null;
+
+    return {
+      posts,
+      nextCursor,
+    };
   } catch (error) {
     console.error("Error fetching posts:", error);
     throw error;

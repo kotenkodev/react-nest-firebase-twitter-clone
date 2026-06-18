@@ -18,7 +18,7 @@ import { CheckOwnership } from '../../common/decorators/check-ownership.decorato
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from '../../common/decorators/get-user.decorator';
-import { FirebaseOptionalAuthGuard } from 'src/common/guards/firebase-optional-auth.guard';
+import { FirebaseOptionalAuthGuard } from '../../common/guards/firebase-optional-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -36,6 +36,7 @@ export class PostsController {
     @GetUser('uid') userId: string,
     @Query('lastDocId') lastDocId?: string,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    @Query('search') searchText?: string,
   ) {
     return this.postsService.findAll(userId, lastDocId, limit);
   }

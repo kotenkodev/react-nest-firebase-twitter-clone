@@ -1,6 +1,6 @@
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import type { User } from "@/types/user";
+import type { User } from "@/types/user.types";
 import { getInitials } from "@/utils/getInitials";
 import { BadgeCheck, CalendarDays, Mail } from "lucide-react";
 

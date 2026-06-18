@@ -1,4 +1,4 @@
-import type { UpdateUser } from "@/types/user";
+import type { UpdateUser } from "@/types/user.types";
 import apiClient from "./apiClient";
 import { transformUserPayload } from "@/utils/transformPayload";
 

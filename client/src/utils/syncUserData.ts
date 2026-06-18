@@ -1,5 +1,5 @@
 import { db } from "@/config/firebaseConfig";
-import type { User, UpdateUser } from "@/types/user";
+import type { User, UpdateUser } from "@/types/user.types";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { transformUserPayload } from "./transformPayload";
 
