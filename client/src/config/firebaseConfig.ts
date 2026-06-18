@@ -26,7 +26,7 @@ export const functions = getFunctions(app);
 export const googleProvider = new GoogleAuthProvider();
 
 if (import.meta.env.DEV) {
-  connectAuthEmulator(auth, "http://localhost:9099");
+  connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
   connectFirestoreEmulator(db, "localhost", 8080);
   connectStorageEmulator(storage, "localhost", 9199);
   connectFunctionsEmulator(functions, "127.0.0.1", 5001);

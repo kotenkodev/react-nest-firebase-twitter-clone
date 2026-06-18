@@ -7,7 +7,6 @@ import type z from "zod";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { createPost, updatePost } from "@/services/postsService";
 import { uploadPostImage } from "@/services/storageService";
 import { collection, doc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
@@ -15,6 +14,8 @@ import { Loader2Icon } from "lucide-react";
 import type { Post } from "@/types/post.types";
 import ImageUploader from "../profile/ImageUploader";
 import { CountedTextarea } from "../CountedTextarea";
+import { useCreatePost } from "@/hooks/posts/useCreatePost";
+import { useUpdatePost } from "@/hooks/posts/useUpdatePost";
 
 type FormValues = z.infer<typeof postSchema>;
 
@@ -26,9 +27,12 @@ type PostFormProps = {
 const MAX_CONTENT_LENGTH = postSchema.shape.content.maxLength;
 
 export default function PostForm({ onSuccess, post }: PostFormProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isImageRemoved, setIsImageRemoved] = useState(false);
+
+  const { createPost, isCreating } = useCreatePost();
+  const { updatePost, isUpdating } = useUpdatePost();
+  const isLoading = isCreating || isUpdating;
 
   const isEditMode = Boolean(post);
 
@@ -42,7 +46,6 @@ export default function PostForm({ onSuccess, post }: PostFormProps) {
   });
 
   const onSubmit = async (data: FormValues) => {
-    setIsLoading(true);
     try {
       const postId =
         isEditMode && post ? post.id : doc(collection(db, "posts")).id;
@@ -56,12 +59,9 @@ export default function PostForm({ onSuccess, post }: PostFormProps) {
       }
 
       if (isEditMode && post) {
-        await updatePost(post.id, {
-          ...data,
-          photoURL: photoURL,
-        });
+        updatePost({ postId: post.id, data: { ...data, photoURL } });
       } else {
-        await createPost({
+        createPost({
           ...data,
           id: postId,
           photoURL: photoURL,
@@ -75,8 +75,6 @@ export default function PostForm({ onSuccess, post }: PostFormProps) {
       toast.error(
         `Failed to ${isEditMode ? "update" : "create"} post. Please try again.`,
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 

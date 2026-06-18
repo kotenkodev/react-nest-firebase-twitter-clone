@@ -1,16 +1,17 @@
 import { toast } from "sonner";
-import { deletePost } from "@/services/postsService";
 import { useUIStore } from "@/store/useUIStore";
 import type { Post } from "@/types/post.types";
 import { useEffect, useState } from "react";
 import PostCard from "./PostCard";
-import { likePost } from "@/services/likesService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { PostCardSkeleton } from "./PostCardSkeleton";
-import { Loader2Icon, SquarePenIcon } from "lucide-react";
+import { SquarePenIcon } from "lucide-react";
 import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
+import { useToggleLike } from "@/hooks/posts/useToggleLike";
+import { postKeys } from "@/lib/queryKeys";
+import { useDeletePost } from "@/hooks/posts/useDeletePost";
 
 type PostListProps = {
   fetchAction: (context: {
@@ -25,11 +26,11 @@ export default function PostList({
 }: PostListProps) {
   const { user } = useAuthStore();
   const [postToDelete, setPostToDelete] = useState<Post | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   const { setPostDialogOpen, setEditingPost } = useUIStore();
 
+  const { deletePost, isDeleting } = useDeletePost();
   const { ref, inView } = useInView({ threshold: 0 });
-  const queryClient = useQueryClient();
+  const { toggleLike } = useToggleLike();
 
   const {
     data,
@@ -40,56 +41,22 @@ export default function PostList({
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["posts"],
+    queryKey: postKeys.feed(),
     queryFn: fetchAction,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
+    staleTime: 1000 * 60,
   });
 
   const posts = data?.pages.flatMap((page) => page.posts) || [];
 
   const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
-    await queryClient.cancelQueries({ queryKey: ["posts"] });
-
-    const previousData = queryClient.getQueryData(["posts"]);
-
-    queryClient.setQueryData(["posts"], (oldData: any) => {
-      if (!oldData) return oldData;
-
-      return {
-        ...oldData,
-        pages: oldData.pages.map((page: any) => ({
-          ...page,
-          posts: page.posts.map((post: Post) => {
-            if (post.id !== postId) return post;
-
-            const isSameReaction = post.userLike === like;
-            const newReaction = isSameReaction ? null : like;
-
-            return {
-              ...post,
-              userLike: newReaction,
-              likesCount:
-                post.likesCount +
-                (newReaction === "like" ? 1 : 0) -
-                (post.userLike === "like" ? 1 : 0),
-              dislikesCount:
-                post.dislikesCount +
-                (newReaction === "dislike" ? 1 : 0) -
-                (post.userLike === "dislike" ? 1 : 0),
-            };
-          }),
-        })),
-      };
-    });
-
-    try {
-      await likePost(postId, { type: like });
-    } catch (error) {
-      queryClient.setQueryData(["posts"], previousData);
-      console.error(`Error handling ${like}:`, error);
-      toast.error("Failed to update reaction.");
-    }
+    toggleLike(
+      { postId, likeType: like },
+      {
+        onError: () => toast.error("Failed to toggle like. Please try again."),
+      },
+    );
   };
 
   const openEditDialog = (post: Post) => {
@@ -104,29 +71,12 @@ export default function PostList({
   const handleDeleteConfirm = async () => {
     if (!postToDelete) return;
 
-    setIsDeleting(true);
-    try {
-      await deletePost(postToDelete.id);
+    deletePost(postToDelete.id, {
+      onSuccess: () => toast.success("Post deleted successfully!"),
+      onError: () => toast.error("Failed to delete post. Please try again."),
+    });
 
-      queryClient.setQueryData(["posts"], (oldData: any) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            posts: page.posts.filter((p: Post) => p.id !== postToDelete.id),
-          })),
-        };
-      });
-
-      toast.success("Post deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting post:", error);
-      toast.error("Failed to delete post. Please try again.");
-    } finally {
-      setIsDeleting(false);
-      setPostToDelete(null);
-    }
+    setPostToDelete(null);
   };
 
   useEffect(() => {
@@ -135,7 +85,7 @@ export default function PostList({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (status === "pending" || status === "loading") {
+  if (status === "pending") {
     return (
       <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
         {Array.from({ length: 3 }).map((_, index) => (
@@ -184,7 +134,19 @@ export default function PostList({
       </ul>
 
       <div ref={ref} className="h-10 flex justify-center mt-4">
-        {isFetchingNextPage && <Loader2Icon className="animate-spin" />}
+        {isFetchingNextPage ? (
+          <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
+            {Array.from({ length: 2 }).map((_, index) => (
+              <li key={index} className="list-none w-full">
+                <PostCardSkeleton />
+              </li>
+            ))}
+          </ul>
+        ) : hasNextPage ? null : (
+          <p className="text-sm text-muted-foreground text-center">
+            You've reached the end of the feed.
+          </p>
+        )}
       </div>
 
       <ConfirmDeleteDialog

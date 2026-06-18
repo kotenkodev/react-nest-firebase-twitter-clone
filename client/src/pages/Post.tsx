@@ -7,17 +7,15 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
-import { useEffect, useState } from "react";
-import TransitionLink from "@/components/TransitionLink";
-import { getPost } from "@/services/postsService";
+import { useEffect } from "react";
 import { PostDetailSkeleton } from "@/components/post/PostDetailSkeleton";
 import type { Post } from "@/types/post.types";
-import { BirdSpinner } from "@/components/ui/bird-spinner";
-import { buttonVariants } from "@/components/ui/button";
-import { likePost } from "@/services/likesService";
 import { PostAuthor } from "@/components/post/PostAuthor";
 import { PostReactions } from "@/components/post/PostReactions";
+import { useToggleLike } from "@/hooks/posts/useToggleLike";
+import ItemNotFound from "@/components/ItemNotFound";
+import { toast } from "sonner";
+import { usePost } from "@/hooks/posts/usePost";
 
 type PostProps = {
   isModal?: boolean;
@@ -26,60 +24,19 @@ type PostProps = {
 export default function Post({ isModal }: PostProps) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { toggleLike } = useToggleLike();
+  const { post, error, isLoading } = usePost(id!);
 
   const handleClose = () => navigate(-1);
 
   const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
-    if (!post) return;
-
-    const previousPost = { ...post };
-
-    setPost((current) => {
-      if (!current) return current;
-
-      const isSameReaction = current.userLike === like;
-      const newReaction = isSameReaction ? null : like;
-      return {
-        ...current,
-        userLike: newReaction,
-        likesCount:
-          current.likesCount +
-          (newReaction === "like" ? 1 : 0) -
-          (current.userLike === "like" ? 1 : 0),
-        dislikesCount:
-          current.dislikesCount +
-          (newReaction === "dislike" ? 1 : 0) -
-          (current.userLike === "dislike" ? 1 : 0),
-      };
-    });
-
-    try {
-      await likePost(postId, { type: like });
-      toast.success(`You ${like}d the post!`);
-    } catch (error) {
-      setPost(previousPost);
-      console.error(`Error handling ${like}:`, error);
-      toast.error("Failed to update reaction.");
-    }
+    toggleLike(
+      { postId, likeType: like },
+      {
+        onError: () => toast.error("Failed to toggle like. Please try again."),
+      },
+    );
   };
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getPost(id!);
-        setPost(data);
-      } catch (error) {
-        console.error("Error fetching post:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [id]);
 
   useEffect(() => {
     if (!isModal && post) {
@@ -92,30 +49,13 @@ export default function Post({ isModal }: PostProps) {
 
     if (!post) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 text-center space-y-6 animate-in fade-in zoom-in duration-500">
-          <div className="relative">
-            <h3 className="text-8xl font-black text-muted-foreground/5 absolute -top-8 left-1/2 -translate-x-1/2 select-none">
-              404
-            </h3>
-            <BirdSpinner size={64} label="" className="relative z-10" />
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-2xl font-bold tracking-tight">
-              Post not found
-            </h3>
-            <p className="text-muted-foreground max-w-75 mx-auto">
-              This post might have been deleted or moved to another nest.
-            </p>
-          </div>
-          {!isModal && (
-            <TransitionLink
-              to="/"
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-            >
-              Back to Home
-            </TransitionLink>
-          )}
-        </div>
+        <ItemNotFound
+          title="Post Not Found"
+          message="The post you are looking for might have been deleted or moved to another nest."
+          errorCode="404"
+          backLinkText="Back to Home"
+          backLinkTo="/"
+        />
       );
     }
 
