@@ -1,11 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogHeader,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { PostDetailSkeleton } from "@/components/post/PostDetailSkeleton";
@@ -70,94 +64,98 @@ export default function Post({ isModal }: PostProps) {
     }
 
     return (
-      <div className="grid gap-8 grid-cols-1 lg:grid-cols-5 items-start">
-        <div className="lg:col-span-3 space-y-6">
-          {post.photoURL && (
-            <div className="relative w-full flex justify-center overflow-hidden rounded-xl border bg-muted/20">
-              <img
-                src={post.photoURL}
-                alt="Post media"
-                className="max-h-125 w-auto max-w-full object-contain transition-transform duration-300"
+      <div className="flex flex-col h-full overflow-hidden">
+        <div className="mb-3 text-left shrink-0 border-b pb-2">
+          <div className="flex items-center justify-between w-full pr-10">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2 min-w-0 flex-1 lg:max-w-[60%] mr-4">
+              <PostAuthor
+                authorId={post.authorId}
+                firstName={post.author?.firstName}
+                lastName={post.author?.lastName}
+                photoURL={post.author?.photoURL}
+                createdAt={post.createdAt}
+                avatarSize="sm"
+                className="shrink-0"
               />
-            </div>
-          )}
-
-          <div className="space-y-6">
-            <PostAuthor
-              authorId={post.authorId}
-              firstName={post.author?.firstName}
-              lastName={post.author?.lastName}
-              photoURL={post.author?.photoURL}
-              createdAt={post.createdAt}
-              avatarSize="lg"
-            />
-
-            <div className="space-y-4">
-              <h2 className="break-all text-3xl md:text-4xl font-extrabold tracking-tight text-foreground leading-tight">
+              <h2 className="text-base md:text-lg font-extrabold leading-tight tracking-tight lg:border-l lg:pl-4 border-muted flex-1 min-w-0 break-words">
                 {post.title}
               </h2>
-              <p className="break-all text-lg md:text-xl text-foreground/90 wrap-break-word leading-relaxed whitespace-pre-wrap tracking-normal">
-                {post.content}
-              </p>
             </div>
-          </div>
-
-          <div className="flex items-center justify-end pt-6 border-t border-muted">
-            <PostReactions
-              postId={post.id}
-              likesCount={post.likesCount}
-              dislikesCount={post.dislikesCount}
-              userLike={post.userLike}
-              onLike={handleLikeClick}
-              showComments={false}
-            />
+            <h3 className="font-bold text-base md:text-lg tracking-tight text-foreground shrink-0 hidden lg:block">
+              Comments ({post.commentsCount})
+            </h3>
           </div>
         </div>
 
-        <div className="lg:col-span-2 border-t lg:border-t-0 lg:border-l lg:pl-8 pt-8 lg:pt-0 h-full min-h-75">
-          <h3 className="font-bold text-xl tracking-tight mb-4 text-foreground">
-            Comments ({post.commentsCount})
-          </h3>
-          <div className="rounded-xl border border-dashed border-muted p-8 text-center bg-muted/20">
-            <CommentList postId={post.id} />
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-5 items-stretch flex-1 overflow-hidden">
+          <div className="lg:col-span-3 flex flex-col h-full overflow-hidden">
+            <div className="flex-1 space-y-2 overflow-y-auto pr-2">
+              {post.photoURL && (
+                <div className="relative w-full flex justify-center overflow-hidden rounded-xl border bg-muted/20">
+                  <img
+                    src={post.photoURL}
+                    alt="Post media"
+                    className="max-h-[500px] w-auto max-w-full object-contain transition-transform duration-300"
+                  />
+                </div>
+              )}
+
+              <p className="text-lg text-foreground/90 leading-relaxed whitespace-pre-wrap break-words">
+                {post.content}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end pt-2 mt-2 border-t border-muted shrink-0 bg-background/95 backdrop-blur">
+              <PostReactions
+                postId={post.id}
+                likesCount={post.likesCount}
+                dislikesCount={post.dislikesCount}
+                userLike={post.userLike}
+                onLike={handleLikeClick}
+                showComments={false}
+              />
+            </div>
           </div>
-          <CommentInput postId={post.id} className="mt-4" />
+
+          <div className="lg:col-span-2 flex flex-col border-t lg:border-t-0 lg:border-l lg:pl-4 pt-4 lg:pt-0 h-full overflow-hidden">
+            <h3 className="font-bold text-lg tracking-tight mb-2 text-foreground shrink-0 block lg:hidden">
+              Comments ({post.commentsCount})
+            </h3>
+
+            <div className="flex-1 flex flex-col gap-2 overflow-hidden">
+              <div className="flex-1 overflow-y-auto pr-1">
+                <CommentList postId={post.id} />
+              </div>
+              <div className="pt-2 sticky bottom-0 bg-background/95 backdrop-blur shrink-0 w-full">
+                <CommentInput postId={post.id} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   };
 
+  const pageContent = (
+    <div className="flex flex-col h-full overflow-hidden p-4 md:p-5">
+      <div className="flex-1 overflow-hidden">{renderContent()}</div>
+    </div>
+  );
+
   if (isModal) {
     return (
       <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
-        <DialogContent className="max-w-full w-[95vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl overflow-y-auto max-h-[92vh] p-6 md:p-8 rounded-xl gap-0">
-          <DialogHeader className="mb-4 text-left">
-            <DialogTitle className="text-2xl font-bold tracking-tight">
-              Post Thread
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              Detailed view and community comments for post {id}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="pt-2">{renderContent()}</div>
+        <DialogContent className="max-w-full w-[95vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl h-[90vh] max-h-[90vh] flex flex-col overflow-hidden p-0 rounded-xl gap-0">
+          {pageContent}
         </DialogContent>
       </Dialog>
     );
   }
 
   return (
-    <div className="container max-w-7xl mx-auto py-2 px-4 md:py-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <Card className="shadow-md border-muted/80 overflow-hidden rounded-2xl">
-        <CardHeader className="pb-6 border-b border-muted bg-muted/5">
-          <CardTitle className="text-2xl md:text-3xl font-bold tracking-tight">
-            {isLoading
-              ? "Loading Post..."
-              : !post
-                ? "Post Not Found"
-                : "Post Thread"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 md:p-8 pt-8">{renderContent()}</CardContent>
+    <div className="container max-w-7xl mx-auto py-1 px-2 md:py-3 animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100vh-100px)]">
+      <Card className="shadow-md border-muted/80 overflow-hidden rounded-2xl h-full flex flex-col">
+        {pageContent}
       </Card>
     </div>
   );
