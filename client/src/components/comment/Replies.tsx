@@ -38,11 +38,12 @@ export default function Replies({ postId, parentId, showReplies }: ReplyProps) {
     );
   }
 
-  const handleDeleteComment = (commentId: string) => {
+  const handleDeleteComment = (commentId: string, parentId?: string) => {
     deleteComment(
       {
         postId,
         commentId,
+        parentId,
       },
       {
         onSuccess: () => {

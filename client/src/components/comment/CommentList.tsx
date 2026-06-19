@@ -26,11 +26,12 @@ export default function CommentList({ postId }: CommentListProps) {
     isFetching,
   } = useComments({ postId });
 
-  const handleDeleteComment = (commentId: string) => {
+  const handleDeleteComment = (commentId: string, parentId?: string) => {
     deleteComment(
       {
         postId,
         commentId,
+        parentId,
       },
       {
         onSuccess: () => {

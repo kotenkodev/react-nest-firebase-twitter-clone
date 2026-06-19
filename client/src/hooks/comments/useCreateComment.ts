@@ -11,7 +11,7 @@ export const useCreateComment = () => {
       createCommentApi(postId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: commentKeys.list(variables.postId),
+        queryKey: commentKeys.all,
       });
 
       queryClient.invalidateQueries({
@@ -21,12 +21,6 @@ export const useCreateComment = () => {
       queryClient.invalidateQueries({
         queryKey: postKeys.all,
       });
-
-      if (variables.data.parentId) {
-        queryClient.invalidateQueries({
-          queryKey: commentKeys.replies(variables.data.parentId),
-        });
-      }
     },
   });
 

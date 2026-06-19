@@ -15,7 +15,7 @@ type CommentCardProps = {
   comment: Comment;
   currentUserId?: string;
   onEdit: (comment: Comment) => void;
-  onDelete: (commentId: string) => void;
+  onDelete: (commentId: string, parentId?: string) => void;
   onReply: (comment: Comment) => void;
 };
 
@@ -89,7 +89,7 @@ export default function CommentCard({
                   size="icon-xs"
                   variant="ghost"
                   className="text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
-                  onClick={() => onDelete(comment.id)}
+                  onClick={() => onDelete(comment.id, comment.parentId)}
                   title="Delete comment"
                 >
                   <TrashIcon className="w-3.5 h-3.5" />

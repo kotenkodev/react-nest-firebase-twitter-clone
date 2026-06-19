@@ -6,12 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { EditIcon, TrashIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { PostAuthor } from "./PostAuthor";
 import { PostReactions } from "./PostReactions";
+import { PostActions } from "./PostActions";
 
 type PostCardProps = {
   post: Post;
@@ -32,7 +32,6 @@ export default function PostCard({
 }: PostCardProps) {
   const [titleExpanded, setTitleExpanded] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
-  const isOwner = post.authorId === currentUserId;
   const location = useLocation();
 
   return (
@@ -86,28 +85,12 @@ export default function PostCard({
         </div>
       </CardHeader>
       <CardContent className="flex justify-between items-center pt-0">
-        <div className="flex items-center gap-2">
-          {isOwner && (
-            <>
-              <Button
-                size="icon-sm"
-                className="bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-100 cursor-pointer shadow-none"
-                variant="secondary"
-                onClick={() => onEdit(post)}
-              >
-                <EditIcon className="w-4 h-4" />
-              </Button>
-              <Button
-                size="icon-sm"
-                className="bg-red-50 text-red-700 hover:bg-red-100 border-red-100 cursor-pointer shadow-none"
-                variant="secondary"
-                onClick={() => onDelete(post.id)}
-              >
-                <TrashIcon className="w-4 h-4" />
-              </Button>
-            </>
-          )}
-        </div>
+        <PostActions
+          post={post}
+          currentUserId={currentUserId}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
 
         <PostReactions
           postId={post.id}

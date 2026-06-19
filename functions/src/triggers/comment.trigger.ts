@@ -46,7 +46,7 @@ export const updatePostCommentCount = onDocumentWritten(
         logger.info(
           `Successfully incremented comment count for post: ${postId}`,
         );
-      } else if (isSoftDeleted || isHardDeleted) {
+      } else if (isHardDeleted) {
         batch.update(postRef, {
           commentsCount: FieldValue.increment(-1),
         });

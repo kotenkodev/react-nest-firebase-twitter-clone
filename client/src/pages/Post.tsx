@@ -6,12 +6,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { PostDetailSkeleton } from "@/components/post/PostDetailSkeleton";
 import type { Post } from "@/types/post.types";
 import { PostAuthor } from "@/components/post/PostAuthor";
 import { PostReactions } from "@/components/post/PostReactions";
+import { PostActions } from "@/components/post/PostActions";
+import ConfirmDeleteDialog from "@/components/post/ConfirmDeleteDialog";
 import { useToggleLike } from "@/hooks/posts/useToggleLike";
+import { useDeletePost } from "@/hooks/posts/useDeletePost";
+import { useUIStore } from "@/store/useUIStore";
 import ItemNotFound from "@/components/ItemNotFound";
 import { toast } from "sonner";
 import { usePost } from "@/hooks/posts/usePost";
@@ -30,6 +34,37 @@ export default function Post({ isModal }: PostProps) {
   const navigate = useNavigate();
   const { toggleLike } = useToggleLike();
   const { post, error, isLoading } = usePost(id!);
+
+  const { setPostDialogOpen, setEditingPost } = useUIStore();
+  const { deletePost, isDeleting } = useDeletePost();
+  const [postToDelete, setPostToDelete] = useState<Post | null>(null);
+
+  const openEditDialog = (postToEdit: Post) => {
+    try {
+      setEditingPost(postToEdit);
+      setPostDialogOpen(true);
+    } catch (err) {
+      console.error("Error opening edit dialog:", err);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!postToDelete) return;
+
+    deletePost(postToDelete.id, {
+      onSuccess: () => {
+        toast.success("Post deleted successfully!");
+        if (isModal) {
+          navigate(-1);
+        } else {
+          navigate("/");
+        }
+      },
+      onError: () => toast.error("Failed to delete post. Please try again."),
+    });
+
+    setPostToDelete(null);
+  };
 
   const handleClose = () => navigate(-1);
 
@@ -111,7 +146,13 @@ export default function Post({ isModal }: PostProps) {
               </p>
             </div>
 
-            <div className="flex items-center justify-end pt-2 mt-2 border-t border-muted shrink-0 bg-background/95 backdrop-blur">
+            <div className="flex items-center justify-between pt-2 mt-2 border-t border-muted shrink-0 bg-background/95 backdrop-blur">
+              <PostActions
+                post={post}
+                currentUserId={user?.id}
+                onEdit={openEditDialog}
+                onDelete={() => setPostToDelete(post)}
+              />
               <PostReactions
                 postId={post.id}
                 likesCount={post.likesCount}
@@ -148,25 +189,35 @@ export default function Post({ isModal }: PostProps) {
     </div>
   );
 
-  if (isModal) {
-    return (
-      <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
-        <DialogContent className="max-w-full w-[95vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl h-[90vh] max-h-[90vh] flex flex-col overflow-hidden p-0 rounded-xl gap-0">
-          <DialogTitle className="sr-only">{post?.title}</DialogTitle>
-          <DialogDescription className="sr-only">
-            Post content and comments.
-          </DialogDescription>
-          {pageContent}
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
-    <div className="container max-w-7xl mx-auto py-1 px-2 md:py-3 animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100vh-100px)]">
-      <Card className="shadow-md border-muted/80 overflow-hidden rounded-2xl h-full flex flex-col">
-        {pageContent}
-      </Card>
-    </div>
+    <>
+      {isModal ? (
+        <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
+          <DialogContent className="max-w-full w-[95vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl h-[90vh] max-h-[90vh] flex flex-col overflow-hidden p-0 rounded-xl gap-0">
+            <DialogTitle className="sr-only">{post?.title}</DialogTitle>
+            <DialogDescription className="sr-only">
+              Post content and comments.
+            </DialogDescription>
+            {pageContent}
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <div className="container max-w-7xl mx-auto py-1 px-2 md:py-3 animate-in fade-in slide-in-from-bottom-4 duration-500 h-[calc(100vh-100px)]">
+          <Card className="shadow-md border-muted/80 overflow-hidden rounded-2xl h-full flex flex-col">
+            {pageContent}
+          </Card>
+        </div>
+      )}
+
+      <ConfirmDeleteDialog
+        isOpen={Boolean(postToDelete)}
+        onClose={() => setPostToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title="Delete Post?"
+        itemName={postToDelete?.title}
+        itemType="post"
+      />
+    </>
   );
 }
