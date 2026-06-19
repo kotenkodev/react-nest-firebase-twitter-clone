@@ -1,5 +1,7 @@
 import z from "zod";
 
+export const MAX_BIO_LENGTH = 250;
+
 export const profileInfoSchema = z.object({
   firstName: z
     .string()
@@ -15,7 +17,11 @@ export const profileInfoSchema = z.object({
     })
     .max(new Date(), { message: "Date cannot be further than today." })
     .optional(),
-  bio: z.string().max(250, "Bio must be at most 250 characters."),
+  bio: z
+    .string()
+    .max(MAX_BIO_LENGTH, {
+      message: `Bio must be at most ${MAX_BIO_LENGTH} characters.`,
+    }),
 });
 
 export const securitySchema = z

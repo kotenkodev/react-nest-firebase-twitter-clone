@@ -1,4 +1,4 @@
-import { postSchema } from "@/schemas/post.schema";
+import { postSchema, MAX_CONTENT_LENGTH } from "@/schemas/post.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -24,7 +24,6 @@ type PostFormProps = {
   post?: Post | null;
 };
 
-const MAX_CONTENT_LENGTH = postSchema.shape.content.maxLength;
 
 export default function PostForm({ onSuccess, post }: PostFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

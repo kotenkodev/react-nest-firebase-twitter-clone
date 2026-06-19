@@ -1,16 +1,19 @@
 import z from "zod";
 
+export const MAX_TITLE_LENGTH = 150;
+export const MAX_CONTENT_LENGTH = 5000;
+
 export const postSchema = z
   .object({
     title: z
       .string()
-      .max(150, { message: "Title cannot exceed 150 characters." })
+      .max(MAX_TITLE_LENGTH, { message: `Title cannot exceed ${MAX_TITLE_LENGTH} characters.` })
       .optional()
       .or(z.literal("")),
 
     content: z
       .string()
-      .max(5000, { message: "Content cannot exceed 5000 characters." })
+      .max(MAX_CONTENT_LENGTH, { message: `Content cannot exceed ${MAX_CONTENT_LENGTH} characters.` })
       .optional()
       .or(z.literal("")),
 

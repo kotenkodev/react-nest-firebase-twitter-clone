@@ -1,10 +1,9 @@
-import { profileInfoSchema } from "@/schemas/profile.schema";
+import { profileInfoSchema, MAX_BIO_LENGTH } from "@/schemas/profile.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { DatePicker } from "../ui/date-picker";
-import { Textarea } from "../ui/textarea";
 import { useState } from "react";
 import type { User } from "@/types/user.types";
 import { Input } from "../ui/input";
@@ -15,8 +14,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { CountedTextarea } from "../CountedTextarea";
 
 type FormValues = z.infer<typeof profileInfoSchema>;
-
-const MAX_BIO_LENGTH = profileInfoSchema.shape.bio.maxLength;
 
 export function ProfileInfoForm({ user }: { user: User }) {
   const setUser = useAuthStore((state) => state.setUser);
