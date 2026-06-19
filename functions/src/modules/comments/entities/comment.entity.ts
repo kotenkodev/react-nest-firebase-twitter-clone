@@ -2,7 +2,7 @@ export interface Comment {
   id: string;
   postId: string;
   content: string;
-  parentId?: string;
+  parentId?: string | null;
   replyCount: number;
   authorId: string;
   author: {

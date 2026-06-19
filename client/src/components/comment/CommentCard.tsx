@@ -125,32 +125,32 @@ export default function CommentCard({
             )}
           </div>
 
-          {!comment.isDeleted && (
-            <div className="flex items-center justify-between gap-1.5 text-xs text-muted-foreground mt-0.5">
-              {comment.replyCount > 0 ? (
-                <div
-                  className="flex gap-1 cursor-pointer hover:text-foreground"
-                  onClick={() => setShowReplies(!showReplies)}
-                >
-                  <MessageSquareIcon className="w-3.5 h-3.5" />
-                  <span>
-                    {showReplies ? "hide " : "see "} {comment.replyCount}{" "}
-                    {comment.replyCount === 1 ? "reply" : "replies"}
-                  </span>
-                </div>
-              ) : (
+          <div className="flex items-center justify-between gap-1.5 text-xs text-muted-foreground mt-0.5">
+            {comment.replyCount > 0 ? (
+              <div
+                className="flex gap-1 cursor-pointer hover:text-foreground"
+                onClick={() => setShowReplies(!showReplies)}
+              >
+                <MessageSquareIcon className="w-3.5 h-3.5" />
+                <span>
+                  {showReplies ? "hide " : "see "} {comment.replyCount}{" "}
+                  {comment.replyCount === 1 ? "reply" : "replies"}
+                </span>
+              </div>
+            ) : (
+              !comment.isDeleted && (
                 <span className="text-muted-foreground/60 select-none">
                   no replies
                 </span>
-              )}
-              <div
-                className="flex gap-1 cursor-pointer hover:text-foreground"
-                onClick={() => onReply(comment)}
-              >
-                <span>write a reply</span>
-              </div>
+              )
+            )}
+            <div
+              className="flex gap-1 cursor-pointer hover:text-foreground"
+              onClick={() => onReply(comment)}
+            >
+              <span>write a reply</span>
             </div>
-          )}
+          </div>
         </div>
       </div>
       {showReplies && (

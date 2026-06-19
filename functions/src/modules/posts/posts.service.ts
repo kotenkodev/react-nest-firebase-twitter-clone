@@ -12,6 +12,7 @@ import { UsersService } from '../users/users.service';
 import { LikesService } from '../likes/likes.service';
 import { ALGOLIA } from '../algolia/algolia.module';
 import type { Algoliasearch } from 'algoliasearch';
+import { CommentsService } from '../comments/comments.service';
 
 @Injectable()
 export class PostsService {
@@ -20,6 +21,8 @@ export class PostsService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => LikesService))
     private readonly likesService: LikesService,
+    @Inject(forwardRef(() => CommentsService))
+    private readonly commentsService: CommentsService,
     @Inject(ALGOLIA) private readonly algolia: Algoliasearch,
   ) {}
 
@@ -103,5 +106,6 @@ export class PostsService {
   async remove(id: string): Promise<void> {
     await this.postsRepository.delete(id);
     await this.likesService.deletePostLikes(id);
+    await this.commentsService.deletePostComments(id);
   }
 }

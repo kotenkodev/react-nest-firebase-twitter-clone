@@ -6,9 +6,9 @@ import { UsersModule } from '../users/users.module';
 import { PostsModule } from '../posts/posts.module';
 
 @Module({
-  imports: [forwardRef(() => PostsModule), UsersModule],
-  providers: [LikesService, LikesRepository],
+  imports: [UsersModule, forwardRef(() => PostsModule)],
   controllers: [LikesController],
+  providers: [LikesService, LikesRepository],
   exports: [LikesService],
 })
 export class LikesModule {}

@@ -4,6 +4,8 @@ import { Button } from "../ui/button";
 import CommentCardSkeleton from "./CommentCardSkeleton";
 import { useUIStore } from "@/store/useUIStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useDeleteComment } from "@/hooks/comments/useDeleteComment";
+import { toast } from "sonner";
 
 type CommentListProps = {
   postId: string;
@@ -12,8 +14,8 @@ type CommentListProps = {
 export default function CommentList({ postId }: CommentListProps) {
   const { setReplyingComment, setEditingComment } = useUIStore();
   const { user } = useAuthStore();
+  const { deleteComment, isDeleting } = useDeleteComment();
 
-  // show skeletons
   const {
     comments,
     fetchNextPage,
@@ -23,6 +25,23 @@ export default function CommentList({ postId }: CommentListProps) {
     error,
     isFetching,
   } = useComments({ postId });
+
+  const handleDeleteComment = (commentId: string) => {
+    deleteComment(
+      {
+        postId,
+        commentId,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Comment deleted successfully!");
+        },
+        onError: () => {
+          toast.error("Failed to delete comment. Please try again.");
+        },
+      },
+    );
+  };
 
   if (status === "pending") {
     return (
@@ -43,8 +62,6 @@ export default function CommentList({ postId }: CommentListProps) {
       </div>
     );
   }
-
-  const handleDeleteComment = (commentId: string) => {};
 
   return (
     <>

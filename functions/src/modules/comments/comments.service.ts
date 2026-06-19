@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { CommentsRepository } from './comments.repository';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -11,6 +17,7 @@ export class CommentsService {
   constructor(
     private readonly commentRepository: CommentsRepository,
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => PostsService))
     private readonly postsService: PostsService,
   ) {}
 
@@ -49,11 +56,25 @@ export class CommentsService {
     return this.commentRepository.create(newComment);
   }
 
-  updateComment(commentId: string, data: UpdateCommentDto) {
+  async updateComment(commentId: string, data: UpdateCommentDto) {
+    const comment = await this.commentRepository.findOne(commentId);
+
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID ${commentId} not found`);
+    }
+
+    if (comment.isDeleted) {
+      throw new ForbiddenException(`Comment with ID ${commentId} is deleted`);
+    }
+
     return this.commentRepository.update(commentId, data);
   }
 
-  deleteComment(commentId: string) {
+  async deleteComment(commentId: string) {
     return this.commentRepository.delete(commentId);
+  }
+
+  async deletePostComments(postId: string): Promise<void> {
+    await this.commentRepository.deleteCommentsByPostId(postId);
   }
 }
