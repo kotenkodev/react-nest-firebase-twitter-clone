@@ -1,4 +1,9 @@
 import type { Comment } from "@/types/comment.types";
+import CommentCard from "./CommentCard";
+import { useComments } from "@/hooks/comments/useComments";
+import { Button } from "../ui/button";
+import CommentCardSkeleton from "./CommentCardSkeleton";
+import { useUIStore } from "@/store/useUIStore";
 
 const comments: Comment[] = [
   {
@@ -147,43 +152,61 @@ const comments: Comment[] = [
   },
 ];
 
-type CommentNode = Comment & {
-  replies: CommentNode[];
+type CommentListProps = {
+  postId: string;
 };
 
-function buildCommentTree(comments: Comment[]): CommentNode[] {
-  const map = new Map<string, CommentNode>();
+export default function CommentList({ postId }: CommentListProps) {
+  const rootComments = comments.filter((comment) => !comment.parentId);
+  const { setReplyingCommentId, setEditingComment } = useUIStore();
 
-  comments.forEach((comment) => {
-    map.set(comment.id, {
-      ...comment,
-      replies: [],
-    });
-  });
+  // show skeletons
+  // const { comments, isLoading, fetchNextPage, hasNextPage } =
+  //   useComments(postId);
 
-  const roots: CommentNode[] = [];
+  // if (status === "pending") {
+  //   return (
+  //     <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
+  //       {Array.from({ length: 5 }).map((_, index) => (
+  //         <li key={index} className="list-none w-full">
+  // <CommentCardSkeleton />
+  //         </li>
+  //       ))}
+  //     </ul>
+  //   );
+  // }
 
-  comments.forEach((comment) => {
-    const node = map.get(comment.id)!;
+  const handleReplyClick = (commentId: string) => {
+    setReplyingCommentId(commentId);
+  };
 
-    if (comment.parentId) {
-      const parent = map.get(comment.parentId);
-
-      if (parent) {
-        parent.replies.push(node);
-      }
-    } else {
-      roots.push(node);
-    }
-  });
-
-  return roots;
-}
-
-export default function CommentList() {
-  const commentTree = buildCommentTree(comments);
-
-  console.log("Comment Tree:", commentTree);
-
-  return <div></div>;
+  return (
+    <>
+      <ul className="flex flex-col gap-3 p-0 m-0 list-none">
+        {rootComments.map((comment) => (
+          <li key={comment.id} className="list-none m-0 p-0">
+            <CommentCard
+              comment={comment}
+              onReply={handleReplyClick}
+              onDelete={() => {}}
+              onEdit={setEditingComment}
+            />
+          </li>
+        ))}
+      </ul>
+      {/* <div>
+        <Button
+          onClick={() => fetchNextPage()}
+          disabled={!hasNextPage || isFetching}
+        >
+          {isFetchingNextPage
+            ? "Loading more..."
+            : hasNextPage
+              ? "Load More"
+              : "Nothing more to load"}
+        </Button>
+      </div>
+      <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>  */}
+    </>
+  );
 }
