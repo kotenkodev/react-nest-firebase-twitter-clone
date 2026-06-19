@@ -36,6 +36,7 @@ export class CommentsService {
 
     const newComment: Partial<Comment> = {
       ...data,
+      parentId: data.parentId || null,
       postId,
       authorId: userId,
       author: {

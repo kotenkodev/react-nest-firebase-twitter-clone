@@ -11,13 +11,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CheckOwnership } from 'src/common/decorators/check-ownership.decorator';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { FirebaseAuthGuard } from 'src/common/guards/firebase-auth.guard';
+import { CheckOwnership } from '../../common/decorators/check-ownership.decorator';
+import { GetUser } from '../../common/decorators/get-user.decorator';
+import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { OwnershipGuard } from 'src/common/guards/ownership.guard';
+import { OwnershipGuard } from '../../common/guards/ownership.guard';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {

@@ -10,8 +10,8 @@ interface UIState {
 
   editingComment: Comment | null;
   setEditingComment: (comment: Comment | null) => void;
-  replyingCommentId: string | null;
-  setReplyingCommentId: (commentId: string | null) => void;
+  replyingComment: Comment | null;
+  setReplyingComment: (comment: Comment | null) => void;
   clearCommentState: () => void;
 }
 
@@ -28,17 +28,17 @@ export const useUIStore = create<UIState>((set) => ({
   setEditingComment: (comment) =>
     set((state) => ({
       editingComment: comment,
-      replyingCommentId: comment ? null : state.replyingCommentId,
+      replyingComment: comment ? null : state.replyingComment,
     })),
-  replyingCommentId: null,
-  setReplyingCommentId: (commentId) =>
+  replyingComment: null,
+  setReplyingComment: (comment) =>
     set((state) => ({
-      replyingCommentId: commentId,
-      editingComment: commentId ? null : state.editingComment,
+      replyingComment: comment,
+      editingComment: comment ? null : state.editingComment,
     })),
   clearCommentState: () =>
     set({
       editingComment: null,
-      replyingCommentId: null,
+      replyingComment: null,
     }),
 }));

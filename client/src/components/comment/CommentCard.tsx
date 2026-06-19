@@ -16,7 +16,7 @@ type CommentCardProps = {
   currentUserId?: string;
   onEdit: (comment: Comment) => void;
   onDelete: (commentId: string) => void;
-  onReply: (commentId: string) => void;
+  onReply: (comment: Comment) => void;
 };
 
 export default function CommentCard({
@@ -127,19 +127,25 @@ export default function CommentCard({
 
           {!comment.isDeleted && (
             <div className="flex items-center justify-between gap-1.5 text-xs text-muted-foreground mt-0.5">
-              <div
-                className="flex gap-1 cursor-pointer hover:text-foreground"
-                onClick={() => setShowReplies(!showReplies)}
-              >
-                <MessageSquareIcon className="w-3.5 h-3.5" />
-                <span>
-                  see {comment.replyCount}{" "}
-                  {comment.replyCount === 1 ? "reply" : "replies"}
+              {comment.replyCount > 0 ? (
+                <div
+                  className="flex gap-1 cursor-pointer hover:text-foreground"
+                  onClick={() => setShowReplies(!showReplies)}
+                >
+                  <MessageSquareIcon className="w-3.5 h-3.5" />
+                  <span>
+                    {showReplies ? "hide " : "see "} {comment.replyCount}{" "}
+                    {comment.replyCount === 1 ? "reply" : "replies"}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-muted-foreground/60 select-none">
+                  no replies
                 </span>
-              </div>
+              )}
               <div
                 className="flex gap-1 cursor-pointer hover:text-foreground"
-                onClick={() => onReply(comment.id)}
+                onClick={() => onReply(comment)}
               >
                 <span>write a reply</span>
               </div>

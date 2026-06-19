@@ -10,7 +10,7 @@ type CommentListProps = {
 };
 
 export default function CommentList({ postId }: CommentListProps) {
-  const { setReplyingCommentId, setEditingComment } = useUIStore();
+  const { setReplyingComment, setEditingComment } = useUIStore();
   const { user } = useAuthStore();
 
   // show skeletons
@@ -36,6 +36,14 @@ export default function CommentList({ postId }: CommentListProps) {
     );
   }
 
+  if (status === "error") {
+    return (
+      <div className="text-center py-4 text-sm text-red-500 font-medium bg-red-50 dark:bg-red-950/10 rounded-xl border border-red-200 dark:border-red-950/30">
+        Failed to load comments. Please try again.
+      </div>
+    );
+  }
+
   const handleDeleteComment = (commentId: string) => {};
 
   return (
@@ -46,26 +54,26 @@ export default function CommentList({ postId }: CommentListProps) {
             <CommentCard
               comment={comment}
               currentUserId={user?.id}
-              onReply={setReplyingCommentId}
+              onReply={setReplyingComment}
               onDelete={handleDeleteComment}
               onEdit={setEditingComment}
             />
           </li>
         ))}
       </ul>
-      <div>
-        <Button
-          onClick={() => fetchNextPage()}
-          disabled={!hasNextPage || isFetching}
-        >
-          {isFetchingNextPage
-            ? "Loading more..."
-            : hasNextPage
-              ? "Load More"
-              : "Nothing more to load"}
-        </Button>
-      </div>
-      <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
+      {hasNextPage && (
+        <div className="flex justify-center mt-4 mb-2">
+          <Button
+            onClick={() => fetchNextPage()}
+            disabled={isFetching}
+            variant="ghost"
+            size="sm"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
+          >
+            {isFetchingNextPage ? "Loading more..." : "Load more comments"}
+          </Button>
+        </div>
+      )}
     </>
   );
 }

@@ -38,7 +38,7 @@ const CountedTextarea = React.forwardRef<
     const isAtLimit = currentLength >= maxLength;
 
     return (
-      <div className="relative flex-1 flex flex-col w-full">
+      <div className="relative flex-1 flex flex-col w-full min-w-0">
         <Textarea
           ref={ref}
           maxLength={maxLength}

@@ -12,7 +12,7 @@ type ReplyProps = {
 };
 
 export default function Replies({ postId, parentId, showReplies }: ReplyProps) {
-  const { setReplyingCommentId, setEditingComment } = useUIStore();
+  const { setReplyingComment, setEditingComment } = useUIStore();
   const { user } = useAuthStore();
   const {
     comments,
@@ -47,24 +47,24 @@ export default function Replies({ postId, parentId, showReplies }: ReplyProps) {
               currentUserId={user?.id}
               onDelete={handleDeleteComment}
               onEdit={setEditingComment}
-              onReply={setReplyingCommentId}
+              onReply={setReplyingComment}
             />
           </li>
         ))}
       </ul>
-      <div>
-        <Button
-          onClick={() => fetchNextPage()}
-          disabled={!hasNextPage || isFetching}
-        >
-          {isFetchingNextPage
-            ? "Loading more..."
-            : hasNextPage
-              ? "Load More"
-              : "Nothing more to load"}
-        </Button>
-      </div>
-      <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
+      {hasNextPage && (
+        <div className="flex justify-start mt-2 pl-11">
+          <Button
+            onClick={() => fetchNextPage()}
+            disabled={isFetching}
+            variant="ghost"
+            size="sm"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 cursor-pointer h-7 py-1 px-2.5 rounded-lg"
+          >
+            {isFetchingNextPage ? "Loading more..." : "Load more replies"}
+          </Button>
+        </div>
+      )}
     </>
   );
 }

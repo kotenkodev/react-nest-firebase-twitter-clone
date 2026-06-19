@@ -5,7 +5,7 @@ import {
 } from 'firebase-admin/firestore';
 import { FIREBASE_DB } from '../firebase/firebase.module';
 import { Inject, Injectable } from '@nestjs/common';
-import { mapToEntity } from 'src/common/utils/firestore.utils';
+import { mapToEntity } from '../../common/utils/firestore.utils';
 import { Comment } from './entities/comment.entity';
 
 @Injectable()
@@ -25,9 +25,11 @@ export class CommentsRepository {
     let query = this.collection.where('postId', '==', postId);
 
     if (parentId) {
-      query = query.where('parentId', '==', parentId);
+      query = query
+        .where('parentId', '==', parentId)
+        .orderBy('createdAt', 'asc');
     } else {
-      query = query.where('parentId', '==', null);
+      query = query.where('parentId', '==', null).orderBy('createdAt', 'desc');
     }
 
     if (lastDocId) {

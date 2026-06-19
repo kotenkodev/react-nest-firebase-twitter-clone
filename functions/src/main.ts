@@ -47,3 +47,4 @@ export const api = onRequest(async (request, response) => {
 });
 
 export { updatePostReactionCount } from './triggers/like.trigger';
+export { updatePostCommentCount } from './triggers/comment.trigger';

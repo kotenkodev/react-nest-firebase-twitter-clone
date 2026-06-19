@@ -152,7 +152,7 @@ export default function Post({ isModal }: PostProps) {
     return (
       <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
         <DialogContent className="max-w-full w-[95vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl h-[90vh] max-h-[90vh] flex flex-col overflow-hidden p-0 rounded-xl gap-0">
-          <DialogTitle>{post?.title}</DialogTitle>
+          <DialogTitle className="sr-only">{post?.title}</DialogTitle>
           <DialogDescription className="sr-only">
             Post content and comments.
           </DialogDescription>
