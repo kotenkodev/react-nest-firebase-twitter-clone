@@ -1,5 +1,10 @@
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { PostDetailSkeleton } from "@/components/post/PostDetailSkeleton";
@@ -13,6 +18,7 @@ import { usePost } from "@/hooks/posts/usePost";
 import { useAuthStore } from "@/store/useAuthStore";
 import CommentList from "@/components/comment/CommentList";
 import CommentInput from "@/components/comment/CommentInput";
+import { VisuallyHidden } from "radix-ui";
 
 type PostProps = {
   isModal?: boolean;
@@ -146,6 +152,10 @@ export default function Post({ isModal }: PostProps) {
     return (
       <Dialog open={true} onOpenChange={(open) => !open && handleClose()}>
         <DialogContent className="max-w-full w-[95vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl h-[90vh] max-h-[90vh] flex flex-col overflow-hidden p-0 rounded-xl gap-0">
+          <DialogTitle>{post?.title}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Post content and comments.
+          </DialogDescription>
           {pageContent}
         </DialogContent>
       </Dialog>

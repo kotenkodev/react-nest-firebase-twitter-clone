@@ -26,6 +26,8 @@ export class CommentsRepository {
 
     if (parentId) {
       query = query.where('parentId', '==', parentId);
+    } else {
+      query = query.where('parentId', '==', null);
     }
 
     if (lastDocId) {

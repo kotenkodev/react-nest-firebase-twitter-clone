@@ -1,13 +1,31 @@
 import { updateComment } from "@/services/commentService";
 import type { UpdateComment } from "@/types/comment.types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { commentKeys } from "@/lib/queryKeys";
 
 export const useEditComment = () => {
-  const { mutate: editComment, isPending: isLoading } = useMutation({
-    mutationFn: (commentId: string, data: UpdateComment) =>
-      updateComment(commentId, data),
-    onSuccess: () => {},
+  const queryClient = useQueryClient();
+  const { mutate: editComment, isPending: isEditing } = useMutation({
+    mutationFn: ({
+      postId,
+      commentId,
+      data,
+    }: {
+      postId: string;
+      commentId: string;
+      data: UpdateComment;
+    }) => updateComment(postId, commentId, data),
+    onSuccess: (updatedComment, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: commentKeys.list(variables.postId),
+      });
+      if (updatedComment?.parentId) {
+        queryClient.invalidateQueries({
+          queryKey: commentKeys.replies(updatedComment.parentId),
+        });
+      }
+    },
   });
 
-  return { editComment, isLoading };
+  return { editComment, isEditing };
 };

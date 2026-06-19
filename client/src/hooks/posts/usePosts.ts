@@ -20,6 +20,7 @@ export const usePosts = (options: UsePostsOptions = {}) => {
     hasNextPage,
     isFetchingNextPage,
     status,
+    isFetching,
   } = useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam }) => getPosts({ ...options, cursor: pageParam }),
@@ -35,5 +36,6 @@ export const usePosts = (options: UsePostsOptions = {}) => {
     hasNextPage,
     isFetchingNextPage,
     status,
+    isFetching,
   };
 };

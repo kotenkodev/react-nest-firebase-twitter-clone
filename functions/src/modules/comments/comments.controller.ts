@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -24,7 +26,7 @@ export class CommentsController {
   @Get()
   getComments(
     @Param('postId') postId: string,
-    @Query('limit') limit = 10,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
     @Query('parentId') parentId?: string,
     @Query('lastDocId') lastDocId?: string,
   ) {

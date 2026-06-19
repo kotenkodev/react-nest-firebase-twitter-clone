@@ -1,3 +1,4 @@
+import type { Comment } from "@/types/comment.types";
 import type { Like } from "@/types/like.types";
 import type { Post } from "@/types/post.types";
 import type { User } from "@/types/user.types";
@@ -34,5 +35,13 @@ export const transformLikePayload = (rawData: any): Like => {
   return {
     ...rawData,
     createdAt: parseDate(rawData.createdAt) || new Date(),
+  };
+};
+
+export const transformCommentPayload = (rawData: any): Comment => {
+  return {
+    ...rawData,
+    createdAt: parseDate(rawData.createdAt) || new Date(),
+    updatedAt: parseDate(rawData.updatedAt) || new Date(),
   };
 };

@@ -35,7 +35,7 @@ export default function CommentCard({
   return (
     <>
       <div
-        className={`flex gap-3 p-3 text-left rounded-xl border border-muted/60 bg-card hover:bg-accent/5 transition-all ${
+        className={`flex items-start gap-3 p-3 text-left rounded-xl border border-transparent hover:border-muted/60 bg-card transition-all ${
           comment.isDeleted ? "opacity-60 select-none" : ""
         }`}
       >
@@ -148,7 +148,11 @@ export default function CommentCard({
         </div>
       </div>
       {showReplies && (
-        <Replies parentId={comment.id} showReplies={showReplies} />
+        <Replies
+          postId={comment.postId}
+          parentId={comment.id}
+          showReplies={showReplies}
+        />
       )}
     </>
   );

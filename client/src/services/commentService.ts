@@ -1,12 +1,22 @@
-import type { CreateComment, UpdateComment } from "@/types/comment.types";
+import type {
+  Comment,
+  CreateComment,
+  UpdateComment,
+} from "@/types/comment.types";
 import apiClient from "./apiClient";
+import { transformCommentPayload } from "@/utils/transformPayload";
+
+export type PaginatedCommentsResponse = {
+  comments: Comment[];
+  nextCursor: string | null;
+};
 
 export const getComments = async (
-  limit: number,
   postId?: string,
   parentId?: string,
   cursor?: string,
-): Promise<Comment[]> => {
+  limit: number = 10,
+): Promise<PaginatedCommentsResponse> => {
   try {
     const response = await apiClient.get(`posts/${postId}/comments`, {
       params: {
@@ -16,7 +26,16 @@ export const getComments = async (
         limit,
       },
     });
-    return response.data;
+
+    const comments = response.data.map(transformCommentPayload);
+
+    const nextCursor =
+      comments.length === limit ? comments[comments.length - 1].id : null;
+
+    return {
+      comments,
+      nextCursor,
+    };
   } catch (error) {
     console.error("Error fetching comments:", error);
     throw error;

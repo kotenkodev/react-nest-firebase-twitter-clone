@@ -5,7 +5,7 @@ import { commentKeys } from "@/lib/queryKeys";
 
 export const useCreateComment = () => {
   const queryClient = useQueryClient();
-  const { mutate: createComment, isPending: isLoading } = useMutation({
+  const { mutate: createComment, isPending: isCreating } = useMutation({
     mutationFn: ({ postId, data }: { postId: string; data: CreateComment }) =>
       createCommentApi(postId, data),
     onSuccess: (_, variables) => {
@@ -20,5 +20,5 @@ export const useCreateComment = () => {
     },
   });
 
-  return { createComment, isLoading };
+  return { createComment, isCreating };
 };
