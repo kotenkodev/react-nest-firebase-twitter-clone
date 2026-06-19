@@ -60,8 +60,14 @@ export default function CommentList({ postId }: CommentListProps) {
             />
           </li>
         ))}
+        {isFetchingNextPage &&
+          Array.from({ length: 2 }).map((_, index) => (
+            <li key={`skeleton-${index}`} className="list-none m-0 p-0">
+              <CommentCardSkeleton />
+            </li>
+          ))}
       </ul>
-      {hasNextPage && (
+      {hasNextPage ? (
         <div className="flex justify-center mt-4 mb-2">
           <Button
             onClick={() => fetchNextPage()}
@@ -73,6 +79,13 @@ export default function CommentList({ postId }: CommentListProps) {
             {isFetchingNextPage ? "Loading more..." : "Load more comments"}
           </Button>
         </div>
+      ) : (
+        comments.length > 0 && (
+          <div className="flex items-center justify-center gap-2 py-4 text-[10px] font-semibold text-muted-foreground/35 tracking-wider uppercase select-none">
+            <span className="w-1 h-1 rounded-full bg-muted-foreground/25" />
+            <span>no more comments</span>
+          </div>
+        )
       )}
     </>
   );

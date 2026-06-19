@@ -51,8 +51,14 @@ export default function Replies({ postId, parentId, showReplies }: ReplyProps) {
             />
           </li>
         ))}
+        {isFetchingNextPage &&
+          Array.from({ length: 1 }).map((_, index) => (
+            <li key={`skeleton-${index}`} className="list-none m-0 p-0 pl-11">
+              <CommentCardSkeleton />
+            </li>
+          ))}
       </ul>
-      {hasNextPage && (
+      {hasNextPage ? (
         <div className="flex justify-start mt-2 pl-11">
           <Button
             onClick={() => fetchNextPage()}
@@ -64,6 +70,13 @@ export default function Replies({ postId, parentId, showReplies }: ReplyProps) {
             {isFetchingNextPage ? "Loading more..." : "Load more replies"}
           </Button>
         </div>
+      ) : (
+        comments.length > 0 && (
+          <div className="flex items-center gap-2 pl-11 py-2 text-[10px] font-semibold text-muted-foreground/35 tracking-wider uppercase select-none">
+            <span className="w-1 h-1 rounded-full bg-muted-foreground/25" />
+            <span>no more replies</span>
+          </div>
+        )
       )}
     </>
   );

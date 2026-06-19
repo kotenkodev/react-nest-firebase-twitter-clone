@@ -15,7 +15,7 @@ export const getComments = async (
   postId?: string,
   parentId?: string,
   cursor?: string,
-  limit: number = 1,
+  limit: number = 10,
 ): Promise<PaginatedCommentsResponse> => {
   try {
     const response = await apiClient.get(`posts/${postId}/comments`, {
