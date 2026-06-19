@@ -8,8 +8,9 @@ const searchClient = algoliasearch(algoliaAppId, algoliaSearchKey);
 
 export default function SearchBar() {
   return (
-    <InstantSearch searchClient={searchClient} indexName="PostsSearch">
+  <InstantSearch searchClient={searchClient} indexName="PostsSearch">
       <SearchBox />
     </InstantSearch>
   );
+
 }

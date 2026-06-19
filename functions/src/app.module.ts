@@ -7,9 +7,18 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { LikesModule } from './modules/likes/likes.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { AlgoliaModule } from './modules/algolia/algolia.module';
 
 @Module({
-  imports: [FirebaseModule, UsersModule, PostsModule, AuthModule, LikesModule, CommentsModule],
+  imports: [
+    FirebaseModule,
+    UsersModule,
+    PostsModule,
+    AuthModule,
+    LikesModule,
+    CommentsModule,
+    AlgoliaModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
