@@ -52,7 +52,7 @@ export default function SignUpForm() {
 
       toast.success("Successfully signed up! Welcome aboard!");
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign-up error:", error.code);
       const message =
         error.code === "auth/email-already-in-use"

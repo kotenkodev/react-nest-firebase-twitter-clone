@@ -90,7 +90,7 @@ export function useToggleLike() {
       return { previousFeed, previousSinglePost };
     },
 
-    onError: (err, variables, context) => {
+    onError: (_err, variables, context) => {
       if (context?.previousFeed) {
         context.previousFeed.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
@@ -103,7 +103,7 @@ export function useToggleLike() {
         );
       }
     },
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
         queryKey: postKeys.single(variables.postId),
       });

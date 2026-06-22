@@ -16,3 +16,4 @@ jobs:
       deploy-only: hosting
     secrets:
       FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      ENV_FILE: ${{ secrets.CLIENT_ENV }}

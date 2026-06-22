@@ -5,9 +5,9 @@ import { transformUserPayload } from "./transformPayload";
 
 export interface AuthUser {
   uid: string;
-  email: string;
-  displayName?: string;
-  photoURL?: string;
+  email: string | null;
+  displayName?: string | null;
+  photoURL?: string | null;
   emailVerified?: boolean;
 }
 
@@ -30,9 +30,9 @@ export const syncUserData = async (
       const dbData: FirestoreUser = {
         firstName,
         lastName,
-        email: user.email,
+        email: user.email || "",
         emailVerified: user.emailVerified,
-        photoURL: user.photoURL,
+        photoURL: user.photoURL || undefined,
         createdAt: new Date(),
         ...additionalData,
       };

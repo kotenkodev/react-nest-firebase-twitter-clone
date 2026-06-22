@@ -71,7 +71,7 @@ export function SecurityForm() {
         newPassword: "",
         confirmNewPassword: "",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating password:", error);
       const message =
         error.code === "auth/wrong-password"

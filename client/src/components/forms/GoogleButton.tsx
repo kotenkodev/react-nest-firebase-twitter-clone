@@ -24,7 +24,7 @@ export default function GoogleButton({
       setUser(user);
       toast.success("Successfully signed in! Welcome back!");
       onSuccess?.(user);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error during Google Sign-In:", error.message);
       toast.error("Google Sign-In failed. Please try again.");
     } finally {

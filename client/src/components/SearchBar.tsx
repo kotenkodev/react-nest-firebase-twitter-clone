@@ -129,7 +129,7 @@ const InfiniteHitsList = () => {
 
   useEffect(() => {
     if (!user?.id || items.length === 0) {
-      setLikesMap({});
+      setLikesMap((prev) => (Object.keys(prev).length === 0 ? prev : {}));
       return;
     }
 

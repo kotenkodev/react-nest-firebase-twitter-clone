@@ -7,17 +7,21 @@ if (admin.apps.length === 0) {
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import express from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import express, { Express } from 'express';
+import { onRequest, HttpsFunction } from 'firebase-functions/v2/https';
 import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 import { AllExceptionsFilter } from './common/filters/all-exception.filter';
 import { INestApplication } from '@nestjs/common';
-import { Express } from 'express';
 
-const getCorsOptions = () => {
-  const origins = process.env.ALLOWED_ORIGINS;
-  if (!origins) return true;
-  return origins.split(',').map((origin) => origin.trim());
+const getCorsOptions = (): string[] => {
+  const envOrigins = process.env.ALLOWED_ORIGINS;
+  const defaultOrigins = [
+    'https://birb-b5cf.web.app',
+    'https://birb-b5fcf.firebaseapp.com',
+  ];
+  return envOrigins
+    ? envOrigins.split(',').map((o) => o.trim())
+    : defaultOrigins;
 };
 
 const configureApp = (app: INestApplication) => {
@@ -45,13 +49,12 @@ const bootstrapNestApp = async (expressInstance: Express) => {
   await app.init();
 };
 
-export const api = onRequest({ cors: getCorsOptions() }, async (request, response) => {
+export const api: HttpsFunction = onRequest(async (request, response) => {
   if (!cachedServer) {
     console.log('Initializing NestJS Server...');
     cachedServer = express();
     await bootstrapNestApp(cachedServer);
   }
-
   cachedServer(request, response);
 });
 

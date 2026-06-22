@@ -65,12 +65,12 @@ export default function ForgotPassword() {
   const onResetSubmit = async (data: ResetFormValues) => {
     try {
       setIsLoading(true);
-      await completePasswordReset(oobCode, data.newPassword);
+      await completePasswordReset(oobCode!, data.newPassword);
       toast.success(
         "New password set successfully! Please log in with your new password.",
       );
       navigate("/signin");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Password reset error:", error);
       const message =
         error.code === "auth/invalid-action-code"

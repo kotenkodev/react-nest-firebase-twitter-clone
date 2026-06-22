@@ -57,12 +57,12 @@ export default function PostForm({ onSuccess, post }: PostFormProps) {
       }
 
       if (isEditMode && post) {
-        updatePost({ postId: post.id, data: { ...data, photoURL } });
+        updatePost({ postId: post.id, data: { ...data, photoURL: photoURL || undefined } });
       } else {
         createPost({
           ...data,
           id: postId,
-          photoURL,
+          photoURL: photoURL || undefined,
         });
       }
 
