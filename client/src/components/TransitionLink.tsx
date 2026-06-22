@@ -21,8 +21,15 @@ export default function TransitionLink({
     if (onClick) {
       onClick(e);
     }
-    if (location.pathname === to) {
+
+    const backgroundPath = location.state?.background?.pathname;
+    const currentMainPath = backgroundPath || location.pathname;
+
+    if (currentMainPath === to) {
       e.preventDefault();
+      if (location.pathname !== to) {
+        navigate(to);
+      }
       return;
     }
 
