@@ -23,16 +23,16 @@ export function PostSkeletonContent({
       {hasImage && <Skeleton className="w-full aspect-video rounded-xl" />}
 
       <div className="space-y-4">
-        {/* Author Info */}
         <div className="flex items-center gap-3">
-          <Skeleton className={cn("rounded-full shrink-0", avatarSizes[avatarSize])} />
+          <Skeleton
+            className={cn("rounded-full shrink-0", avatarSizes[avatarSize])}
+          />
           <div className="space-y-2">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-20" />
           </div>
         </div>
 
-        {/* Title and Content */}
         <div className="space-y-3 pt-2">
           <Skeleton className="h-6 w-3/4" />
           <div className="space-y-2">

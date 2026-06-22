@@ -17,7 +17,6 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if true; 
-      // Users check the document ID directly, not a field inside the document
       allow create, update, delete: if isAuthenticated() && userId == request.auth.uid;
     }
 

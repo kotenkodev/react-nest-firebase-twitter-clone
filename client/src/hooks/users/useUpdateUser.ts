@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateUser as updateUserApi } from "@/services/usersService";
 import { useAuthStore } from "@/store/useAuthStore";
 import type { UpdateUser } from "@/types/user.types";
-import { userKeys } from "@/lib/queryKeys";
 
 interface UpdateUserVariables {
   id?: string;

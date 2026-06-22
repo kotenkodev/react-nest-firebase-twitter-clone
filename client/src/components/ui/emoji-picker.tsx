@@ -99,7 +99,6 @@ export default function EmojiPicker({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const emojiGridRef = useRef<HTMLDivElement>(null);
 
-  // Load recent emojis from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("recent-emojis");
     if (stored) {
@@ -108,12 +107,10 @@ export default function EmojiPicker({
           setRecentEmojis(JSON.parse(stored));
         });
       } catch {
-        // Ignore invalid JSON in localStorage
+        /* empty */
       }
     }
   }, []);
-
-  // Get unique categories with better ordering
   const categories = useMemo(() => {
     const categoryOrder = [
       "Smileys & Emotion",
@@ -133,7 +130,6 @@ export default function EmojiPicker({
     return categoryOrder.filter((cat) => availableCategories.includes(cat));
   }, []);
 
-  // Enhanced search with keywords and fuzzy matching
   const filteredEmojis = useMemo(() => {
     if (!searchTerm) return emojis;
 
@@ -142,7 +138,6 @@ export default function EmojiPicker({
       const nameMatch = emoji.name.toLowerCase().includes(searchLower);
       const categoryMatch = emoji.category.toLowerCase().includes(searchLower);
 
-      // Add keyword matching if emoji has keywords property
       const emojiKeywords =
         "keywords" in emoji && Array.isArray(emoji.keywords)
           ? emoji.keywords
@@ -155,7 +150,6 @@ export default function EmojiPicker({
     });
   }, [searchTerm]);
 
-  // Group emojis by category
   const emojisByCategory = useMemo(() => {
     return categories.reduce(
       (acc, category) => {
@@ -168,7 +162,6 @@ export default function EmojiPicker({
     );
   }, [categories, filteredEmojis]);
 
-  // Get all visible emojis for keyboard navigation
   const allVisibleEmojis = useMemo(() => {
     if (searchTerm) {
       return filteredEmojis;
@@ -179,7 +172,6 @@ export default function EmojiPicker({
   const handleEmojiClick = (emoji: string) => {
     onEmojiSelect(emoji);
 
-    // Update recent emojis
     const newRecent = [emoji, ...recentEmojis.filter((e) => e !== emoji)].slice(
       0,
       maxRecentEmojis,
@@ -193,7 +185,6 @@ export default function EmojiPicker({
     setSelectedIndex(-1);
   };
 
-  // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) return;
 
@@ -222,14 +213,12 @@ export default function EmojiPicker({
     }
   };
 
-  // Focus search input when popover opens
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, [isOpen]);
 
-  // Reset selection when search changes
   useEffect(() => {
     startTransition(() => {
       setSelectedIndex(-1);
@@ -255,7 +244,6 @@ export default function EmojiPicker({
         align="end"
         onKeyDown={handleKeyDown}
       >
-        {/* Search Header */}
         <div className="space-y-2 border-b p-3">
           <div className="relative">
             <Search className="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground" />
@@ -269,7 +257,6 @@ export default function EmojiPicker({
             />
           </div>
 
-          {/* Search Results Count */}
           {searchTerm && (
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>{filteredEmojis.length} results found</span>
@@ -282,7 +269,6 @@ export default function EmojiPicker({
           )}
         </div>
 
-        {/* Search Results */}
         {searchTerm ? (
           <ScrollArea className="h-64">
             {filteredEmojis.length > 0 ? (
@@ -347,7 +333,6 @@ export default function EmojiPicker({
                 })}
             </TabsList>
 
-            {/* Recent Emojis Tab */}
             {recentEmojis.length > 0 && (
               <TabsContent value="recent" className="mt-0">
                 <ScrollArea className="h-64">
@@ -377,7 +362,6 @@ export default function EmojiPicker({
               </TabsContent>
             )}
 
-            {/* Category Tabs */}
             {categories.map((category) => (
               <TabsContent key={category} value={category} className="mt-0">
                 <ScrollArea className="h-64">

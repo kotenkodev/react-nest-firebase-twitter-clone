@@ -162,7 +162,6 @@ const InfiniteHitsList = () => {
     }));
   }, [items, likesMap]);
 
-  // Synchronize search hits with TanStack query cache
   useEffect(() => {
     posts.forEach((post) => {
       const queryKey = postKeys.single(post.id);
