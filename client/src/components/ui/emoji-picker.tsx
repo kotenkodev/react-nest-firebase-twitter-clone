@@ -290,7 +290,6 @@ export default function EmojiPicker({
             )}
           </ScrollArea>
         ) : (
-          /* Category Tabs */
           <Tabs
             defaultValue={recentEmojis.length > 0 ? "recent" : categories[0]}
             className="w-full"
