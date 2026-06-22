@@ -1,34 +1,44 @@
-import PostList from "@/components/post/PostList";
 import { Container } from "@/components/ui/container";
-import { Input } from "@/components/ui/input";
-import { SearchIcon } from "lucide-react";
-import { useState } from "react";
+import PostList from "@/components/post/PostList";
+import SearchBar from "@/components/SearchBar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Home as HomeIcon, Compass as CompassIcon } from "lucide-react";
 
 export default function Home() {
-  const [searchText, setSearchText] = useState("");
-
   return (
     <Container className="pt-6">
-      <title>Feed / Birb</title>
+      <Tabs defaultValue="home" className="w-full max-w-2xl mx-auto">
+        <TabsList
+          variant="line"
+          className="w-full border-b border-border flex bg-transparent rounded-none p-0 h-12 gap-0"
+        >
+          <TabsTrigger
+            value="home"
+            className="flex-1 text-center font-semibold text-base h-full rounded-none transition-all cursor-pointer relative gap-2 data-[state=active]:text-foreground data-[state=active]:font-bold"
+          >
+            <HomeIcon className="w-4 h-4" />
+            <span>Home</span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="explore"
+            className="flex-1 text-center font-semibold text-base h-full rounded-none transition-all cursor-pointer relative gap-2 data-[state=active]:text-foreground data-[state=active]:font-bold"
+          >
+            <CompassIcon className="w-4 h-4" />
+            <span>Explore</span>
+          </TabsTrigger>
+        </TabsList>
 
-      <div className="relative mb-4">
-        <Input
-          placeholder="Search posts..."
-          className="mb-4"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
-        <SearchIcon
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-          size={16}
-        />
-      </div>
+        <TabsContent value="home" className="mt-6 focus-visible:outline-none">
+          <PostList />
+        </TabsContent>
 
-      <PostList
-        search={searchText}
-        sortBy="popular"
-        emptyMessage="No posts to show on feed"
-      />
+        <TabsContent
+          value="explore"
+          className="mt-6 focus-visible:outline-none space-y-6"
+        >
+          <SearchBar />
+        </TabsContent>
+      </Tabs>
     </Container>
   );
 }
