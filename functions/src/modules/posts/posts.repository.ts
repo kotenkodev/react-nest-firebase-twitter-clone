@@ -53,7 +53,7 @@ export class PostsRepository {
     return mapToEntity(doc);
   }
 
-  async findManyByIds(ids: string[]): Promise<(Post | null)[]> {
+  async findManyByIds(ids: string[]): Promise<Post[]> {
     if (!ids || ids.length === 0) {
       return [];
     }
@@ -62,9 +62,9 @@ export class PostsRepository {
 
     const snapshots = await this.db.getAll(...refs);
 
-    return snapshots.map((snap) => {
-      return snap.exists ? mapToEntity<Post>(snap) : null;
-    });
+    return snapshots
+      .map((snap) => mapToEntity<Post>(snap))
+      .filter((post): post is Post => post !== null);
   }
 
   async create(id: string, data: Partial<Post>): Promise<Post | null> {
