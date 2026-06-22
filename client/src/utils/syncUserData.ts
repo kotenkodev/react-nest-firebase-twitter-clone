@@ -37,9 +37,13 @@ export const syncUserData = async (
         ...additionalData,
       };
 
-      await setDoc(userDocRef, dbData);
+      const cleanDbData = Object.fromEntries(
+        Object.entries(dbData).filter(([_, v]) => v !== undefined),
+      ) as FirestoreUser;
 
-      return transformUserPayload({ id: user.uid, ...dbData });
+      await setDoc(userDocRef, cleanDbData);
+
+      return transformUserPayload({ id: user.uid, ...cleanDbData });
     }
 
     const existingData = userSnapshot.data() as FirestoreUser;
@@ -57,9 +61,13 @@ export const syncUserData = async (
         ...additionalData,
       };
 
-      await setDoc(userDocRef, updatePayload, { merge: true });
+      const cleanUpdatePayload = Object.fromEntries(
+        Object.entries(updatePayload).filter(([_, v]) => v !== undefined),
+      );
 
-      const mergedData = { ...existingData, ...updatePayload };
+      await setDoc(userDocRef, cleanUpdatePayload, { merge: true });
+
+      const mergedData = { ...existingData, ...cleanUpdatePayload };
 
       return transformUserPayload({ id: user.uid, ...mergedData });
     }
