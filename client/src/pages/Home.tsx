@@ -6,7 +6,7 @@ import { Home as HomeIcon, Compass as CompassIcon } from "lucide-react";
 
 export default function Home() {
   return (
-    <Container className="pt-6">
+    <Container className="p-0 sm:px-6 lg:px-8">
       <Tabs defaultValue="home" className="w-full max-w-2xl mx-auto">
         <TabsList
           variant="line"

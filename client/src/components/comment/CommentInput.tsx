@@ -9,6 +9,8 @@ import type z from "zod";
 import { createCommentSchema } from "@/schemas/comment.schema";
 import { useUIStore } from "@/store/useUIStore";
 import { useEditComment } from "@/hooks/comments/useEditComment";
+import { useAuthStore } from "@/store/useAuthStore";
+import TransitionLink from "../TransitionLink";
 
 interface CommentInputProps {
   postId: string;
@@ -22,6 +24,7 @@ export default function CommentInput({ postId, onSuccess }: CommentInputProps) {
   const { replyingComment, editingComment, clearCommentState } = useUIStore();
   const { editComment, isEditing } = useEditComment();
   const { createComment, isCreating } = useCreateComment();
+  const user = useAuthStore((state) => state.user);
 
   const isReply = !!replyingComment;
   const isEdit = !!editingComment;
@@ -100,6 +103,26 @@ export default function CommentInput({ postId, onSuccess }: CommentInputProps) {
     };
     currentText();
   }, [editingComment, replyingComment]);
+
+  if (!user) {
+    return (
+      <div className="w-full border-t border-muted/80 bg-background p-4 flex flex-col items-center justify-center gap-3">
+        <p className="text-sm font-medium text-muted-foreground">Sign in to leave a comment</p>
+        <div className="flex items-center space-x-2">
+          <TransitionLink to="/signin">
+            <Button variant="outline" size="sm">
+              Sign In
+            </Button>
+          </TransitionLink>
+          <TransitionLink to="/signup">
+            <Button size="sm">
+              Sign Up
+            </Button>
+          </TransitionLink>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full border-t border-muted/80 bg-background">

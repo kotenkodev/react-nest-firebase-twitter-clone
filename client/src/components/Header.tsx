@@ -3,6 +3,7 @@ import ProfileDropdown from "./ProfileDropdown";
 import { useAuthStore } from "@/store/useAuthStore";
 import TransitionLink from "./TransitionLink";
 import { MobileMenu } from "./MobileMenu";
+import { Button } from "./ui/button";
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
@@ -20,14 +21,30 @@ export default function Header() {
       </div>
       <div>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <div className="hidden sm:block text-sm text-muted-foreground">
-            Welcome, {user?.firstName} {user?.lastName}
-          </div>
-          <div className="w-full flex-1 md:w-auto md:flex-none max-w-sm hidden sm:block">
-            <ProfileDropdown />
-          </div>
-
-          <MobileMenu />
+          {user ? (
+            <>
+              <div className="hidden sm:block text-sm text-muted-foreground">
+                Welcome, {user.firstName} {user.lastName}
+              </div>
+              <div className="w-full flex-1 md:w-auto md:flex-none max-w-sm hidden sm:block">
+                <ProfileDropdown />
+              </div>
+              <MobileMenu />
+            </>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <TransitionLink to="/signin">
+                <Button variant="outline" size="sm">
+                  Sign In
+                </Button>
+              </TransitionLink>
+              <TransitionLink to="/signup">
+                <Button size="sm">
+                  Sign Up
+                </Button>
+              </TransitionLink>
+            </div>
+          )}
         </div>
       </div>
     </header>

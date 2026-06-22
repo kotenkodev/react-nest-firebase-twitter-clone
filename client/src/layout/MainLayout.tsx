@@ -11,7 +11,7 @@ export default function MainLayout() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      {!user?.emailVerified && <VerifyNotification />}
+      {user && !user?.emailVerified && <VerifyNotification />}
 
       <main className="flex-1 w-full">
         <Outlet />

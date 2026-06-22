@@ -170,7 +170,7 @@ export default function CommentCard({
                 </span>
               )
             )}
-            {!isCommentDeleted && (
+            {!isCommentDeleted && currentUserId && (
               <div
                 className="flex gap-1 cursor-pointer hover:text-foreground"
                 onClick={() => onReply(comment)}

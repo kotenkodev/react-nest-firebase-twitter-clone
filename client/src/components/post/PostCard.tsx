@@ -43,7 +43,7 @@ export default function PostCard({
             <img
               src={post.photoURL}
               alt="Post media"
-              className="max-h-80 w-auto max-w-full object-contain transition-transform duration-300 hover:scale-[1.02]"
+              className="max-h-80 w-auto max-w-full object-contain transition-opacity duration-300 hover:opacity-80"
             />
           </Link>
         </div>

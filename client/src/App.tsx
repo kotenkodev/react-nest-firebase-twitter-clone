@@ -91,20 +91,20 @@ function AppContent() {
             <Route path="/verify-email" element={<VerifyEmail />} />
           </Route>
 
-          <Route element={<ProtectedRoute />}>
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<Home />} />
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/post/:id" element={<Post />} />
 
-              <Route path="/post/:id" element={<Post />} />
+            <Route path="/profile/:id" element={<ProfileView />} />
 
+            <Route element={<ProtectedRoute />}>
               <Route path="/profile">
                 <Route index element={<ProfileView />} />
                 <Route path="settings" element={<ProfileSettings />} />
-                <Route path=":id" element={<ProfileView />} />
               </Route>
-
-              <Route path="*" element={<NotFound />} />
             </Route>
+
+            <Route path="*" element={<NotFound />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Route>
