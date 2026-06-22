@@ -115,10 +115,12 @@ export default function Post({ isModal }: PostProps) {
                 lastName={post.author?.lastName}
                 photoURL={post.author?.photoURL}
                 createdAt={post.createdAt}
+                isEdited={post.isEdited}
+                updatedAt={post.updatedAt}
                 avatarSize="sm"
                 className="shrink-0"
               />
-              <h2 className="text-base md:text-lg font-extrabold leading-tight tracking-tight lg:border-l lg:pl-4 border-muted flex-1 min-w-0 break-words">
+              <h2 className="text-base md:text-lg font-extrabold leading-tight tracking-tight lg:border-l lg:pl-4 border-muted flex-1 min-w-0 wrap-break-word">
                 {post.title}
               </h2>
             </div>
@@ -141,7 +143,7 @@ export default function Post({ isModal }: PostProps) {
                 </div>
               )}
 
-              <p className="text-lg text-foreground/90 leading-relaxed whitespace-pre-wrap break-words">
+              <p className="text-lg text-foreground/90 leading-relaxed whitespace-pre-wrap wrap-break-word">
                 {post.content}
               </p>
             </div>

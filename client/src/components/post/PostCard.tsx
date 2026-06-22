@@ -55,6 +55,8 @@ export default function PostCard({
           lastName={post.author?.lastName}
           photoURL={post.author?.photoURL}
           createdAt={post.createdAt}
+          isEdited={post.isEdited}
+          updatedAt={post.updatedAt}
         />
 
         <div className="space-y-2">

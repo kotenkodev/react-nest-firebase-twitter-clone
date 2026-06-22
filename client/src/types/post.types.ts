@@ -17,6 +17,7 @@ export interface Post {
   createdAt: Date;
   updatedAt: Date;
   userLike?: LikeType | null;
+  isEdited?: boolean;
 }
 
 export type CreatePost = {

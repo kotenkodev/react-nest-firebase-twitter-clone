@@ -91,18 +91,15 @@ export default function CommentInput({ postId, onSuccess }: CommentInputProps) {
   };
 
   useEffect(() => {
-    if (replyingComment) {
-      setContent("");
-    }
-  }, [replyingComment]);
-
-  useEffect(() => {
-    if (editingComment) {
-      setContent(editingComment.content);
-    } else {
-      setContent("");
-    }
-  }, [editingComment]);
+    const currentText = () => {
+      if (editingComment) {
+        setContent(editingComment.content);
+      } else {
+        setContent("");
+      }
+    };
+    currentText();
+  }, [editingComment, replyingComment]);
 
   return (
     <div className="w-full border-t border-muted/80 bg-background">

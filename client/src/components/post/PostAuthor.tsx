@@ -13,6 +13,8 @@ interface PostAuthorProps {
   lastName?: string;
   photoURL?: string;
   createdAt: Date | string;
+  isEdited?: boolean;
+  updatedAt?: Date | string;
   avatarSize?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -29,6 +31,8 @@ export function PostAuthor({
   lastName,
   photoURL,
   createdAt,
+  isEdited,
+  updatedAt,
   avatarSize = "md",
   className,
 }: PostAuthorProps) {
@@ -59,8 +63,16 @@ export function PostAuthor({
         >
           {fullName}
         </span>
-        <span className="text-xs text-muted-foreground mt-0.5">
+        <span className="text-xs text-muted-foreground mt-0.5 select-none">
           {dayjs(createdAt).fromNow()}
+          {isEdited && updatedAt && (
+            <span
+              className="ml-1 text-[10px] italic font-normal text-muted-foreground/80 cursor-help"
+              title={`Edited on ${dayjs(updatedAt).format("MMM D, YYYY h:mm A")}`}
+            >
+              (edited)
+            </span>
+          )}
         </span>
       </div>
     </TransitionLink>

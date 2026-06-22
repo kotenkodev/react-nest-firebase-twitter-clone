@@ -89,8 +89,11 @@ export default function CommentCard({
               )}
               <span className="text-xs text-muted-foreground shrink-0 select-none">
                 {dayjs(comment.createdAt).fromNow()}
-                {comment.isEdited && (
-                  <span className="ml-1 text-[10px] italic font-normal text-muted-foreground/80">
+                {comment.isEdited && comment.updatedAt && (
+                  <span
+                    className="ml-1 text-[10px] italic font-normal text-muted-foreground/80 cursor-help"
+                    title={`Edited on ${dayjs(comment.updatedAt).format("MMM D, YYYY h:mm A")}`}
+                  >
                     (edited)
                   </span>
                 )}

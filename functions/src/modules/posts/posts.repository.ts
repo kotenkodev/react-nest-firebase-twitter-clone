@@ -88,6 +88,7 @@ export class PostsRepository {
 
     await docRef.update({
       ...data,
+      isEdited: true,
       updatedAt: FieldValue.serverTimestamp(),
     });
 

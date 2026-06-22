@@ -6,6 +6,7 @@ import { useUIStore } from "@/store/useUIStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useDeleteComment } from "@/hooks/comments/useDeleteComment";
 import { toast } from "sonner";
+import { MessageSquareIcon } from "lucide-react";
 
 type CommentListProps = {
   postId: string;
@@ -58,6 +59,20 @@ export default function CommentList({ postId }: CommentListProps) {
     return (
       <div className="text-center py-4 text-sm text-red-500 font-medium bg-red-50 dark:bg-red-950/10 rounded-xl border border-red-200 dark:border-red-950/30">
         Failed to load comments. Please try again.
+      </div>
+    );
+  }
+
+  if (comments.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 px-4 text-center border border-dashed border-muted/50 rounded-2xl bg-muted/5 transition-all animate-in fade-in duration-300">
+        <MessageSquareIcon className="h-8 w-8 text-muted-foreground/30 mb-2.5" />
+        <h4 className="text-sm font-semibold text-muted-foreground/80 mb-1">
+          No comments yet
+        </h4>
+        <p className="text-xs text-muted-foreground/60 max-w-[240px]">
+          Be the first to share your thoughts on this post!
+        </p>
       </div>
     );
   }
