@@ -69,7 +69,7 @@ export default function PostList({
   const handleDeleteConfirm = async () => {
     if (!postToDelete) return;
 
-    deletePost(postToDelete.id, {
+    deletePost(postToDelete.id || (postToDelete as any).objectID, {
       onSuccess: () => toast.success("Post deleted successfully!"),
       onError: () => toast.error("Failed to delete post. Please try again."),
     });
@@ -114,21 +114,24 @@ export default function PostList({
   return (
     <>
       <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
-        {posts.map((post) => (
-          <li
-            key={post.id}
-            className="list-none w-full animate-in fade-in slide-in-from-bottom-4 duration-500"
-          >
-            <PostCard
-              post={post}
-              onLike={handleLikeClick}
-              onEdit={openEditDialog}
-              onDelete={() => setPostToDelete(post)}
-              userLike={post.userLike}
-              currentUserId={user?.id}
-            />
-          </li>
-        ))}
+        {posts.map((post) => {
+          const postId = post.id || (post as any).objectID;
+          return (
+            <li
+              key={postId}
+              className="list-none w-full animate-in fade-in slide-in-from-bottom-4 duration-500"
+            >
+              <PostCard
+                post={{ ...post, id: postId }}
+                onLike={handleLikeClick}
+                onEdit={openEditDialog}
+                onDelete={() => setPostToDelete(post)}
+                userLike={post.userLike}
+                currentUserId={user?.id}
+              />
+            </li>
+          );
+        })}
       </ul>
 
       <div ref={ref} className="h-10 flex justify-center mt-4">

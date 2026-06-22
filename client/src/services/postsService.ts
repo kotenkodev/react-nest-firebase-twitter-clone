@@ -61,7 +61,6 @@ export const getPost = async (id: string): Promise<Post> => {
 
 export const createPost = async (data: CreatePost): Promise<Post> => {
   try {
-    console.log("Creating post with data:", data);
     const response = await apiClient.post("posts", data);
     return transformPostPayload(response.data);
   } catch (error) {
