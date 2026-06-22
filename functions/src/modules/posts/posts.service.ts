@@ -10,8 +10,7 @@ import { Post } from './entities/post.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
 import { LikesService } from '../likes/likes.service';
-import { CommentsService } from '../comments/comments.service';
-import { PostSortBy } from './dto/post-query.dto';
+import { PostQueryDto } from './dto/post-query.dto';
 
 @Injectable()
 export class PostsService {
@@ -20,8 +19,6 @@ export class PostsService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => LikesService))
     private readonly likesService: LikesService,
-    @Inject(forwardRef(() => CommentsService))
-    private readonly commentsService: CommentsService,
   ) {}
 
   async findOne(id: string, userId?: string): Promise<Post> {
@@ -46,18 +43,10 @@ export class PostsService {
   }
 
   async findAll(
-    currentUserId?: string,
-    lastDocId?: string,
-    limit: number = 10,
-    userId?: string,
-    sortBy?: PostSortBy,
+    currentUserId: string | undefined,
+    query: PostQueryDto,
   ): Promise<Post[]> {
-    const posts: Post[] = await this.postsRepository.findAll(
-      limit,
-      lastDocId,
-      userId,
-      sortBy,
-    );
+    const posts: Post[] = await this.postsRepository.findAll(query);
 
     if (!currentUserId || posts.length === 0) {
       return posts.map((post) => ({

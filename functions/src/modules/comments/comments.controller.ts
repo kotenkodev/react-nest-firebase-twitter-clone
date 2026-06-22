@@ -27,12 +27,7 @@ export class CommentsController {
     @Param('postId') postId: string,
     @Query() query: CommentQueryDto,
   ) {
-    return this.commentService.getComments(
-      postId,
-      query.limit,
-      query.parentId,
-      query.lastDocId,
-    );
+    return this.commentService.getComments(postId, query);
   }
 
   @UseGuards(FirebaseAuthGuard)

@@ -32,16 +32,10 @@ export class PostsController {
   @UseGuards(FirebaseOptionalAuthGuard)
   @Get()
   async findAll(
-    @GetUser('uid') currentUserId: string,
+    @GetUser('uid') currentUserId: string | undefined,
     @Query() query: PostQueryDto,
   ) {
-    return this.postsService.findAll(
-      currentUserId,
-      query.lastDocId,
-      query.limit,
-      query.userId,
-      query.sortBy,
-    );
+    return this.postsService.findAll(currentUserId, query);
   }
 
   @UseGuards(FirebaseAuthGuard)

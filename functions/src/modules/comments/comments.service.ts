@@ -11,6 +11,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UsersService } from '../users/users.service';
 import { Comment } from './entities/comment.entity';
 import { PostsService } from '../posts/posts.service';
+import { CommentQueryDto } from './dto/comment-query.dto';
 
 @Injectable()
 export class CommentsService {
@@ -21,13 +22,8 @@ export class CommentsService {
     private readonly postsService: PostsService,
   ) {}
 
-  getComments(
-    postId: string,
-    limit: number = 10,
-    parentId?: string,
-    lastDocId?: string,
-  ) {
-    return this.commentRepository.findAll(postId, limit, parentId, lastDocId);
+  getComments(postId: string, query: CommentQueryDto) {
+    return this.commentRepository.findAll(postId, query);
   }
 
   async createComment(userId: string, postId: string, data: CreateCommentDto) {

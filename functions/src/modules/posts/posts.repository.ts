@@ -7,7 +7,7 @@ import {
   FieldValue,
   Firestore,
 } from 'firebase-admin/firestore';
-import { PostSortBy } from './dto/post-query.dto';
+import { PostQueryDto, PostSortBy } from './dto/post-query.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -17,12 +17,8 @@ export class PostsRepository {
     this.collection = this.db.collection('posts');
   }
 
-  async findAll(
-    limit: number,
-    lastDocId?: string,
-    userId?: string,
-    sortBy?: PostSortBy,
-  ): Promise<Post[]> {
+  async findAll(options: PostQueryDto): Promise<Post[]> {
+    const { limit = 10, lastDocId, userId, sortBy } = options;
     let query: FirebaseFirestore.Query = this.collection;
 
     if (userId) {

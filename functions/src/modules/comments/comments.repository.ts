@@ -7,6 +7,7 @@ import { FIREBASE_DB } from '../firebase/firebase.module';
 import { Inject, Injectable } from '@nestjs/common';
 import { mapToEntity } from '../../common/utils/firestore.utils';
 import { Comment } from './entities/comment.entity';
+import { CommentQueryDto } from './dto/comment-query.dto';
 
 @Injectable()
 export class CommentsRepository {
@@ -16,13 +17,9 @@ export class CommentsRepository {
     this.collection = db.collection('comments');
   }
 
-  async findAll(
-    postId: string,
-    limit: number,
-    parentId?: string,
-    lastDocId?: string,
-  ): Promise<Comment[]> {
+  async findAll(postId: string, options: CommentQueryDto): Promise<Comment[]> {
     let query = this.collection.where('postId', '==', postId);
+    const { limit = 10, parentId, lastDocId } = options;
 
     if (parentId) {
       query = query
