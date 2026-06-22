@@ -19,6 +19,7 @@ import { getUser } from "./services/usersService";
 import ProfileSettings from "./pages/ProfileSettings";
 import ProfileView from "./pages/ProfileView";
 import ForgotPassword from "./pages/ForgotPassword";
+import VerifyEmail from "./pages/VerifyEmail";
 
 function AppContent() {
   const location = useLocation();
@@ -81,13 +82,15 @@ function AppContent() {
     <>
       <Routes location={background || location}>
         <Route element={<AnimationLayout />}>
-          <Route element={<PublicRoute />}>
-            <Route element={<DefaultLayout />}>
+          <Route element={<DefaultLayout />}>
+            <Route element={<PublicRoute />}>
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
             </Route>
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
           </Route>
+
           <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Home />} />

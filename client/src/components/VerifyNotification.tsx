@@ -9,10 +9,14 @@ import {
 import { Button } from "./ui/button";
 import { sendNewEmailVerification } from "@/services/authService";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export function VerifyNotification() {
+  const [isSent, setIsSent] = useState(false);
+
   const handleSendVerificationEmail = async () => {
     try {
+      setIsSent(true);
       await sendNewEmailVerification();
       toast.success("Verification email sent! Please check your inbox.");
     } catch (error) {
@@ -30,21 +34,21 @@ export function VerifyNotification() {
             Your account needs verification
           </AlertTitle>
           <AlertDescription>
-            Please verify your account to access all features. Check your email
-            for the verification link.
+            Please verify your account to prove that you are real user and get
+            verified badge. Check your email for the verification link.
           </AlertDescription>
         </div>
       </div>
 
-      {/* FIXED: Handled width constraints and alignments for premium mobile responsiveness */}
       <AlertAction className="w-fit shrink-0 pl-8 sm:pl-0 self-start sm:self-auto">
         <Button
           onClick={handleSendVerificationEmail}
           size="sm"
           variant="outline"
+          disabled={isSent}
           className="bg-transparent border-amber-300 hover:bg-amber-100 text-amber-900 dark:border-amber-700 dark:hover:bg-amber-900 dark:text-amber-50"
         >
-          Send Email
+          {isSent ? "Email Sent" : "Send Email"}
         </Button>
       </AlertAction>
     </Alert>

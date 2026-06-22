@@ -29,7 +29,12 @@ import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import type z from "zod";
-import { ChevronLeft, Mail, Lock, CheckCircle2 } from "lucide-react";
+import {
+  ChevronLeftIcon,
+  MailIcon,
+  LockIcon,
+  CheckCircle2Icon,
+} from "lucide-react";
 import TransitionLink from "@/components/TransitionLink";
 
 type ResetFormValues = z.infer<typeof forgetPasswordSchema>;
@@ -60,7 +65,7 @@ export default function ForgotPassword() {
   const onResetSubmit = async (data: ResetFormValues) => {
     try {
       setIsLoading(true);
-      await completePasswordReset(oobCode!, data.newPassword);
+      await completePasswordReset(oobCode, data.newPassword);
       toast.success(
         "New password set successfully! Please log in with your new password.",
       );
@@ -100,11 +105,11 @@ export default function ForgotPassword() {
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-primary/10 rounded-full">
               {oobCode ? (
-                <Lock className="w-6 h-6 text-primary" />
+                <LockIcon className="w-6 h-6 text-primary" />
               ) : isEmailSent ? (
-                <CheckCircle2 className="w-6 h-6 text-green-500" />
+                <CheckCircle2Icon className="w-6 h-6 text-green-500" />
               ) : (
-                <Mail className="w-6 h-6 text-primary" />
+                <MailIcon className="w-6 h-6 text-primary" />
               )}
             </div>
           </div>
@@ -228,7 +233,7 @@ export default function ForgotPassword() {
             to="/signin"
             className="flex items-center text-sm font-medium text-primary hover:underline underline-offset-4"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" />
+            <ChevronLeftIcon className="w-4 h-4 mr-1" />
             Back to Sign In
           </TransitionLink>
         </CardFooter>

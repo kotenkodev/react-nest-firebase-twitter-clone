@@ -44,10 +44,22 @@ export const syncUserData = async (
 
     const existingData = userSnapshot.data() as FirestoreUser;
 
-    if (additionalData && Object.keys(additionalData).length > 0) {
-      await setDoc(userDocRef, additionalData, { merge: true });
+    const needsSync = existingData.emailVerified !== user.emailVerified;
 
-      const mergedData = { ...existingData, ...additionalData };
+    if (needsSync || (additionalData && Object.keys(additionalData).length > 0)) {
+      const syncFields: Partial<FirestoreUser> = {};
+      if (existingData.emailVerified !== user.emailVerified) {
+        syncFields.emailVerified = user.emailVerified;
+      }
+
+      const updatePayload = {
+        ...syncFields,
+        ...additionalData,
+      };
+
+      await setDoc(userDocRef, updatePayload, { merge: true });
+
+      const mergedData = { ...existingData, ...updatePayload };
 
       return transformUserPayload({ id: user.uid, ...mergedData });
     }

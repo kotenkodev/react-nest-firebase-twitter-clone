@@ -132,6 +132,9 @@ export const sendNewEmailVerification = async () => {
 export const completeEmailVerification = async (oobCode: string) => {
   try {
     await applyActionCode(auth, oobCode);
+    if (auth.currentUser) {
+      await auth.currentUser.reload();
+    }
   } catch (error) {
     console.error("Email Verification Error:", error);
     throw error;

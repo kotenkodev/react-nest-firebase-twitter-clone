@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { auth } from "@/config/firebaseConfig";
-import { applyActionCode } from "firebase/auth";
 import { toast } from "sonner";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
