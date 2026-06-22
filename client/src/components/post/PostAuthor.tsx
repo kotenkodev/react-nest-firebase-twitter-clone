@@ -15,7 +15,6 @@ interface PostAuthorProps {
   createdAt: Date | string;
   avatarSize?: "sm" | "md" | "lg";
   className?: string;
-  nameOverride?: React.ReactNode;
 }
 
 const sizeMap = {
@@ -32,7 +31,6 @@ export function PostAuthor({
   createdAt,
   avatarSize = "md",
   className,
-  nameOverride,
 }: PostAuthorProps) {
   const fullName =
     `${firstName || ""} ${lastName || ""}`.trim() || "Unknown User";
@@ -59,7 +57,7 @@ export function PostAuthor({
             avatarSize === "lg" ? "text-base" : "text-sm",
           )}
         >
-          {nameOverride || fullName}
+          {fullName}
         </span>
         <span className="text-xs text-muted-foreground mt-0.5">
           {dayjs(createdAt).fromNow()}

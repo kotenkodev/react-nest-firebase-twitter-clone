@@ -170,7 +170,7 @@ const DebouncedSearchBox = (props: any) => {
         onChange={(event) => setInputValue(event.currentTarget.value)}
         placeholder="Search Birb..."
         autoFocus
-        className="bg-transparent border-none flex-grow outline-none text-foreground w-full"
+        className="bg-transparent border-none grow outline-none text-foreground w-full"
       />
     </div>
   );
