@@ -27,7 +27,7 @@ export const getPosts = async ({
     const response = await apiClient.get("posts", {
       params: {
         lastDocId: cursor,
-        user: userId,
+        userId,
         search,
         sortBy,
         limit,

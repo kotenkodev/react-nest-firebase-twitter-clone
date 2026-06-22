@@ -24,7 +24,7 @@ export const signOut = async () => {
   }
 };
 
-export const signUp = async (userData: CreateUser) => {
+export const signUp = async (userData: CreateUser & { confirmPassword?: string }) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -32,7 +32,7 @@ export const signUp = async (userData: CreateUser) => {
       userData.password,
     );
 
-    const { email, password, ...additionalData } = userData;
+    const { email, password, confirmPassword, ...additionalData } = userData;
 
     const data = await syncUserData(userCredential.user, additionalData);
 

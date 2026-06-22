@@ -67,7 +67,10 @@ export function PostAuthor({
           {fullName}
           {isVerified && (
             <BadgeCheck
-              className={cn("text-primary shrink-0", avatarSize === "lg" ? "w-4 h-4" : "w-3.5 h-3.5")}
+              className={cn(
+                "text-primary shrink-0",
+                avatarSize === "lg" ? "w-4 h-4" : "w-3.5 h-3.5",
+              )}
               aria-label="Verified Account"
             />
           )}
