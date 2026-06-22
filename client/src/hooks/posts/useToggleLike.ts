@@ -2,7 +2,12 @@ import { postKeys } from "@/lib/queryKeys";
 import { likePost } from "@/services/likesService";
 import type { Post } from "@/types/post.types";
 import type { LikeType } from "@/types/like.types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
+import type { PaginatedPostsResponse } from "@/services/postsService";
 
 type ToggleLikeParams = {
   postId: string;
@@ -27,34 +32,37 @@ export function useToggleLike() {
         postKeys.single(postId),
       );
 
-      queryClient.setQueriesData({ queryKey: postKeys.all }, (oldData: any) => {
-        if (!oldData?.pages) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            posts: page.posts.map((post: Post) => {
-              if (post.id !== postId) return post;
+      queryClient.setQueriesData(
+        { queryKey: postKeys.all },
+        (oldData: InfiniteData<PaginatedPostsResponse> | undefined) => {
+          if (!oldData?.pages) return oldData;
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: PaginatedPostsResponse) => ({
+              ...page,
+              posts: page.posts.map((post: Post) => {
+                if (post.id !== postId) return post;
 
-              const isSameReaction = post.userLike === likeType;
-              const newReaction = isSameReaction ? null : likeType;
+                const isSameReaction = post.userLike === likeType;
+                const newReaction = isSameReaction ? null : likeType;
 
-              return {
-                ...post,
-                userLike: newReaction,
-                likesCount:
-                  post.likesCount +
-                  (newReaction === "like" ? 1 : 0) -
-                  (post.userLike === "like" ? 1 : 0),
-                dislikesCount:
-                  post.dislikesCount +
-                  (newReaction === "dislike" ? 1 : 0) -
-                  (post.userLike === "dislike" ? 1 : 0),
-              };
-            }),
-          })),
-        };
-      });
+                return {
+                  ...post,
+                  userLike: newReaction,
+                  likesCount:
+                    post.likesCount +
+                    (newReaction === "like" ? 1 : 0) -
+                    (post.userLike === "like" ? 1 : 0),
+                  dislikesCount:
+                    post.dislikesCount +
+                    (newReaction === "dislike" ? 1 : 0) -
+                    (post.userLike === "dislike" ? 1 : 0),
+                };
+              }),
+            })),
+          };
+        },
+      );
 
       queryClient.setQueryData(
         postKeys.single(postId),

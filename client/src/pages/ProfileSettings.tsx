@@ -16,20 +16,23 @@ import { AccountModal } from "../components/profile/AccountModal";
 import ImageUploader from "../components/profile/ImageUploader";
 import { getInitials } from "@/utils/getInitials";
 import { uploadAvatar } from "@/services/storageService";
-import { updateUser } from "@/services/usersService";
+import { useNavigate } from "react-router-dom";
+import { deleteAccount } from "@/services/authService";
+import { useUpdateUser } from "@/hooks/users/useUpdateUser";
 
 export default function Profile() {
   const { user, setUser } = useAuthStore();
+  const navigate = useNavigate();
+  const { updateUser } = useUpdateUser();
 
   async function handleDeleteAccount() {
     try {
-      // const response = await deleteUser(user.id);
-      // await deleteAccount();
+      await deleteAccount();
 
       toast.success("Account deleted successfully!");
+      navigate("/");
     } catch {
       toast.error("Failed to delete account. Please try again.");
-    } finally {
     }
   }
 
@@ -38,9 +41,12 @@ export default function Profile() {
 
     try {
       const downloadURL = await uploadAvatar(user.id, file);
-      const updatedUser = await updateUser(user.id, { photoURL: downloadURL });
+      const updated = await updateUser({
+        id: user.id,
+        data: { photoURL: downloadURL },
+      });
 
-      setUser(updatedUser);
+      setUser(updated);
       toast.success("Profile picture updated!");
     } catch (error) {
       console.error("Upload error:", error);

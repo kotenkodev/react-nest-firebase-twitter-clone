@@ -19,7 +19,12 @@ export interface Post {
   userLike?: LikeType | null;
 }
 
-export type CreatePost = Pick<Post, "id" | "title" | "content" | "photoURL">;
+export type CreatePost = {
+  id: string;
+  title?: string;
+  content?: string;
+  photoURL?: string;
+};
 
 export type UpdatePost = Partial<Pick<Post, "title" | "content" | "photoURL">>;
 

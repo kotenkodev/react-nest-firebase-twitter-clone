@@ -8,16 +8,17 @@ import { useState } from "react";
 import type { User } from "@/types/user.types";
 import { Input } from "../ui/input";
 import type z from "zod";
-import { updateUser } from "@/services/usersService";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { CountedTextarea } from "../CountedTextarea";
+import { useUpdateUser } from "@/hooks/users/useUpdateUser";
 
 type FormValues = z.infer<typeof profileInfoSchema>;
 
 export function ProfileInfoForm({ user }: { user: User }) {
   const setUser = useAuthStore((state) => state.setUser);
   const [isLoading, setIsLoading] = useState(false);
+  const { updateUser } = useUpdateUser();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(profileInfoSchema),
@@ -32,9 +33,9 @@ export function ProfileInfoForm({ user }: { user: User }) {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      const updatedData: User = await updateUser(user.id, data);
+      const updated = await updateUser({ id: user.id, data });
 
-      setUser(updatedData);
+      setUser(updated);
 
       toast.success("Profile updated successfully!");
     } catch (error) {
@@ -112,11 +113,7 @@ export function ProfileInfoForm({ user }: { user: User }) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Date of Birth</FieldLabel>
-                <DatePicker
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabled={fieldState.invalid || isLoading}
-                />
+                <DatePicker value={field.value} onChange={field.onChange} />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

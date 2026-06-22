@@ -3,6 +3,7 @@ import {
   applyActionCode,
   confirmPasswordReset,
   createUserWithEmailAndPassword,
+  deleteUser,
   EmailAuthProvider,
   reauthenticateWithCredential,
   sendEmailVerification,
@@ -154,6 +155,18 @@ export const completePasswordReset = async (
     await confirmPasswordReset(auth, oobCode, newPassword);
   } catch (error) {
     console.error("Password Reset Confirmation Error:", error);
+    throw error;
+  }
+};
+
+export const deleteAccount = async () => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No authenticated user found.");
+    await deleteUser(user);
+    await signOut();
+  } catch (error) {
+    console.error("Delete Account Error:", error);
     throw error;
   }
 };

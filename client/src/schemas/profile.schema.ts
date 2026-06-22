@@ -17,11 +17,9 @@ export const profileInfoSchema = z.object({
     })
     .max(new Date(), { message: "Date cannot be further than today." })
     .optional(),
-  bio: z
-    .string()
-    .max(MAX_BIO_LENGTH, {
-      message: `Bio must be at most ${MAX_BIO_LENGTH} characters.`,
-    }),
+  bio: z.string().max(MAX_BIO_LENGTH, {
+    message: `Bio must be at most ${MAX_BIO_LENGTH} characters.`,
+  }),
 });
 
 export const securitySchema = z

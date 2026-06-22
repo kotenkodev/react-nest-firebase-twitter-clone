@@ -16,7 +16,7 @@ type ReplyProps = {
 export default function Replies({ postId, parentId, showReplies }: ReplyProps) {
   const { setReplyingComment, setEditingComment } = useUIStore();
   const { user } = useAuthStore();
-  const { deleteComment, isDeleting } = useDeleteComment();
+  const { deleteComment } = useDeleteComment();
   const {
     comments,
     hasNextPage,
@@ -38,12 +38,11 @@ export default function Replies({ postId, parentId, showReplies }: ReplyProps) {
     );
   }
 
-  const handleDeleteComment = (commentId: string, parentId?: string) => {
+  const handleDeleteComment = (commentId: string) => {
     deleteComment(
       {
         postId,
         commentId,
-        parentId,
       },
       {
         onSuccess: () => {

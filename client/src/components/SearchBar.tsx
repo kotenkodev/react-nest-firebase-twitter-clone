@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { algoliasearch } from "algoliasearch";
 import {
   InstantSearch,
@@ -22,12 +22,53 @@ import { SquarePenIcon, Search } from "lucide-react";
 import type { Post } from "@/types/post.types";
 import { getLikesByPostIds } from "@/services/likesService";
 import type { LikeType } from "@/types/like.types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getPost } from "@/services/postsService";
+import { postKeys } from "@/lib/queryKeys";
 
 const algoliaAppId = import.meta.env.VITE_ALGOLIA_APP_ID;
 const algoliaSearchKey = import.meta.env.VITE_ALGOLIA_SEARCH_KEY;
 const indexName = "PostsSearch";
 
 const searchClient = algoliasearch(algoliaAppId, algoliaSearchKey);
+
+interface PostCardWithLikesProps {
+  initialPost: Post;
+  onLike: (postId: string, type: LikeType) => void;
+  onEdit: (post: Post) => void;
+  onDelete: () => void;
+  currentUserId?: string;
+}
+
+const PostCardWithLikes = ({
+  initialPost,
+  onLike,
+  onEdit,
+  onDelete,
+  currentUserId,
+}: PostCardWithLikesProps) => {
+  const { data: post } = useQuery<Post>({
+    queryKey: postKeys.single(initialPost.id),
+    queryFn: () => getPost(initialPost.id),
+    initialData: initialPost,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  if (!post) {
+    return null;
+  }
+
+  return (
+    <PostCard
+      post={post}
+      onLike={onLike}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      userLike={post.userLike}
+      currentUserId={currentUserId}
+    />
+  );
+};
 
 const InfiniteHitsList = () => {
   const { items, isLastPage, showMore } = useInfiniteHits<Post>();
@@ -81,6 +122,7 @@ const InfiniteHitsList = () => {
     setPostToDelete(null);
   };
 
+  const queryClient = useQueryClient();
   const isLoading = status === "loading" || status === "stalled";
 
   const [likesMap, setLikesMap] = useState<Record<string, LikeType | null>>({});
@@ -112,11 +154,29 @@ const InfiniteHitsList = () => {
     };
   }, [user?.id, items]);
 
-  const posts = items.map((item) => ({
-    ...item,
-    id: item.objectID,
-    userLike: likesMap[item.objectID] || null,
-  }));
+  const posts = useMemo(() => {
+    return items.map((item) => ({
+      ...item,
+      id: item.objectID,
+      userLike: likesMap[item.objectID] || null,
+    }));
+  }, [items, likesMap]);
+
+  // Synchronize search hits with TanStack query cache
+  useEffect(() => {
+    posts.forEach((post) => {
+      const queryKey = postKeys.single(post.id);
+      const existing = queryClient.getQueryData<Post>(queryKey);
+      if (!existing) {
+        queryClient.setQueryData(queryKey, post);
+      } else {
+        queryClient.setQueryData(queryKey, {
+          ...post,
+          ...existing,
+        });
+      }
+    });
+  }, [posts, queryClient]);
 
   if (posts.length === 0 && !isLoading) {
     return (
@@ -143,12 +203,11 @@ const InfiniteHitsList = () => {
               key={post.id}
               className="list-none w-full animate-in fade-in slide-in-from-bottom-4 duration-500"
             >
-              <PostCard
-                post={post}
+              <PostCardWithLikes
+                initialPost={post}
                 onLike={handleLikeClick}
                 onEdit={openEditDialog}
                 onDelete={() => setPostToDelete(post)}
-                userLike={post.userLike}
                 currentUserId={user?.id}
               />
             </li>

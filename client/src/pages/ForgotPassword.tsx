@@ -65,7 +65,7 @@ export default function ForgotPassword() {
         "New password set successfully! Please log in with your new password.",
       );
       navigate("/signin");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Password reset error:", error);
       const message =
         error.code === "auth/invalid-action-code"
@@ -83,7 +83,7 @@ export default function ForgotPassword() {
       await sendNewPasswordResetEmail(data.email);
       setIsEmailSent(true);
       toast.success("Password reset email sent!");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Send reset email error:", error);
       toast.error("Failed to send password reset email. Please try again.");
     } finally {

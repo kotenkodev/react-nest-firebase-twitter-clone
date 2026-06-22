@@ -3,10 +3,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { signInWithGoogle } from "@/services/authService";
 import { useAuthStore } from "@/store/useAuthStore";
+import type { User } from "@/types/user.types";
 
 interface GoogleButtonProps {
   text?: string;
-  onSuccess?: (user: any) => void;
+  onSuccess?: (user: User) => void;
 }
 
 export default function GoogleButton({
@@ -23,7 +24,7 @@ export default function GoogleButton({
       setUser(user);
       toast.success("Successfully signed in! Welcome back!");
       onSuccess?.(user);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error during Google Sign-In:", error.message);
       toast.error("Google Sign-In failed. Please try again.");
     } finally {

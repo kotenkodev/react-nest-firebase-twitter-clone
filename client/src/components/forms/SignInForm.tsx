@@ -49,7 +49,7 @@ export default function SignInForm() {
 
       toast.success("Successfully signed in! Welcome back!");
       navigate("/");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Sign-in error:", error.code);
       const message =
         error.code === "auth/wrong-password" ||

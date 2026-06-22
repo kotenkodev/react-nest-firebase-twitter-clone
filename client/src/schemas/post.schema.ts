@@ -7,13 +7,17 @@ export const postSchema = z
   .object({
     title: z
       .string()
-      .max(MAX_TITLE_LENGTH, { message: `Title cannot exceed ${MAX_TITLE_LENGTH} characters.` })
+      .max(MAX_TITLE_LENGTH, {
+        message: `Title cannot exceed ${MAX_TITLE_LENGTH} characters.`,
+      })
       .optional()
       .or(z.literal("")),
 
     content: z
       .string()
-      .max(MAX_CONTENT_LENGTH, { message: `Content cannot exceed ${MAX_CONTENT_LENGTH} characters.` })
+      .max(MAX_CONTENT_LENGTH, {
+        message: `Content cannot exceed ${MAX_CONTENT_LENGTH} characters.`,
+      })
       .optional()
       .or(z.literal("")),
 

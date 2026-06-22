@@ -16,7 +16,9 @@ const parseDate = (value: unknown): Date | undefined => {
   return undefined;
 };
 
-export const transformUserPayload = (rawData: Record<string, unknown>): User => {
+export const transformUserPayload = (
+  rawData: Record<string, unknown>,
+): User => {
   return {
     ...rawData,
     birthDate: parseDate(rawData["birthDate"]),
@@ -24,7 +26,9 @@ export const transformUserPayload = (rawData: Record<string, unknown>): User => 
   } as unknown as User;
 };
 
-export const transformPostPayload = (rawData: Record<string, unknown>): Post => {
+export const transformPostPayload = (
+  rawData: Record<string, unknown>,
+): Post => {
   return {
     ...rawData,
     createdAt: parseDate(rawData["createdAt"]) || new Date(),
@@ -32,14 +36,18 @@ export const transformPostPayload = (rawData: Record<string, unknown>): Post => 
   } as unknown as Post;
 };
 
-export const transformLikePayload = (rawData: Record<string, unknown>): Like => {
+export const transformLikePayload = (
+  rawData: Record<string, unknown>,
+): Like => {
   return {
     ...rawData,
     createdAt: parseDate(rawData["createdAt"]) || new Date(),
   } as unknown as Like;
 };
 
-export const transformCommentPayload = (rawData: Record<string, unknown>): Comment => {
+export const transformCommentPayload = (
+  rawData: Record<string, unknown>,
+): Comment => {
   return {
     ...rawData,
     createdAt: parseDate(rawData["createdAt"]) || new Date(),

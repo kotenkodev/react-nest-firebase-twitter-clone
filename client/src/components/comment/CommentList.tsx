@@ -14,7 +14,7 @@ type CommentListProps = {
 export default function CommentList({ postId }: CommentListProps) {
   const { setReplyingComment, setEditingComment } = useUIStore();
   const { user } = useAuthStore();
-  const { deleteComment, isDeleting } = useDeleteComment();
+  const { deleteComment } = useDeleteComment();
 
   const {
     comments,
@@ -22,16 +22,14 @@ export default function CommentList({ postId }: CommentListProps) {
     hasNextPage,
     isFetchingNextPage,
     status,
-    error,
     isFetching,
   } = useComments({ postId });
 
-  const handleDeleteComment = (commentId: string, parentId?: string) => {
+  const handleDeleteComment = (commentId: string) => {
     deleteComment(
       {
         postId,
         commentId,
-        parentId,
       },
       {
         onSuccess: () => {

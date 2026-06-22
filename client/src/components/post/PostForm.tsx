@@ -1,21 +1,21 @@
-import { postSchema, MAX_CONTENT_LENGTH } from "@/schemas/post.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { Button } from "../ui/button";
+import { collection, doc } from "firebase/firestore";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import type z from "zod";
+import { CountedTextarea } from "../CountedTextarea";
+import { db } from "@/config/firebaseConfig";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { uploadPostImage } from "@/services/storageService";
-import { collection, doc } from "firebase/firestore";
-import { db } from "@/config/firebaseConfig";
 import { Loader2Icon } from "lucide-react";
-import type { Post } from "@/types/post.types";
-import ImageUploader from "../profile/ImageUploader";
-import { CountedTextarea } from "../CountedTextarea";
+import { postSchema, MAX_CONTENT_LENGTH } from "@/schemas/post.schema";
+import { toast } from "sonner";
+import { uploadPostImage } from "@/services/storageService";
 import { useCreatePost } from "@/hooks/posts/useCreatePost";
+import { useState } from "react";
 import { useUpdatePost } from "@/hooks/posts/useUpdatePost";
+import { zodResolver } from "@hookform/resolvers/zod";
+import ImageUploader from "../profile/ImageUploader";
+import type { Post } from "@/types/post.types";
+import type z from "zod";
 
 type FormValues = z.infer<typeof postSchema>;
 
@@ -23,7 +23,6 @@ type PostFormProps = {
   onSuccess?: () => void;
   post?: Post | null;
 };
-
 
 export default function PostForm({ onSuccess, post }: PostFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -63,13 +62,13 @@ export default function PostForm({ onSuccess, post }: PostFormProps) {
         createPost({
           ...data,
           id: postId,
-          photoURL: photoURL,
+          photoURL,
         });
       }
 
       toast.success(`Post ${isEditMode ? "updated" : "created"} successfully!`);
       onSuccess?.();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to save post:", error);
       toast.error(
         `Failed to ${isEditMode ? "update" : "create"} post. Please try again.`,

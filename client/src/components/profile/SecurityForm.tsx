@@ -7,15 +7,21 @@ import TransitionLink from "../TransitionLink";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
-import { createUserPassword, updateUserPassword } from "@/services/authService";
+import {
+  createUserPassword,
+  signOut,
+  updateUserPassword,
+} from "@/services/authService";
 import { toast } from "sonner";
 import { auth } from "@/config/firebaseConfig";
+import { useNavigate } from "react-router-dom";
 
 type FormValues = z.infer<typeof securitySchema>;
 
 export function SecurityForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasPasswordProvider, setHasPasswordProvider] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkPasswordProvider = () => {
@@ -65,7 +71,7 @@ export function SecurityForm() {
         newPassword: "",
         confirmNewPassword: "",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating password:", error);
       const message =
         error.code === "auth/wrong-password"
@@ -76,6 +82,8 @@ export function SecurityForm() {
       toast.error(message);
     } finally {
       setIsLoading(false);
+      await signOut();
+      navigate("/signin");
     }
   };
 

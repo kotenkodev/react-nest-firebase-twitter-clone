@@ -29,6 +29,8 @@ export default function CommentCard({
   const [contentExpanded, setContentExpanded] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const isOwner = comment.authorId === currentUserId;
+  const isAuthorDeleted = comment.authorId === "deleted_user";
+  const isCommentDeleted = comment.isDeleted && comment.content === "[deleted]";
   const fullName =
     `${comment.author.firstName} ${comment.author.lastName || ""}`.trim();
 
@@ -36,35 +38,56 @@ export default function CommentCard({
     <>
       <div
         className={`flex items-start gap-3 p-3 text-left rounded-xl border border-transparent hover:border-muted/60 bg-card transition-all ${
-          comment.isDeleted ? "opacity-60 select-none" : ""
+          isCommentDeleted ? "opacity-60 select-none" : ""
         }`}
       >
-        <TransitionLink
-          to={`/profile/${comment.authorId}`}
-          className="shrink-0"
-        >
-          <Avatar className="h-8 w-8 border shadow-sm">
-            <AvatarImage
-              src={comment.author.photoURL}
-              alt={fullName}
-              className="object-cover"
-            />
-            <AvatarFallback className="bg-secondary text-secondary-foreground font-bold text-[10px]">
-              {getInitials(fullName)}
-            </AvatarFallback>
-          </Avatar>
-        </TransitionLink>
+        {isAuthorDeleted ? (
+          <div className="shrink-0 select-none">
+            <Avatar className="h-8 w-8 border shadow-sm">
+              <AvatarImage
+                src={comment.author.photoURL}
+                alt={fullName}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-secondary text-secondary-foreground font-bold text-[10px]">
+                {getInitials(fullName)}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        ) : (
+          <TransitionLink
+            to={`/profile/${comment.authorId}`}
+            className="shrink-0"
+          >
+            <Avatar className="h-8 w-8 border shadow-sm">
+              <AvatarImage
+                src={comment.author.photoURL}
+                alt={fullName}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-secondary text-secondary-foreground font-bold text-[10px]">
+                {getInitials(fullName)}
+              </AvatarFallback>
+            </Avatar>
+          </TransitionLink>
+        )}
 
         <div className="flex-1 min-w-0 flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-2 min-w-0">
-              <TransitionLink
-                to={`/profile/${comment.authorId}`}
-                className="font-bold text-sm tracking-tight text-foreground hover:underline truncate"
-              >
-                {fullName}
-              </TransitionLink>
-              <span className="text-xs text-muted-foreground shrink-0">
+              {isAuthorDeleted ? (
+                <span className="font-bold text-sm tracking-tight text-foreground truncate select-none">
+                  {fullName}
+                </span>
+              ) : (
+                <TransitionLink
+                  to={`/profile/${comment.authorId}`}
+                  className="font-bold text-sm tracking-tight text-foreground hover:underline truncate"
+                >
+                  {fullName}
+                </TransitionLink>
+              )}
+              <span className="text-xs text-muted-foreground shrink-0 select-none">
                 {dayjs(comment.createdAt).fromNow()}
                 {comment.isEdited && (
                   <span className="ml-1 text-[10px] italic font-normal text-muted-foreground/80">
@@ -74,7 +97,7 @@ export default function CommentCard({
               </span>
             </div>
 
-            {isOwner && !comment.isDeleted && (
+            {isOwner && !isCommentDeleted && (
               <div className="flex items-center gap-0.5 shrink-0">
                 <Button
                   size="icon-xs"
@@ -99,7 +122,7 @@ export default function CommentCard({
           </div>
 
           <div className="text-sm text-foreground/90 wrap-break-word leading-relaxed">
-            {comment.isDeleted ? (
+            {isCommentDeleted ? (
               <span className="italic text-muted-foreground font-normal">
                 [deleted]
               </span>
@@ -125,7 +148,7 @@ export default function CommentCard({
             )}
           </div>
 
-          <div className="flex items-center justify-between gap-1.5 text-xs text-muted-foreground mt-0.5">
+          <div className="flex items-center justify-between gap-1.5 text-xs text-muted-foreground mt-0.5 select-none">
             {comment.replyCount > 0 ? (
               <div
                 className="flex gap-1 cursor-pointer hover:text-foreground"
@@ -138,18 +161,20 @@ export default function CommentCard({
                 </span>
               </div>
             ) : (
-              !comment.isDeleted && (
+              !isCommentDeleted && (
                 <span className="text-muted-foreground/60 select-none">
                   no replies
                 </span>
               )
             )}
-            <div
-              className="flex gap-1 cursor-pointer hover:text-foreground"
-              onClick={() => onReply(comment)}
-            >
-              <span>write a reply</span>
-            </div>
+            {!isCommentDeleted && (
+              <div
+                className="flex gap-1 cursor-pointer hover:text-foreground"
+                onClick={() => onReply(comment)}
+              >
+                <span>write a reply</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
