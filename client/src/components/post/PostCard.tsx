@@ -54,6 +54,7 @@ export default function PostCard({
           firstName={post.author?.firstName}
           lastName={post.author?.lastName}
           photoURL={post.author?.photoURL}
+          isVerified={post.author?.emailVerified}
           createdAt={post.createdAt}
           isEdited={post.isEdited}
           updatedAt={post.updatedAt}

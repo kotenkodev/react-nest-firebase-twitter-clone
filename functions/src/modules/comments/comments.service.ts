@@ -46,6 +46,7 @@ export class CommentsService {
         firstName: user.firstName,
         lastName: user.lastName,
         photoURL: user.photoURL,
+        emailVerified: user.emailVerified,
       },
     };
 

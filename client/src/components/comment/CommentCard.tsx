@@ -4,7 +4,7 @@ import { getInitials } from "@/utils/getInitials";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "../ui/button";
-import { EditIcon, TrashIcon, MessageSquareIcon } from "lucide-react";
+import { EditIcon, TrashIcon, MessageSquareIcon, BadgeCheck } from "lucide-react";
 import { useState } from "react";
 import TransitionLink from "../TransitionLink";
 import Replies from "./Replies";
@@ -82,9 +82,15 @@ export default function CommentCard({
               ) : (
                 <TransitionLink
                   to={`/profile/${comment.authorId}`}
-                  className="font-bold text-sm tracking-tight text-foreground hover:underline truncate"
+                  className="font-bold text-sm tracking-tight text-foreground hover:underline truncate flex items-center gap-1"
                 >
                   {fullName}
+                  {comment.author.emailVerified && (
+                    <BadgeCheck
+                      className="text-primary shrink-0 w-3.5 h-3.5"
+                      aria-label="Verified Account"
+                    />
+                  )}
                 </TransitionLink>
               )}
               <span className="text-xs text-muted-foreground shrink-0 select-none">

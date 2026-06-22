@@ -81,6 +81,7 @@ export class PostsService {
         firstName: user.firstName,
         lastName: user.lastName,
         photoURL: user.photoURL,
+        emailVerified: user.emailVerified,
       },
     });
   }

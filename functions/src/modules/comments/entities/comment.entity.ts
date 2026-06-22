@@ -9,6 +9,7 @@ export interface Comment {
     firstName: string;
     lastName?: string;
     photoURL?: string;
+    emailVerified?: boolean;
   };
   isDeleted?: boolean;
   isEdited?: boolean;

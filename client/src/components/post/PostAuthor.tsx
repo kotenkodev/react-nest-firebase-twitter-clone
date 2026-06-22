@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BadgeCheck } from "lucide-react";
 import { getInitials } from "@/utils/getInitials";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -12,6 +13,7 @@ interface PostAuthorProps {
   firstName?: string;
   lastName?: string;
   photoURL?: string;
+  isVerified?: boolean;
   createdAt: Date | string;
   isEdited?: boolean;
   updatedAt?: Date | string;
@@ -30,6 +32,7 @@ export function PostAuthor({
   firstName,
   lastName,
   photoURL,
+  isVerified,
   createdAt,
   isEdited,
   updatedAt,
@@ -57,11 +60,17 @@ export function PostAuthor({
       <div className="flex flex-col justify-center">
         <span
           className={cn(
-            "font-bold tracking-tight text-foreground leading-tight group-hover:underline",
+            "font-bold tracking-tight text-foreground leading-tight group-hover:underline flex items-center gap-1",
             avatarSize === "lg" ? "text-base" : "text-sm",
           )}
         >
           {fullName}
+          {isVerified && (
+            <BadgeCheck
+              className={cn("text-primary shrink-0", avatarSize === "lg" ? "w-4 h-4" : "w-3.5 h-3.5")}
+              aria-label="Verified Account"
+            />
+          )}
         </span>
         <span className="text-xs text-muted-foreground mt-0.5 select-none">
           {dayjs(createdAt).fromNow()}

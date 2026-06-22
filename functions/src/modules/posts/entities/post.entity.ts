@@ -10,6 +10,7 @@ export interface Post {
     firstName: string;
     lastName: string;
     photoURL?: string;
+    emailVerified?: boolean;
   };
   commentsCount: number;
   dislikesCount: number;
