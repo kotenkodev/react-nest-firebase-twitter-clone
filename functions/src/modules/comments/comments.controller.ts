@@ -1,11 +1,9 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -18,6 +16,7 @@ import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { OwnershipGuard } from '../../common/guards/ownership.guard';
+import { CommentQueryDto } from './dto/comment-query.dto';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {
@@ -26,11 +25,14 @@ export class CommentsController {
   @Get()
   getComments(
     @Param('postId') postId: string,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-    @Query('parentId') parentId?: string,
-    @Query('lastDocId') lastDocId?: string,
+    @Query() query: CommentQueryDto,
   ) {
-    return this.commentService.getComments(postId, limit, parentId, lastDocId);
+    return this.commentService.getComments(
+      postId,
+      query.limit,
+      query.parentId,
+      query.lastDocId,
+    );
   }
 
   @UseGuards(FirebaseAuthGuard)

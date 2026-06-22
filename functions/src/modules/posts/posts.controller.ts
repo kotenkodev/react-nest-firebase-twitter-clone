@@ -19,6 +19,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { FirebaseOptionalAuthGuard } from '../../common/guards/firebase-optional-auth.guard';
+import { PostQueryDto } from './dto/post-query.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -34,19 +35,14 @@ export class PostsController {
   @Get()
   async findAll(
     @GetUser('uid') currentUserId: string,
-    @Query('lastDocId') lastDocId?: string,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-    @Query('search') searchText?: string,
-    @Query('user') userId?: string,
-    @Query('sortBy') sortBy?: 'newest' | 'popular',
+    @Query() query: PostQueryDto,
   ) {
     return this.postsService.findAll(
       currentUserId,
-      lastDocId,
-      limit,
-      searchText,
-      userId,
-      sortBy,
+      query.lastDocId,
+      query.limit,
+      query.userId,
+      query.sortBy,
     );
   }
 
