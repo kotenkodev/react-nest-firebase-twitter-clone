@@ -13,6 +13,7 @@ import { LikesService } from '../likes/likes.service';
 import { ALGOLIA } from '../algolia/algolia.module';
 import type { Algoliasearch } from 'algoliasearch';
 import { CommentsService } from '../comments/comments.service';
+import { logger } from 'firebase-functions';
 
 @Injectable()
 export class PostsService {
@@ -55,13 +56,56 @@ export class PostsService {
     userId?: string,
     sortBy?: 'newest' | 'popular',
   ): Promise<Post[]> {
-    const posts = await this.postsRepository.findAll(
-      limit,
-      lastDocId,
-      searchText,
-      userId,
-      sortBy,
-    );
+    let posts: Post[] = [];
+
+    if (searchText) {
+      try {
+        const response = await this.algolia.search({
+          requests: [
+            {
+              indexName: 'PostsSearch',
+              query: searchText,
+              hitsPerPage: 100, // Fetch up to 100 hits to support cursor pagination
+            },
+          ],
+        });
+
+        const hits = response.results[0].hits;
+        let ids = hits.map((hit) => hit.objectID);
+
+        if (ids.length > 0) {
+          if (lastDocId) {
+            const index = ids.indexOf(lastDocId);
+            if (index !== -1) {
+              ids = ids.slice(index + 1);
+            } else {
+              ids = [];
+            }
+          }
+
+          ids = ids.slice(0, limit);
+
+          if (ids.length > 0) {
+            const postsWithNulls =
+              await this.postsRepository.findManyByIds(ids);
+            posts = postsWithNulls.filter(
+              (post): post is Post => post !== null,
+            );
+          }
+        }
+      } catch (error) {
+        logger.error('Error searching posts via Algolia:', error);
+        posts = [];
+      }
+    } else {
+      posts = await this.postsRepository.findAll(
+        limit,
+        lastDocId,
+        searchText,
+        userId,
+        sortBy,
+      );
+    }
 
     if (!currentUserId || posts.length === 0) {
       return posts.map((post) => ({
