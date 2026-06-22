@@ -10,18 +10,18 @@ export default function Home() {
       <Tabs defaultValue="home" className="w-full max-w-2xl mx-auto">
         <TabsList
           variant="line"
-          className="w-full border-b border-border flex bg-transparent rounded-none p-0 h-12 gap-0"
+          className="w-full border-b border-border flex rounded-none p-0 h-12 gap-0 sticky top-[69px] z-20 bg-background/95 backdrop-blur-sm"
         >
           <TabsTrigger
             value="home"
-            className="flex-1 text-center font-semibold text-base h-full rounded-none transition-all cursor-pointer relative gap-2 data-[state=active]:text-foreground data-[state=active]:font-bold"
+            className="flex-1 text-center font-semibold text-base h-full rounded-none transition-all cursor-pointer relative gap-2 data-[state=active]:text-foreground data-[state=active]:font-bold after:hidden"
           >
             <HomeIcon className="w-4 h-4" />
             <span>Home</span>
           </TabsTrigger>
           <TabsTrigger
             value="explore"
-            className="flex-1 text-center font-semibold text-base h-full rounded-none transition-all cursor-pointer relative gap-2 data-[state=active]:text-foreground data-[state=active]:font-bold"
+            className="flex-1 text-center font-semibold text-base h-full rounded-none transition-all cursor-pointer relative gap-2 data-[state=active]:text-foreground data-[state=active]:font-bold after:hidden"
           >
             <CompassIcon className="w-4 h-4" />
             <span>Explore</span>

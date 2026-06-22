@@ -31,7 +31,6 @@ export default function CommentInput({ postId, onSuccess }: CommentInputProps) {
     const result = createCommentSchema.safeParse({ content });
     if (!result.success) {
       toast.error(result.error.message);
-      console.log(result.error.message);
       return;
     }
 
