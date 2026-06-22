@@ -60,5 +60,5 @@ export const api: HttpsFunction = onRequest(async (request, response) => {
 
 export { updatePostReactionCount } from './triggers/like.trigger';
 export { updatePostCommentCount } from './triggers/comment.trigger';
-export { onUserAccountDeleted } from './triggers/user.trigger';
+export { onUserAccountDeleted, onUserUpdated } from './triggers/user.trigger';
 export { onPostDeleted } from './triggers/post.trigger';
