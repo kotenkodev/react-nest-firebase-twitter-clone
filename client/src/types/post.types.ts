@@ -1,3 +1,5 @@
+import type { LikeType } from "./like.types";
+
 export interface Post {
   id: string;
   title: string;
@@ -14,9 +16,11 @@ export interface Post {
   likesCount: number;
   createdAt: Date;
   updatedAt: Date;
-  userLike?: "like" | "dislike" | null;
+  userLike?: LikeType | null;
 }
 
 export type CreatePost = Pick<Post, "id" | "title" | "content" | "photoURL">;
 
 export type UpdatePost = Partial<Pick<Post, "title" | "content" | "photoURL">>;
+
+export type PostSortBy = "newest" | "popular";

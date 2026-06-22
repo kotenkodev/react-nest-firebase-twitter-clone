@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import PostList from "@/components/post/PostList";
-import { getPosts } from "@/services/postsService";
 import { BirdSpinner } from "@/components/ui/bird-spinner";
 import ItemNotFound from "@/components/ItemNotFound";
 import { useUser } from "@/hooks/users/useUser";

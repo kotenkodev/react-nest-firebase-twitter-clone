@@ -12,14 +12,15 @@ import { Button } from "../ui/button";
 import { PostAuthor } from "./PostAuthor";
 import { PostReactions } from "./PostReactions";
 import { PostActions } from "./PostActions";
+import type { LikeType } from "@/types/like.types";
 
 type PostCardProps = {
   post: Post;
   currentUserId?: string;
-  onLike: (postId: string, type: "like" | "dislike") => void;
+  onLike: (postId: string, type: LikeType) => void;
   onEdit: (post: Post) => void;
   onDelete: (postId: string) => void;
-  userLike?: "like" | "dislike" | null;
+  userLike?: LikeType | null;
 };
 
 export default function PostCard({

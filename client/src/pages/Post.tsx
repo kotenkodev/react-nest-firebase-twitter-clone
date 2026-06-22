@@ -22,7 +22,7 @@ import { usePost } from "@/hooks/posts/usePost";
 import { useAuthStore } from "@/store/useAuthStore";
 import CommentList from "@/components/comment/CommentList";
 import CommentInput from "@/components/comment/CommentInput";
-import { VisuallyHidden } from "radix-ui";
+import type { LikeType } from "@/types/like.types";
 
 type PostProps = {
   isModal?: boolean;
@@ -33,7 +33,7 @@ export default function Post({ isModal }: PostProps) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toggleLike } = useToggleLike();
-  const { post, error, isLoading } = usePost(id!);
+  const { post, isLoading } = usePost(id!);
 
   const { setPostDialogOpen, setEditingPost } = useUIStore();
   const { deletePost, isDeleting } = useDeletePost();
@@ -68,7 +68,7 @@ export default function Post({ isModal }: PostProps) {
 
   const handleClose = () => navigate(-1);
 
-  const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
+  const handleLikeClick = async (postId: string, like: LikeType) => {
     toggleLike(
       { postId, likeType: like },
       {

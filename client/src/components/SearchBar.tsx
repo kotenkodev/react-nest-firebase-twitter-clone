@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { algoliasearch } from "algoliasearch";
 import {
   InstantSearch,
@@ -6,6 +6,7 @@ import {
   useInfiniteHits,
   useInstantSearch,
   useSearchBox,
+  type UseSearchBoxProps,
 } from "react-instantsearch";
 import { useInView } from "react-intersection-observer";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -19,6 +20,8 @@ import ConfirmDeleteDialog from "@/components/post/ConfirmDeleteDialog";
 import { PostCardSkeleton } from "@/components/post/PostCardSkeleton";
 import { SquarePenIcon, Search } from "lucide-react";
 import type { Post } from "@/types/post.types";
+import { getLikesByPostIds } from "@/services/likesService";
+import type { LikeType } from "@/types/like.types";
 
 const algoliaAppId = import.meta.env.VITE_ALGOLIA_APP_ID;
 const algoliaSearchKey = import.meta.env.VITE_ALGOLIA_SEARCH_KEY;
@@ -27,7 +30,7 @@ const indexName = "PostsSearch";
 const searchClient = algoliasearch(algoliaAppId, algoliaSearchKey);
 
 const InfiniteHitsList = () => {
-  const { items, isLastPage, showMore } = useInfiniteHits();
+  const { items, isLastPage, showMore } = useInfiniteHits<Post>();
   const { status } = useInstantSearch();
   const { ref, inView } = useInView({ threshold: 0 });
 
@@ -43,7 +46,7 @@ const InfiniteHitsList = () => {
     }
   }, [inView, isLastPage, showMore]);
 
-  const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
+  const handleLikeClick = async (postId: string, like: LikeType) => {
     toggleLike(
       { postId, likeType: like },
       {
@@ -70,7 +73,7 @@ const InfiniteHitsList = () => {
   const handleDeleteConfirm = async () => {
     if (!postToDelete) return;
 
-    deletePost(postToDelete.id || (postToDelete as any).objectID, {
+    deletePost(postToDelete.id, {
       onSuccess: () => toast.success("Post deleted successfully!"),
       onError: () => toast.error("Failed to delete post. Please try again."),
     });
@@ -80,7 +83,42 @@ const InfiniteHitsList = () => {
 
   const isLoading = status === "loading" || status === "stalled";
 
-  if (items.length === 0 && !isLoading) {
+  const [likesMap, setLikesMap] = useState<Record<string, LikeType | null>>({});
+
+  useEffect(() => {
+    if (!user?.id || items.length === 0) {
+      setLikesMap({});
+      return;
+    }
+
+    let isMounted = true;
+    getLikesByPostIds(items.map((item) => item.objectID))
+      .then((likes) => {
+        if (!isMounted) return;
+        const map: Record<string, LikeType | null> = {};
+        likes.forEach((like) => {
+          if (like) {
+            map[like.postId] = like.type;
+          }
+        });
+        setLikesMap(map);
+      })
+      .catch((error) => {
+        console.error("Error loading likes for search hits:", error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, items]);
+
+  const posts = items.map((item) => ({
+    ...item,
+    id: item.objectID,
+    userLike: likesMap[item.objectID] || null,
+  }));
+
+  if (posts.length === 0 && !isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center border-2 border-dashed rounded-xl bg-muted/20 w-full max-w-2xl mx-auto mt-6">
         <div className="bg-secondary/50 p-4 rounded-full mb-4">
@@ -99,12 +137,7 @@ const InfiniteHitsList = () => {
   return (
     <>
       <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
-        {items.map((hit: any) => {
-          const post = {
-            ...hit,
-            id: hit.objectID,
-          };
-
+        {posts.map((post) => {
           return (
             <li
               key={post.id}
@@ -152,7 +185,7 @@ const InfiniteHitsList = () => {
   );
 };
 
-const DebouncedSearchBox = (props: any) => {
+const DebouncedSearchBox = (props: UseSearchBoxProps) => {
   const { query, refine } = useSearchBox(props);
   const [inputValue, setInputValue] = useState(query);
   const debouncedInputValue = useDebounce(inputValue, 700);

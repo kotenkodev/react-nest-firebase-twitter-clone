@@ -14,3 +14,14 @@ export const likePost = async (
     throw error;
   }
 };
+
+export const getLikesByPostIds = async (postIds: string[]): Promise<Like[]> => {
+  try {
+    const response = await apiClient.post(`likes/interactions`, { postIds });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching likes:", error);
+    throw error;
+  }
+};

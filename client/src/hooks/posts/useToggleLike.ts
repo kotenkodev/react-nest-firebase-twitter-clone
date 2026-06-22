@@ -1,11 +1,12 @@
 import { postKeys } from "@/lib/queryKeys";
 import { likePost } from "@/services/likesService";
 import type { Post } from "@/types/post.types";
+import type { LikeType } from "@/types/like.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type ToggleLikeParams = {
   postId: string;
-  likeType: "like" | "dislike";
+  likeType: LikeType;
 };
 
 export function useToggleLike() {

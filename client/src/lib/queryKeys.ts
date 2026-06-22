@@ -1,6 +1,8 @@
+import type { PostSortBy } from "@/types/post.types";
+
 export type PostFilters = {
   search?: string;
-  sortBy?: "newest" | "popular";
+  sortBy?: PostSortBy;
 };
 
 export const postKeys = {

@@ -11,17 +11,17 @@ import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import { useToggleLike } from "@/hooks/posts/useToggleLike";
 import { useDeletePost } from "@/hooks/posts/useDeletePost";
 import { usePosts } from "@/hooks/posts/usePosts";
+import type { LikeType } from "@/types/like.types";
+import type { PostSortBy } from "@/types/post.types";
 
 type PostListProps = {
   userId?: string;
-  search?: string;
-  sortBy?: "newest" | "popular";
+  sortBy?: PostSortBy;
   emptyMessage?: string;
 };
 
 export default function PostList({
   userId,
-  search,
   sortBy,
   emptyMessage = "No posts found.",
 }: PostListProps) {
@@ -33,16 +33,10 @@ export default function PostList({
   const { ref, inView } = useInView({ threshold: 0 });
   const { toggleLike } = useToggleLike();
 
-  const {
-    posts,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    status,
-  } = usePosts({ userId, search, sortBy });
+  const { posts, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+    usePosts({ userId, sortBy });
 
-  const handleLikeClick = async (postId: string, like: "like" | "dislike") => {
+  const handleLikeClick = async (postId: string, like: LikeType) => {
     toggleLike(
       { postId, likeType: like },
       {
@@ -69,7 +63,7 @@ export default function PostList({
   const handleDeleteConfirm = async () => {
     if (!postToDelete) return;
 
-    deletePost(postToDelete.id || (postToDelete as any).objectID, {
+    deletePost(postToDelete.id, {
       onSuccess: () => toast.success("Post deleted successfully!"),
       onError: () => toast.error("Failed to delete post. Please try again."),
     });
@@ -115,7 +109,7 @@ export default function PostList({
     <>
       <ul className="flex flex-col space-y-6 md:space-y-8 w-full max-w-2xl mx-auto pb-10">
         {posts.map((post) => {
-          const postId = post.id || (post as any).objectID;
+          const postId = post.id;
           return (
             <li
               key={postId}

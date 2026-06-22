@@ -13,7 +13,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { auth } from "./config/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
-import BirdLoadingBar from "./components/BirdLoadingBar";
+import BirdLoadingBar from "./components/LoadingBar";
 import AnimationLayout from "./components/AnimationLayout";
 import { getUser } from "./services/usersService";
 import ProfileSettings from "./pages/ProfileSettings";

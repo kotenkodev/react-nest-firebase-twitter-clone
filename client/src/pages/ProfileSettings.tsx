@@ -27,7 +27,7 @@ export default function Profile() {
       // await deleteAccount();
 
       toast.success("Account deleted successfully!");
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete account. Please try again.");
     } finally {
     }

@@ -9,11 +9,9 @@ export const useDeleteComment = () => {
     mutationFn: ({
       postId,
       commentId,
-      parentId,
     }: {
       postId: string;
       commentId: string;
-      parentId?: string;
     }) => deleteCommentApi(postId, commentId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({

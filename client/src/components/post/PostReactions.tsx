@@ -2,14 +2,15 @@ import { Badge } from "../ui/badge";
 import { ThumbsDownIcon, ThumbsUpIcon, MessageCircleIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import type { LikeType } from "@/types/like.types";
 
 interface PostReactionsProps {
   postId: string;
   likesCount: number;
   dislikesCount: number;
   commentsCount?: number;
-  userLike?: "like" | "dislike" | null;
-  onLike: (postId: string, type: "like" | "dislike") => void;
+  userLike?: LikeType | null;
+  onLike: (postId: string, type: LikeType) => void;
   showComments?: boolean;
   className?: string;
 }

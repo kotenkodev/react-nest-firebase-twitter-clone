@@ -29,7 +29,7 @@ export default function Home() {
         </TabsList>
 
         <TabsContent value="home" className="mt-6 focus-visible:outline-none">
-          <PostList />
+          <PostList sortBy="popular" />
         </TabsContent>
 
         <TabsContent

@@ -31,8 +31,11 @@ export default function ImageUploader({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setPreviewUrl(defaultImage || "");
-    setSelectedFile(null);
+    const handleImage = () => {
+      setPreviewUrl(defaultImage || "");
+      setSelectedFile(null);
+    };
+    handleImage();
   }, [defaultImage]);
 
   const handleContainerClick = () => fileInputRef.current?.click();

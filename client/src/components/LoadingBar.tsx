@@ -1,12 +1,12 @@
 import { BirdSpinner } from "./ui/bird-spinner";
 
-interface BirdLoadingAnimationProps {
+interface LoadingAnimationProps {
   withBackground?: boolean;
 }
 
-export default function BirdLoadingAnimation({
+export default function LoadingAnimation({
   withBackground = false,
-}: BirdLoadingAnimationProps) {
+}: LoadingAnimationProps) {
   return (
     <div
       id="bird-loader"
