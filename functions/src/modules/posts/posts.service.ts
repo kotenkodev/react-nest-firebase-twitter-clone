@@ -10,8 +10,6 @@ import { Post } from './entities/post.entity';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
 import { LikesService } from '../likes/likes.service';
-import { ALGOLIA } from '../algolia/algolia.module';
-import type { Algoliasearch } from 'algoliasearch';
 import { CommentsService } from '../comments/comments.service';
 import { logger } from 'firebase-functions';
 
@@ -24,7 +22,6 @@ export class PostsService {
     private readonly likesService: LikesService,
     @Inject(forwardRef(() => CommentsService))
     private readonly commentsService: CommentsService,
-    @Inject(ALGOLIA) private readonly algolia: Algoliasearch,
   ) {}
 
   async findOne(id: string, userId?: string): Promise<Post> {
@@ -52,60 +49,15 @@ export class PostsService {
     currentUserId?: string,
     lastDocId?: string,
     limit: number = 10,
-    searchText?: string,
     userId?: string,
     sortBy?: 'newest' | 'popular',
   ): Promise<Post[]> {
-    let posts: Post[] = [];
-
-    if (searchText) {
-      try {
-        const response = await this.algolia.search({
-          requests: [
-            {
-              indexName: 'PostsSearch',
-              query: searchText,
-              hitsPerPage: 100, // Fetch up to 100 hits to support cursor pagination
-            },
-          ],
-        });
-
-        const hits = response.results[0].hits;
-        let ids = hits.map((hit) => hit.objectID);
-
-        if (ids.length > 0) {
-          if (lastDocId) {
-            const index = ids.indexOf(lastDocId);
-            if (index !== -1) {
-              ids = ids.slice(index + 1);
-            } else {
-              ids = [];
-            }
-          }
-
-          ids = ids.slice(0, limit);
-
-          if (ids.length > 0) {
-            const postsWithNulls =
-              await this.postsRepository.findManyByIds(ids);
-            posts = postsWithNulls.filter(
-              (post): post is Post => post !== null,
-            );
-          }
-        }
-      } catch (error) {
-        logger.error('Error searching posts via Algolia:', error);
-        posts = [];
-      }
-    } else {
-      posts = await this.postsRepository.findAll(
-        limit,
-        lastDocId,
-        searchText,
-        userId,
-        sortBy,
-      );
-    }
+    const posts: Post[] = await this.postsRepository.findAll(
+      limit,
+      lastDocId,
+      userId,
+      sortBy,
+    );
 
     if (!currentUserId || posts.length === 0) {
       return posts.map((post) => ({

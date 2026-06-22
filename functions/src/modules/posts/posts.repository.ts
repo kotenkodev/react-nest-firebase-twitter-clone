@@ -19,7 +19,6 @@ export class PostsRepository {
   async findAll(
     limit: number,
     lastDocId?: string,
-    searchText?: string,
     userId?: string,
     sortBy?: 'newest' | 'popular',
   ): Promise<Post[]> {
@@ -27,10 +26,6 @@ export class PostsRepository {
 
     if (userId) {
       query = query.where('authorId', '==', userId);
-    }
-
-    if (searchText) {
-      // algolia
     }
 
     if (sortBy === 'newest') {
