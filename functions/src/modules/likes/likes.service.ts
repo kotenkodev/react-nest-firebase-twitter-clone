@@ -23,9 +23,12 @@ export class LikesService {
   }
 
   async findManyByIds(
-    ids: { userId: string; postId: string }[],
+    userId: string,
+    postIds: string[],
   ): Promise<(Like | null)[]> {
-    const likeIds = ids.map((id) => this.generateLikeId(id.userId, id.postId));
+    const likeIds = postIds.map((postId) =>
+      this.generateLikeId(userId, postId),
+    );
     return this.likesRepository.findManyByIds(likeIds);
   }
 

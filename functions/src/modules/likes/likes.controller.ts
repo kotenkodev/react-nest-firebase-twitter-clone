@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   UseGuards,
@@ -17,6 +18,19 @@ import { LikesService } from './likes.service';
 @Controller('posts/:postId/likes')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
+
+  @CheckOwnership({
+    resource: 'likes',
+    idParam: 'id',
+    ownerField: 'userId',
+  })
+  @Get()
+  async getLikes(
+    @GetUser('uid') userId: string,
+    @Body() body: { postIds: string[] },
+  ) {
+    return await this.likesService.findManyByIds(userId, body.postIds);
+  }
 
   @CheckOwnership({
     resource: 'likes',

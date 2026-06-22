@@ -7,6 +7,7 @@ import {
   FieldValue,
   Firestore,
 } from 'firebase-admin/firestore';
+import { PostSortBy } from './dto/post-query.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -20,7 +21,7 @@ export class PostsRepository {
     limit: number,
     lastDocId?: string,
     userId?: string,
-    sortBy?: 'newest' | 'popular',
+    sortBy?: PostSortBy,
   ): Promise<Post[]> {
     let query: FirebaseFirestore.Query = this.collection;
 
@@ -28,9 +29,9 @@ export class PostsRepository {
       query = query.where('authorId', '==', userId);
     }
 
-    if (sortBy === 'newest') {
+    if (sortBy === PostSortBy.NEWEST) {
       query = query.orderBy('createdAt', 'desc');
-    } else if (sortBy === 'popular') {
+    } else if (sortBy === PostSortBy.POPULAR) {
       query = query
         .orderBy('likesCount', 'desc')
         .orderBy('commentsCount', 'asc')

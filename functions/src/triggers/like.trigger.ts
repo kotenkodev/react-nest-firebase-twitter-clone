@@ -2,13 +2,14 @@ import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
+import { Like, LikeType } from '../modules/likes/entities/like.entity';
 
 export const updatePostReactionCount = onDocumentWritten(
   'likes/{interactionId}',
   async (event) => {
     const db = admin.firestore();
-    const beforeData = event.data?.before.data();
-    const afterData = event.data?.after.data();
+    const beforeData = event.data?.before.data() as Partial<Like> | undefined;
+    const afterData = event.data?.after.data() as Partial<Like> | undefined;
 
     const postId = (afterData?.postId || beforeData?.postId) as string;
     if (!postId) return;
@@ -18,7 +19,7 @@ export const updatePostReactionCount = onDocumentWritten(
     try {
       if (!event.data?.before.exists && event.data?.after.exists) {
         const fieldToIncrement =
-          afterData?.type === 'like' ? 'likesCount' : 'dislikesCount';
+          afterData?.type === LikeType.LIKE ? 'likesCount' : 'dislikesCount';
 
         return await postRef.update({
           [fieldToIncrement]: FieldValue.increment(1),
@@ -27,7 +28,7 @@ export const updatePostReactionCount = onDocumentWritten(
 
       if (event.data?.before.exists && !event.data?.after.exists) {
         const fieldToDecrement =
-          beforeData?.type === 'like' ? 'likesCount' : 'dislikesCount';
+          beforeData?.type === LikeType.LIKE ? 'likesCount' : 'dislikesCount';
 
         return await postRef.update({
           [fieldToDecrement]: FieldValue.increment(-1),
@@ -41,22 +42,23 @@ export const updatePostReactionCount = onDocumentWritten(
         if (oldType === newType) return;
 
         const fieldToDecrement =
-          oldType === 'like' ? 'likesCount' : 'dislikesCount';
+          oldType === LikeType.LIKE ? 'likesCount' : 'dislikesCount';
         const fieldToIncrement =
-          newType === 'like' ? 'likesCount' : 'dislikesCount';
+          newType === LikeType.LIKE ? 'likesCount' : 'dislikesCount';
 
         return await postRef.update({
           [fieldToDecrement]: FieldValue.increment(-1),
           [fieldToIncrement]: FieldValue.increment(1),
         });
       }
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as { code?: number };
       if (error.code === 5) {
         logger.info(`Ignored like update for deleted post: ${postId}`);
         return;
       }
 
-      logger.error('Error updating post reaction count:', error);
+      logger.error('Error updating post reaction count:', err);
     }
   },
 );

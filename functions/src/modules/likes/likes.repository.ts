@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FIREBASE_DB } from '../../modules/firebase/firebase.module';
 import {
   CollectionReference,
+  FieldPath,
   FieldValue,
   Firestore,
 } from 'firebase-admin/firestore';

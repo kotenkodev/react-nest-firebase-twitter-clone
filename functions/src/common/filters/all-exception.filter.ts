@@ -40,7 +40,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       error:
         typeof message === 'string'
           ? message
-          : (message as any).message || message,
+          : (message as Record<string, unknown>).message || message,
       stack,
     });
   }

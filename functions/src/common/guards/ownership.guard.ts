@@ -14,6 +14,7 @@ import {
 } from '../decorators/check-ownership.decorator';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Firestore } from 'firebase-admin/firestore';
+import { Request } from 'express';
 
 @Injectable()
 export class OwnershipGuard implements CanActivate {
@@ -33,9 +34,11 @@ export class OwnershipGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
     const user = request.user as DecodedIdToken;
-    const resourceId = request.params[options.idParam || 'id'];
+    const resourceId = request.params[options.idParam || 'id'] as
+      | string
+      | undefined;
 
     if (!user) {
       throw new ForbiddenException('User not authenticated');
@@ -70,7 +73,6 @@ export class OwnershipGuard implements CanActivate {
       throw new ForbiddenException('You do not own this resource');
     }
 
-    request.resource = data;
     return true;
   }
 }

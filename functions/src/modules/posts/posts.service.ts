@@ -11,7 +11,6 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
 import { LikesService } from '../likes/likes.service';
 import { CommentsService } from '../comments/comments.service';
-import { logger } from 'firebase-functions';
 
 @Injectable()
 export class PostsService {
@@ -67,7 +66,8 @@ export class PostsService {
     }
 
     const likes = await this.likesService.findManyByIds(
-      posts.map((post) => ({ userId: currentUserId, postId: post.id })),
+      currentUserId,
+      posts.map((post) => post.id),
     );
 
     return posts.map((post, index) => ({
@@ -100,8 +100,8 @@ export class PostsService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.postsRepository.delete(id);
     await this.likesService.deletePostLikes(id);
     await this.commentsService.deletePostComments(id);
+    await this.postsRepository.delete(id);
   }
 }

@@ -1,15 +1,16 @@
 import { Timestamp, DocumentSnapshot } from 'firebase-admin/firestore';
 
-export function convertTimestamps(data: any): any {
+export function convertTimestamps(data: unknown): unknown {
   if (!data || typeof data !== 'object') return data;
 
-  const converted = { ...data };
+  const converted = { ...(data as Record<string, unknown>) };
 
   for (const key in converted) {
-    if (converted[key] instanceof Timestamp) {
-      converted[key] = converted[key].toDate();
-    } else if (typeof converted[key] === 'object' && converted[key] !== null) {
-      converted[key] = convertTimestamps(converted[key]);
+    const value = converted[key];
+    if (value instanceof Timestamp) {
+      converted[key] = value.toDate();
+    } else if (typeof value === 'object' && value !== null) {
+      converted[key] = convertTimestamps(value);
     }
   }
 
@@ -23,6 +24,6 @@ export function mapToEntity<T>(doc: DocumentSnapshot): T | null {
 
   return {
     id: doc.id,
-    ...convertTimestamps(data),
+    ...(convertTimestamps(data) as Record<string, unknown>),
   } as T;
 }

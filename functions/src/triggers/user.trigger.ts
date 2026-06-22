@@ -18,12 +18,7 @@ export const onUserAccountDeleted = auth
       const avatarRef = bucket.file(`avatars/${uid}`);
       await avatarRef.delete();
     } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'code' in err &&
-        (err as { code: any }).code !== 404
-      ) {
+      if (err && typeof err === 'object' && 'code' in err && err.code !== 404) {
         logger.error('Failed to delete avatar:', err);
       }
     }

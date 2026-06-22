@@ -1,3 +1,5 @@
+import type { LikeType } from '../../likes/entities/like.entity';
+
 export interface Post {
   id: string;
   title: string;
@@ -14,5 +16,5 @@ export interface Post {
   likesCount: number;
   createdAt: Date;
   updatedAt: Date;
-  userLike?: 'like' | 'dislike' | null;
+  userLike?: LikeType | null;
 }

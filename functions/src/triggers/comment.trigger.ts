@@ -23,12 +23,6 @@ export const updatePostCommentCount = onDocumentWritten(
 
     const isCreated = !event.data?.before.exists && event.data?.after.exists;
 
-    const isSoftDeleted =
-      event.data?.before.exists &&
-      event.data?.after.exists &&
-      !beforeData?.isDeleted &&
-      afterData?.isDeleted;
-
     const isHardDeleted =
       event.data?.before.exists && !event.data?.after.exists;
 
@@ -60,12 +54,13 @@ export const updatePostCommentCount = onDocumentWritten(
           `Successfully decremented comment count for post: ${postId}`,
         );
       }
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as { code?: number };
       if (error.code === 5) {
         logger.info(`Ignored comment count update for deleted post: ${postId}`);
         return;
       }
-      logger.error('Error updating comment count:', error);
+      logger.error('Error updating comment count:', err);
     }
   },
 );
