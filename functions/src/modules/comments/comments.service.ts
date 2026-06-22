@@ -73,8 +73,4 @@ export class CommentsService {
   async deleteComment(commentId: string) {
     return this.commentRepository.delete(commentId);
   }
-
-  async deletePostComments(postId: string): Promise<void> {
-    await this.commentRepository.deleteCommentsByPostId(postId);
-  }
 }

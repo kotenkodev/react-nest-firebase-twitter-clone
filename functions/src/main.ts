@@ -38,7 +38,7 @@ const bootstrapNestApp = async (expressInstance: Express) => {
 
 export const api = onRequest(async (request, response) => {
   if (!cachedServer) {
-    console.log('Cold start: Initializing NestJS Server...');
+    console.log('Initializing NestJS Server...');
     cachedServer = express();
     await bootstrapNestApp(cachedServer);
   }
@@ -49,3 +49,4 @@ export const api = onRequest(async (request, response) => {
 export { updatePostReactionCount } from './triggers/like.trigger';
 export { updatePostCommentCount } from './triggers/comment.trigger';
 export { onUserAccountDeleted } from './triggers/user.trigger';
+export { onPostDeleted } from './triggers/post.trigger';

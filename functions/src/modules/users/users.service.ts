@@ -39,8 +39,4 @@ export class UsersService {
 
     return this.usersRepository.update(id, userData);
   }
-
-  async remove(id: string): Promise<void> {
-    return this.usersRepository.delete(id);
-  }
 }

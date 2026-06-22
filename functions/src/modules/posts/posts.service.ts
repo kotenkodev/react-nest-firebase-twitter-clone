@@ -11,6 +11,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
 import { LikesService } from '../likes/likes.service';
 import { CommentsService } from '../comments/comments.service';
+import { PostSortBy } from './dto/post-query.dto';
 
 @Injectable()
 export class PostsService {
@@ -49,7 +50,7 @@ export class PostsService {
     lastDocId?: string,
     limit: number = 10,
     userId?: string,
-    sortBy?: 'newest' | 'popular',
+    sortBy?: PostSortBy,
   ): Promise<Post[]> {
     const posts: Post[] = await this.postsRepository.findAll(
       limit,
@@ -100,8 +101,6 @@ export class PostsService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.likesService.deletePostLikes(id);
-    await this.commentsService.deletePostComments(id);
     await this.postsRepository.delete(id);
   }
 }

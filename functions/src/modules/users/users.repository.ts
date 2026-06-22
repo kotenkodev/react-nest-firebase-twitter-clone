@@ -41,8 +41,4 @@ export class UsersRepository {
     const updatedDoc = await docRef.get();
     return mapToEntity(updatedDoc);
   }
-
-  async delete(id: string): Promise<void> {
-    await this.collection.doc(id).delete();
-  }
 }

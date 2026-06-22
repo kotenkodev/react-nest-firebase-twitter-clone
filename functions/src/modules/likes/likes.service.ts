@@ -103,8 +103,4 @@ export class LikesService {
     const likeId = this.generateLikeId(userId, postId);
     await this.likesRepository.delete(likeId);
   }
-
-  async deletePostLikes(postId: string): Promise<void> {
-    await this.likesRepository.deleteLikesByPostId(postId);
-  }
 }

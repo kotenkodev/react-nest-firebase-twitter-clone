@@ -3,6 +3,30 @@ import * as admin from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import { UserRecord } from 'firebase-admin/auth';
 
+const ANONYMIZED_AUTHOR = {
+  'author.firstName': 'Deleted',
+  'author.lastName': 'User',
+  'author.photoURL': null,
+  authorId: 'deleted_user',
+};
+
+async function anonymizeCollection(
+  db: admin.firestore.Firestore,
+  query: admin.firestore.Query,
+  extraFields: Record<string, unknown> = {},
+): Promise<number> {
+  const snapshot = await query.get();
+  if (snapshot.empty) return 0;
+
+  const writer = db.bulkWriter();
+  snapshot.forEach((doc) => {
+    writer.update(doc.ref, { ...ANONYMIZED_AUTHOR, ...extraFields });
+  });
+  await writer.close();
+
+  return snapshot.size;
+}
+
 export const onUserAccountDeleted = auth
   .user()
   .onDelete(async (user: UserRecord) => {
@@ -12,48 +36,36 @@ export const onUserAccountDeleted = auth
 
     logger.info(`User ${uid} deleted. Starting anonymization...`);
 
-    await db.collection('users').doc(uid).delete();
+    await Promise.all([
+      db.collection('users').doc(uid).delete(),
+      bucket
+        .file(`avatars/${uid}`)
+        .delete()
+        .catch((err: unknown) => {
+          if (
+            err &&
+            typeof err === 'object' &&
+            'code' in err &&
+            (err as { code: number }).code === 404
+          ) {
+            logger.warn(`Avatar not found for user: ${uid}, skipping`);
+          } else {
+            logger.error('Failed to delete avatar:', err);
+          }
+        }),
+    ]);
 
-    try {
-      const avatarRef = bucket.file(`avatars/${uid}`);
-      await avatarRef.delete();
-    } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'code' in err && err.code !== 404) {
-        logger.error('Failed to delete avatar:', err);
-      }
-    }
-
-    const postsSnapshot = await db
-      .collection('posts')
-      .where('authorId', '==', uid)
-      .get();
-    const postsBatch = db.batch();
-    postsSnapshot.docs.forEach((doc) => {
-      postsBatch.update(doc.ref, {
-        'author.firstName': 'Deleted',
-        'author.lastName': 'User',
-        'author.photoURL': null,
-        authorId: 'deleted_user',
-        isAnonymized: true,
-      });
-    });
-    if (!postsSnapshot.empty) await postsBatch.commit();
-
-    const commentsSnapshot = await db
+    const byAuthor = db.collection('posts').where('authorId', '==', uid);
+    const byAuthorComments = db
       .collection('comments')
-      .where('authorId', '==', uid)
-      .get();
-    const commentsBatch = db.batch();
-    commentsSnapshot.docs.forEach((doc) => {
-      commentsBatch.update(doc.ref, {
-        'author.firstName': 'Deleted',
-        'author.lastName': 'User',
-        'author.photoURL': null,
-        authorId: 'deleted_user',
-        isDeleted: true,
-      });
-    });
-    if (!commentsSnapshot.empty) await commentsBatch.commit();
+      .where('authorId', '==', uid);
 
-    logger.info(`Successfully anonymized data for user: ${uid}`);
+    const [postsCount, commentsCount] = await Promise.all([
+      anonymizeCollection(db, byAuthor, { isAnonymized: true }),
+      anonymizeCollection(db, byAuthorComments, { isDeleted: true }),
+    ]);
+
+    logger.info(
+      `Anonymized data for user ${uid} — posts: ${postsCount}, comments: ${commentsCount}`,
+    );
   });
