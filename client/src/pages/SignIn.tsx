@@ -1,5 +1,7 @@
 import DescriptionBlock from "@/components/DescriptionBlock";
+import PhoneSignIn from "@/components/forms/PhoneSignInForm";
 import SignInForm from "@/components/forms/SignInForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function SignIn() {
   return (
@@ -9,7 +11,18 @@ export default function SignIn() {
 
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-          <SignInForm />
+          <Tabs defaultValue="email" className="w-full flex flex-col gap-4">
+            <TabsList className="grid w-full! grid-cols-2">
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="phone">Phone</TabsTrigger>
+            </TabsList>
+            <TabsContent value="email" className="w-full">
+              <SignInForm />
+            </TabsContent>
+            <TabsContent value="phone" className="w-full">
+              <PhoneSignIn />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
