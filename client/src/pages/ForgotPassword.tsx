@@ -88,9 +88,13 @@ export default function ForgotPassword() {
       await sendNewPasswordResetEmail(data.email);
       setIsEmailSent(true);
       toast.success("Password reset email sent!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Send reset email error:", error);
-      toast.error("Failed to send password reset email. Please try again.");
+      const message =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Failed to send password reset email. Please try again.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

@@ -1,7 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { FIREBASE_AUTH } from '../firebase/firebase.module';
 import { Auth } from 'firebase-admin/auth';
 import { EmailService } from '../email/email.service';
+
+interface FirebaseError {
+  code?: string;
+  message?: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -24,12 +34,40 @@ export class AuthService {
     await this.emailService.sendPasswordResetEmail(email, oobCode);
   }
 
+  async checkPhone(phoneNumber: string): Promise<boolean> {
+    try {
+      await this.auth.getUserByPhoneNumber(phoneNumber);
+      return true;
+    } catch (error) {
+      const err = error as FirebaseError;
+      if (err?.code === 'auth/user-not-found') {
+        return false;
+      }
+      throw new BadRequestException(
+        err?.message || 'Invalid phone number format',
+      );
+    }
+  }
+
   async generateOobCode(
     email: string,
     action: 'VERIFY_EMAIL' | 'RESET_PASSWORD',
   ) {
-    let firebaseLink = '';
+    try {
+      await this.auth.getUserByEmail(email);
+    } catch (error) {
+      const err = error as FirebaseError;
+      console.error('User lookup error:', err);
+      if (err?.code === 'auth/user-not-found') {
+        throw new NotFoundException('No user found with this email address');
+      }
+      if (err?.code === 'auth/invalid-email') {
+        throw new BadRequestException('Invalid email format');
+      }
+      throw new BadRequestException(err?.message || 'Failed to verify user');
+    }
 
+    let firebaseLink = '';
     try {
       if (action === 'VERIFY_EMAIL') {
         firebaseLink = await this.auth.generateEmailVerificationLink(email);
@@ -37,8 +75,9 @@ export class AuthService {
         firebaseLink = await this.auth.generatePasswordResetLink(email);
       }
     } catch (error) {
-      console.error('Error generating link:', error);
-      throw new Error('Failed to generate Firebase link');
+      const err = error as FirebaseError;
+      console.error('Error generating link:', err);
+      throw new BadRequestException(err?.message || 'Failed to generate link');
     }
 
     const url = new URL(firebaseLink);

@@ -14,4 +14,10 @@ export class AuthController {
   async sendPasswordResetEmail(@Body() data: { email: string }) {
     await this.authService.sendResetPasswordEmail(data.email);
   }
+
+  @Post('check-phone')
+  async checkPhone(@Body() data: { phoneNumber: string }) {
+    const exists = await this.authService.checkPhone(data.phoneNumber);
+    return { exists };
+  }
 }
