@@ -6,13 +6,14 @@ A modern, premium Twitter (X) clone built with a unified full-stack monorepo arc
 
 ## 🚀 Key Features
 
-*   **Authentication**: Secure email/password and Google authentication via Firebase Auth, complete with an email verification flow, secure forgot-password requests, and real-time profile syncing.
+*   **Authentication**: Secure email/password, Google, and Phone (SMS) authentication via Firebase Auth, complete with reCAPTCHA verification, an email verification flow, secure forgot-password requests, and real-time profile syncing.
+*   **Profile Security**: Password generation/updates, along with a secure flow to add or update verified phone numbers via OTP codes directly within the user settings.
 *   **Microblogging (CRUD)**: Create, edit, and delete posts (tweets) with support for rich text, image attachments, and automatic media cleanup on deletion.
 *   **Comments & Replies**: Interactive nested comments and replies system with reactive update counters.
 *   **Likes System**: Fast like/dislike actions on posts with reactive counters updated via Firestore Cloud Function triggers.
 *   **Search**: Full-page, infinite-loading search powered by Algolia search engine integration.
 *   **Rich Media**: Direct avatar and post attachment uploads utilizing Firebase Cloud Storage.
-*   **Premium UI/UX**: Designed using TailwindCSS (v4), shadcn/ui components, custom loaders, and smooth page transitions using React Router and GSAP.
+*   **Premium UI/UX**: Designed using TailwindCSS (v4), shadcn/ui components, custom loaders, custom background animations (aurora blobs + dot grid + floating social icons), and smooth page transitions using React Router.
 
 ---
 

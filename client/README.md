@@ -7,7 +7,8 @@ The user interface of **Birb**, built on React (Vite) and TailwindCSS v4. It fea
 ## 🛠️ Core Technologies
 
 *   **Framework**: React 19 + Vite
-*   **Styling**: TailwindCSS (v4) + custom utility CSS tokens + Lucide Icons + Radix UI primitives
+*   **Styling**: TailwindCSS (v4) + custom utility CSS tokens + custom canvas/SVG animations + Lucide Icons + Radix UI primitives
+*   **Authentication**: Multi-method sign-in switcher (Email/Password, Google, Phone SMS with invisible reCAPTCHA verifier) and in-app profile phone/password management
 *   **State Management**: Zustand (client UI/auth store)
 *   **Data Fetching**: TanStack React Query (v5) for caching, infinite feeds, and automatic key invalidations
 *   **Search**: Algolia InstantSearch integration

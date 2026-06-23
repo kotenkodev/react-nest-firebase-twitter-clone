@@ -21,7 +21,7 @@ functions/src/
 ├── common/           # Custom exception filters and middleware configurations
 ├── main.ts           # Entry point. Configures NestJS CORS options and exports Cloud Functions
 ├── modules/          # NestJS Business Logic Modules
-│   ├── auth/         # Token validation and auth guards utilizing Firebase Admin SDK
+│   ├── auth/         # Token validation, phone registration check endpoint (/auth/check-phone), and auth guards utilizing Firebase Admin SDK
 │   ├── comments/     # Comments management and thread nesting services
 │   ├── firebase/     # Shared module providing database connection instances
 │   ├── likes/        # Like/Dislike action controllers and operations
