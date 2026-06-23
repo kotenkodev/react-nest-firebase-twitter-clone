@@ -11,7 +11,11 @@ import {
   signInWithPopup,
   updatePassword,
   updateProfile,
+  linkWithCredential,
+  updatePhoneNumber as updateUserPhoneNumber,
+  PhoneAuthProvider,
 } from "firebase/auth";
+import type { ConfirmationResult } from "firebase/auth";
 import { syncUserData } from "@/utils/syncUserData";
 import type { CreateUser, SignInUser } from "@/types/user.types";
 import apiClient from "./apiClient";
@@ -61,6 +65,80 @@ export const signInWithGoogle = async () => {
     return data;
   } catch (error) {
     console.error("Sign-In with Google Error:", error);
+    throw error;
+  }
+};
+
+export const verifyPhoneForUpdate = async (
+  phoneNumber: string,
+  appVerifier: any,
+): Promise<string> => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No authenticated user found.");
+
+    const provider = new PhoneAuthProvider(auth);
+    return await provider.verifyPhoneNumber(phoneNumber, appVerifier);
+  } catch (error) {
+    console.error("Verify Phone Number Error:", error);
+    throw error;
+  }
+};
+
+export const linkOrUpdatePhone = async (
+  verificationId: string,
+  otpCode: string,
+) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No authenticated user found.");
+
+    const credential = PhoneAuthProvider.credential(verificationId, otpCode);
+    const hasPhoneProvider = user.providerData.some(
+      (p) => p.providerId === "phone",
+    );
+
+    if (hasPhoneProvider) {
+      await updateUserPhoneNumber(user, credential);
+    } else {
+      await linkWithCredential(user, credential);
+    }
+
+    await user.reload();
+    return auth.currentUser;
+  } catch (error) {
+    console.error("Confirm Phone Link/Update Error:", error);
+    throw error;
+  }
+};
+
+export const signInWithPhone = async (
+  confirmationResult: ConfirmationResult,
+  otpCode: string,
+) => {
+  try {
+    const result = await confirmationResult.confirm(otpCode);
+    const data = await syncUserData(result.user);
+    return data;
+  } catch (error) {
+    console.error("Sign-In with Phone Error:", error);
+    throw error;
+  }
+};
+
+export const checkPhoneNumberExists = async (
+  phoneNumber: string,
+): Promise<boolean> => {
+  try {
+    const response = await apiClient.post<{ exists: boolean }>(
+      "/auth/check-phone",
+      {
+        phoneNumber,
+      },
+    );
+    return response.data.exists;
+  } catch (error) {
+    console.error("Check Phone Number Error:", error);
     throw error;
   }
 };
