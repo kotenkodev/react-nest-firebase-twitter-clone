@@ -2,6 +2,7 @@ import type { CreatePost, Post, UpdatePost } from "@/types/post.types";
 import apiClient from "./apiClient";
 import { transformPostPayload } from "@/utils/transformPayload";
 import type { PostFilters } from "@/lib/queryKeys";
+import type { PostSortBy } from "@/types/post.types";
 
 export type PaginatedPostsResponse = {
   posts: Post[];
@@ -12,6 +13,7 @@ type GetPostsParams = PostFilters & {
   cursor?: string;
   userId?: string;
   limit?: number;
+  sortBy?: PostSortBy;
 };
 
 export const getPosts = async ({

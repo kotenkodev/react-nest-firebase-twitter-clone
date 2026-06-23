@@ -7,7 +7,6 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
   sendEmailVerification,
-  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
@@ -15,6 +14,7 @@ import {
 } from "firebase/auth";
 import { syncUserData } from "@/utils/syncUserData";
 import type { CreateUser, SignInUser } from "@/types/user.types";
+import apiClient from "./apiClient";
 
 export const signOut = async () => {
   try {
@@ -24,7 +24,9 @@ export const signOut = async () => {
   }
 };
 
-export const signUp = async (userData: CreateUser & { confirmPassword?: string }) => {
+export const signUp = async (
+  userData: CreateUser & { confirmPassword?: string },
+) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -121,8 +123,11 @@ export const sendNewEmailVerification = async () => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error("No authenticated user found.");
+    const response = await apiClient.post("/auth/verify-email", {
+      email: user.email!,
+    });
 
-    await sendEmailVerification(user);
+    console.log(response.data);
   } catch (error) {
     console.error("Email Verification Error:", error);
     throw error;
@@ -143,7 +148,8 @@ export const completeEmailVerification = async (oobCode: string) => {
 
 export const sendNewPasswordResetEmail = async (email: string) => {
   try {
-    await sendPasswordResetEmail(auth, email);
+    const response = await apiClient.post("/auth/forgot-password", { email });
+    console.log(response.data);
   } catch (error) {
     console.error("Password Reset Error:", error);
     throw error;
@@ -156,6 +162,7 @@ export const completePasswordReset = async (
 ) => {
   try {
     await confirmPasswordReset(auth, oobCode, newPassword);
+    await signOut();
   } catch (error) {
     console.error("Password Reset Confirmation Error:", error);
     throw error;

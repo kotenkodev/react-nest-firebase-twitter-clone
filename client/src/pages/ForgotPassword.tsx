@@ -69,7 +69,7 @@ export default function ForgotPassword() {
       toast.success(
         "New password set successfully! Please log in with your new password.",
       );
-      navigate("/signin");
+      navigate("/signin", { replace: true });
     } catch (error: any) {
       console.error("Password reset error:", error);
       const message =
