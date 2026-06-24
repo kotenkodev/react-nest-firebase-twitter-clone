@@ -30,7 +30,7 @@ export class PostsRepository {
     } else if (sortBy === PostSortBy.POPULAR) {
       query = query
         .orderBy('likesCount', 'desc')
-        .orderBy('commentsCount', 'asc')
+        .orderBy('commentsCount', 'desc')
         .orderBy('createdAt', 'desc');
     }
 
