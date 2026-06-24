@@ -17,7 +17,9 @@ export const likePost = async (
 
 export const getLikesByPostIds = async (postIds: string[]): Promise<Like[]> => {
   try {
-    const response = await apiClient.post(`likes/interactions`, { postIds });
+    const response = await apiClient.get(`posts/batch/likes`, {
+      params: { postIds: postIds.join(",") },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching likes:", error);
