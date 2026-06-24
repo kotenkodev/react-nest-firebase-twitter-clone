@@ -24,8 +24,6 @@ export const getPosts = async ({
   limit = 10,
 }: GetPostsParams): Promise<PaginatedPostsResponse> => {
   try {
-    limit = 1;
-
     const response = await apiClient.get("posts", {
       params: {
         lastDocId: cursor,

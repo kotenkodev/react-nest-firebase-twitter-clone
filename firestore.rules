@@ -7,36 +7,13 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isOwnerOfIncoming(field) {
-      return isAuthenticated() && request.resource.data[field] == request.auth.uid;
-    }
-
-    function isOwnerOfExisting(field) {
-      return isAuthenticated() && resource.data[field] == request.auth.uid;
-    }
-
     match /users/{userId} {
-      allow read: if true; 
+      allow read: if true;
       allow create, update, delete: if isAuthenticated() && userId == request.auth.uid;
     }
 
-    match /posts/{postId} {
-      allow read: if true;
-      allow create: if isOwnerOfIncoming('authorId');
-      allow update, delete: if isOwnerOfExisting('authorId');
+    match /{document=**} {
+      allow read, write: if false;
     }
-
-    match /likes/{likeId} {
-      allow read: if true; 
-      allow create: if isOwnerOfIncoming('userId');
-      allow update, delete: if isOwnerOfExisting('userId');
-    }
-
-    match /comments/{commentId} {
-      allow read: if true; 
-      allow create: if isOwnerOfIncoming('authorId');
-      allow update, delete: if isOwnerOfExisting('authorId');
-    }
-   
   }
 }

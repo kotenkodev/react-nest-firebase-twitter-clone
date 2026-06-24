@@ -204,8 +204,6 @@ export const sendNewEmailVerification = async () => {
     const response = await apiClient.post("/auth/verify-email", {
       email: user.email!,
     });
-
-    console.log(response.data);
   } catch (error) {
     console.error("Email Verification Error:", error);
     throw error;
@@ -227,7 +225,6 @@ export const completeEmailVerification = async (oobCode: string) => {
 export const sendNewPasswordResetEmail = async (email: string) => {
   try {
     const response = await apiClient.post("/auth/forgot-password", { email });
-    console.log(response.data);
   } catch (error) {
     console.error("Password Reset Error:", error);
     throw error;
