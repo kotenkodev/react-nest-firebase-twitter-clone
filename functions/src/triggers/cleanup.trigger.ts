@@ -7,7 +7,7 @@ export const cleanupOrphanedComments = onSchedule(
     schedule: '0 0 * * 0',
     timeZone: 'UTC',
   },
-  async (event) => {
+  async (_event) => {
     const db = admin.firestore();
 
     try {

@@ -15,8 +15,8 @@ import {
   updatePhoneNumber as updateUserPhoneNumber,
   PhoneAuthProvider,
 } from "firebase/auth";
-import type { ConfirmationResult } from "firebase/auth";
-import { syncUserData } from "@/utils/syncUserData";
+import type { ConfirmationResult, ApplicationVerifier } from "firebase/auth";
+import { getUser } from "./usersService";
 import type { CreateUser, SignInUser } from "@/types/user.types";
 import apiClient from "./apiClient";
 
@@ -38,18 +38,22 @@ export const signUp = async (
       userData.password,
     );
 
-    const { email, password, confirmPassword, ...additionalData } = userData;
-
-    const data = await syncUserData(userCredential.user, additionalData);
-
     await updateProfile(userCredential.user, {
       displayName: `${userData.firstName} ${userData.lastName || ""}`.trim(),
       photoURL: userData.photoURL,
     });
 
+    const response = await apiClient.post("/users", {
+      firstName: userData.firstName,
+      lastName: userData.lastName || "",
+      email: userData.email,
+      photoURL: userData.photoURL || undefined,
+      emailVerified: userCredential.user.emailVerified,
+    });
+
     await sendEmailVerification(userCredential.user);
 
-    return data;
+    return response.data;
   } catch (error) {
     console.error("Sign-Up Error:", error);
     throw error;
@@ -58,9 +62,9 @@ export const signUp = async (
 
 export const signInWithGoogle = async () => {
   try {
-    const userCredential = await signInWithPopup(auth, googleProvider);
+    await signInWithPopup(auth, googleProvider);
 
-    const data = await syncUserData(userCredential.user);
+    const data = await getUser();
 
     return data;
   } catch (error) {
@@ -71,7 +75,7 @@ export const signInWithGoogle = async () => {
 
 export const verifyPhoneForUpdate = async (
   phoneNumber: string,
-  appVerifier: any,
+  appVerifier: ApplicationVerifier,
 ): Promise<string> => {
   try {
     const user = auth.currentUser;
@@ -117,8 +121,8 @@ export const signInWithPhone = async (
   otpCode: string,
 ) => {
   try {
-    const result = await confirmationResult.confirm(otpCode);
-    const data = await syncUserData(result.user);
+    await confirmationResult.confirm(otpCode);
+    const data = await getUser();
     return data;
   } catch (error) {
     console.error("Sign-In with Phone Error:", error);
@@ -145,13 +149,13 @@ export const checkPhoneNumberExists = async (
 
 export const signIn = async (userData: SignInUser) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(
+    await signInWithEmailAndPassword(
       auth,
       userData.email,
       userData.password,
     );
 
-    const data = await syncUserData(userCredential.user);
+    const data = await getUser();
 
     return data;
   } catch (error) {
@@ -215,6 +219,7 @@ export const completeEmailVerification = async (oobCode: string) => {
     await applyActionCode(auth, oobCode);
     if (auth.currentUser) {
       await auth.currentUser.reload();
+      await auth.currentUser.getIdToken(true);
     }
   } catch (error) {
     console.error("Email Verification Error:", error);

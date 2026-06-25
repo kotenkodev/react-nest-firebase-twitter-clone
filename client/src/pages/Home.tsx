@@ -18,7 +18,7 @@ export default function Home() {
       >
         <TabsList
           variant="line"
-          className="w-full border-b border-l border-r border-border flex rounded-none p-0 h-12 gap-0 sticky top-[65px] z-20 bg-white"
+          className="w-full border-b border-l border-r border-border flex rounded-none p-0 h-12 gap-0 sticky top-[72px] z-20 bg-white"
         >
           <TabsTrigger
             value="home"

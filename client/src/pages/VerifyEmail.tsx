@@ -16,7 +16,7 @@ import TransitionLink from "@/components/TransitionLink";
 import { ChevronLeftIcon, MailIcon, AlertTriangleIcon } from "lucide-react";
 import { completeEmailVerification } from "@/services/authService";
 import { useAuthStore } from "@/store/useAuthStore";
-import { syncUserData } from "@/utils/syncUserData";
+import { getUser } from "@/services/usersService";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 export default function VerifyEmail() {
@@ -34,7 +34,7 @@ export default function VerifyEmail() {
       await completeEmailVerification(oobCode!);
 
       if (auth.currentUser) {
-        const updatedUser = await syncUserData(auth.currentUser);
+        const updatedUser = await getUser();
         setUser(updatedUser);
       }
 

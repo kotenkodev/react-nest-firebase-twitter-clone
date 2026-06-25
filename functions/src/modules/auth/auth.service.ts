@@ -26,6 +26,7 @@ export class AuthService {
 
   async sendVerificationEmail(email: string) {
     const oobCode = await this.generateOobCode(email, 'VERIFY_EMAIL');
+    console.log(oobCode);
     await this.emailService.sendEmailAddressVerificationEmail(email, oobCode);
   }
 

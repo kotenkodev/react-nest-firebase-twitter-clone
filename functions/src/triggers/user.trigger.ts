@@ -23,7 +23,7 @@ async function anonymizeCollection(
 
   const writer = db.bulkWriter();
   snapshot.forEach((doc) => {
-    writer.update(doc.ref, { ...ANONYMIZED_AUTHOR, ...extraFields });
+    void writer.update(doc.ref, { ...ANONYMIZED_AUTHOR, ...extraFields });
   });
   await writer.close();
 
@@ -39,7 +39,7 @@ async function deleteCollection(
 
   const writer = db.bulkWriter();
   snapshot.forEach((doc) => {
-    writer.delete(doc.ref);
+    void writer.delete(doc.ref);
   });
   await writer.close();
 
@@ -146,11 +146,11 @@ export const onUserUpdated = onDocumentUpdated(
     updatePayload['author.emailVerified'] = afterData.emailVerified ?? false;
 
     postsSnapshot.forEach((doc) => {
-      writer.update(doc.ref, updatePayload);
+      void writer.update(doc.ref, updatePayload);
     });
 
     commentsSnapshot.forEach((doc) => {
-      writer.update(doc.ref, updatePayload);
+      void writer.update(doc.ref, updatePayload);
     });
 
     await writer.close();

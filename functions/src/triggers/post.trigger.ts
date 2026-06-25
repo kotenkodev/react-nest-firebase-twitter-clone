@@ -11,7 +11,7 @@ async function deleteCollection(
 
   const writer = db.bulkWriter();
   snapshot.forEach((doc) => {
-    writer.delete(doc.ref);
+    void writer.delete(doc.ref);
   });
   await writer.close();
 

@@ -295,7 +295,7 @@ export default function SearchBar() {
           attributesToHighlight={["title", "text", "content", "author"]}
         />
 
-        <div className="max-w-2xl mx-auto mb-3 sticky top-[100px] z-10 bg-background/95 backdrop-blur-sm">
+        <div className="max-w-2xl mx-auto mb-3 sticky top-[105px] z-10 bg-background/95 backdrop-blur-sm">
           <DebouncedSearchBox />
         </div>
 
