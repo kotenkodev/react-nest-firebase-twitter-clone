@@ -25,6 +25,7 @@ import type { LikeType } from "@/types/like.types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPost } from "@/services/postsService";
 import { postKeys } from "@/lib/queryKeys";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const algoliaAppId = import.meta.env.VITE_ALGOLIA_APP_ID;
 const algoliaSearchKey = import.meta.env.VITE_ALGOLIA_SEARCH_KEY;
@@ -125,25 +126,48 @@ const InfiniteHitsList = () => {
   const queryClient = useQueryClient();
   const isLoading = status === "loading" || status === "stalled";
 
-  const [likesMap, setLikesMap] = useState<Record<string, LikeType | null>>({});
-
   useEffect(() => {
-    if (!user?.id || items.length === 0) {
-      setLikesMap((prev) => (Object.keys(prev).length === 0 ? prev : {}));
-      return;
-    }
+    if (items.length === 0) return;
+
+    items.forEach((item) => {
+      const queryKey = postKeys.single(item.objectID);
+      const existing = queryClient.getQueryData<Post>(queryKey);
+      if (!existing) {
+        queryClient.setQueryData(queryKey, {
+          ...item,
+          id: item.objectID,
+          userLike: null,
+        } as unknown as Post);
+      }
+    });
+
+    if (!user?.id) return;
 
     let isMounted = true;
     getLikesByPostIds(items.map((item) => item.objectID))
       .then((likes) => {
         if (!isMounted) return;
-        const map: Record<string, LikeType | null> = {};
-        likes.forEach((like) => {
-          if (like) {
-            map[like.postId] = like.type;
+
+        items.forEach((item, index) => {
+          const queryKey = postKeys.single(item.objectID);
+          const existing = queryClient.getQueryData<Post>(queryKey);
+
+          const like = likes[index];
+          const userLike = like ? like.type : null;
+
+          if (existing) {
+            queryClient.setQueryData(queryKey, {
+              ...existing,
+              userLike,
+            });
+          } else {
+            queryClient.setQueryData(queryKey, {
+              ...item,
+              id: item.objectID,
+              userLike,
+            } as unknown as Post);
           }
         });
-        setLikesMap(map);
       })
       .catch((error) => {
         console.error("Error loading likes for search hits:", error);
@@ -152,30 +176,23 @@ const InfiniteHitsList = () => {
     return () => {
       isMounted = false;
     };
-  }, [user?.id, items]);
+  }, [user?.id, items, queryClient]);
 
   const posts = useMemo(() => {
-    return items.map((item) => ({
-      ...item,
-      id: item.objectID,
-      userLike: likesMap[item.objectID] || null,
-    }));
-  }, [items, likesMap]);
-
-  useEffect(() => {
-    posts.forEach((post) => {
-      const queryKey = postKeys.single(post.id);
-      const existing = queryClient.getQueryData<Post>(queryKey);
-      if (!existing) {
-        queryClient.setQueryData(queryKey, post);
-      } else {
-        queryClient.setQueryData(queryKey, {
-          ...post,
-          ...existing,
-        });
-      }
+    return items.map((item) => {
+      const cached = queryClient.getQueryData<Post>(
+        postKeys.single(item.objectID),
+      );
+      return (
+        cached ||
+        ({
+          ...item,
+          id: item.objectID,
+          userLike: null,
+        } as unknown as Post)
+      );
     });
-  }, [posts, queryClient]);
+  }, [items, queryClient]);
 
   if (posts.length === 0 && !isLoading) {
     return (
@@ -253,7 +270,7 @@ const DebouncedSearchBox = (props: UseSearchBoxProps) => {
   }, [debouncedInputValue, refine]);
 
   return (
-    <div className="flex rounded-full bg-muted px-4 py-2 border border-transparent transition-all items-center focus-within:bg-background focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20">
+    <div className="flex bg-muted px-4 py-2 border transition-all items-center focus-within:bg-background focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20">
       <Search className="w-5 h-5 text-muted-foreground mr-2 shrink-0" />
       <input
         type="search"
@@ -268,19 +285,17 @@ const DebouncedSearchBox = (props: UseSearchBoxProps) => {
 };
 
 export default function SearchBar() {
+  useDocumentTitle("Explore / Birb");
+
   return (
     <div className="w-full">
-      <InstantSearch
-        indexName={indexName}
-        searchClient={searchClient}
-        routing={true}
-      >
+      <InstantSearch indexName={indexName} searchClient={searchClient}>
         <Configure
           hitsPerPage={10}
           attributesToHighlight={["title", "text", "content", "author"]}
         />
 
-        <div className="max-w-2xl mx-auto mb-6 sticky top-[100px] z-10 bg-background/95 backdrop-blur-sm py-2">
+        <div className="max-w-2xl mx-auto mb-3 sticky top-[100px] z-10 bg-background/95 backdrop-blur-sm">
           <DebouncedSearchBox />
         </div>
 
