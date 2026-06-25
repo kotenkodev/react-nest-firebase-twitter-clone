@@ -25,9 +25,16 @@ export const updatePostCommentCount = onDocumentWritten(
 
     const isHardDeleted =
       event.data?.before.exists && !event.data?.after.exists;
+    const wasSoftDeletedBefore = beforeData?.isDeleted === true;
+    const isSoftDeletedNow =
+      beforeData?.isDeleted !== true && afterData?.isDeleted === true;
+
+    const shouldIncrement = isCreated;
+    const shouldDecrement =
+      (isHardDeleted && !wasSoftDeletedBefore) || isSoftDeletedNow;
 
     try {
-      if (isCreated) {
+      if (shouldIncrement) {
         batch.update(postRef, {
           commentsCount: FieldValue.increment(1),
         });
@@ -40,7 +47,7 @@ export const updatePostCommentCount = onDocumentWritten(
         logger.info(
           `Successfully incremented comment count for post: ${postId}`,
         );
-      } else if (isHardDeleted) {
+      } else if (shouldDecrement) {
         batch.update(postRef, {
           commentsCount: FieldValue.increment(-1),
         });
