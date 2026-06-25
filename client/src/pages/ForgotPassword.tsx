@@ -93,9 +93,11 @@ export default function ForgotPassword() {
     } catch (error: any) {
       console.error("Send reset email error:", error);
       const message =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Failed to send password reset email. Please try again.";
+        error.response?.status === 429
+          ? "Too many requests. Please wait a minute before requesting another reset link."
+          : error.response?.data?.message ||
+            error.response?.data?.error ||
+            "Failed to send password reset email. Please try again.";
       toast.error(message);
     } finally {
       setIsLoading(false);

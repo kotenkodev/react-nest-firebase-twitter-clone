@@ -19,9 +19,16 @@ export function VerifyNotification() {
       setIsSent(true);
       await sendNewEmailVerification();
       toast.success("Verification email sent! Please check your inbox.");
-    } catch (error) {
+    } catch (error: any) {
+      setIsSent(false);
       console.error("Error sending verification email:", error);
-      toast.error("Failed to send verification email. Please try again later.");
+      if (error.response?.status === 429) {
+        toast.error(
+          "Too many requests. Please wait a minute before requesting another verification email.",
+        );
+      } else {
+        toast.error("Failed to send verification email. Please try again later.");
+      }
     }
   };
 

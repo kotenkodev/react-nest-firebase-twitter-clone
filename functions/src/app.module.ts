@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { LikesModule } from './modules/likes/likes.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { EmailModule } from './modules/email/email.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -18,6 +19,12 @@ import { EmailModule } from './modules/email/email.module';
     LikesModule,
     CommentsModule,
     EmailModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 60,
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService],
