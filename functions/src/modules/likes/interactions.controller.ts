@@ -8,9 +8,9 @@ import { LikesService } from './likes.service';
 export class InteractionsController {
   constructor(private readonly likesService: LikesService) {}
 
-  @Post('interactions')
+  @Post('batch')
   @HttpCode(200)
-  async getPostInteractions(
+  async getLikesBatch(
     @GetUser('uid') userId: string,
     @Body() body: { postIds: string[] },
   ) {

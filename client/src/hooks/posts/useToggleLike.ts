@@ -76,11 +76,11 @@ export function useToggleLike() {
             ...oldPost,
             userLike: newReaction,
             likesCount:
-              oldPost.likesCount +
+              (oldPost.likesCount || 0) +
               (newReaction === "like" ? 1 : 0) -
               (oldPost.userLike === "like" ? 1 : 0),
             dislikesCount:
-              oldPost.dislikesCount +
+              (oldPost.dislikesCount || 0) +
               (newReaction === "dislike" ? 1 : 0) -
               (oldPost.userLike === "dislike" ? 1 : 0),
           };
@@ -102,11 +102,6 @@ export function useToggleLike() {
           context.previousSinglePost,
         );
       }
-    },
-    onSettled: (_data, _error, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: postKeys.single(variables.postId),
-      });
     },
   });
 

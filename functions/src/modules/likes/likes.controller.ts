@@ -2,10 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   Param,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CheckOwnership } from '../../common/decorators/check-ownership.decorator';
@@ -19,20 +17,6 @@ import { LikesService } from './likes.service';
 @Controller('posts/:postId/likes')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
-
-  @Get()
-  async getLikes(
-    @GetUser('uid') userId: string,
-    @Query('postIds') postIds?: string | string[],
-  ) {
-    let ids: string[] = [];
-    if (typeof postIds === 'string') {
-      ids = postIds.split(',');
-    } else if (Array.isArray(postIds)) {
-      ids = postIds;
-    }
-    return await this.likesService.findManyByIds(userId, ids);
-  }
 
   @CheckOwnership({
     resource: 'likes',

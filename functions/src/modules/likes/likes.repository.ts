@@ -21,7 +21,7 @@ export class LikesRepository {
     return mapToEntity(doc);
   }
 
-  async findManyByIds(ids: string[]): Promise<Like[]> {
+  async findManyByIds(ids: string[]): Promise<(Like | null)[]> {
     if (!ids || ids.length === 0) {
       return [];
     }
@@ -30,9 +30,7 @@ export class LikesRepository {
 
     const snapshots = await this.db.getAll(...refs);
 
-    return snapshots
-      .map((snap) => mapToEntity<Like>(snap))
-      .filter((like): like is Like => like !== null);
+    return snapshots.map((snap) => mapToEntity<Like>(snap));
   }
 
   async create(id: string, like: Partial<Like>): Promise<Like | null> {

@@ -22,7 +22,10 @@ export class LikesService {
     return this.likesRepository.findOne(likeId);
   }
 
-  async findManyByIds(userId: string, postIds: string[]): Promise<Like[]> {
+  async findManyByIds(
+    userId: string,
+    postIds: string[],
+  ): Promise<(Like | null)[]> {
     const likeIds = postIds.map((postId) =>
       this.generateLikeId(userId, postId),
     );
