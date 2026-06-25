@@ -134,29 +134,48 @@ npm run format  # Format codebase with prettier
 
 ## 🚀 Deployment
 
-To deploy the workspace to Firebase:
+To deploy the workspace to Firebase successfully, you must push security rules, indexes, storage rules, and backend functions so that the live frontend doesn't encounter permission or index issues.
 
-1.  Login to your account and select your project:
-    ```bash
-    firebase login
-    firebase use <your-project-id>
-    ```
-2.  Deploy Firestore rules and indexes:
-    ```bash
-    firebase deploy --only firestore
-    ```
-3.  Deploy backend API and Cloud Function triggers:
-    ```bash
-    firebase deploy --only functions
-    ```
-4.  Deploy Storage rules:
-    ```bash
-    firebase deploy --only storage
-    ```
-5.  Build the client production bundle and deploy static hosting files:
-    ```bash
-    cd client
-    npm run build
-    cd ..
-    firebase deploy --only hosting
-    ```
+> [!IMPORTANT]
+> **Priority Order**: Always deploy security rules, database configurations, and functions *first* before deploying the frontend hosting files to prevent users from encountering permission blocks or broken functionality on the live site.
+
+### 1. Log In and Select Your Project
+Run these commands from the root directory:
+```bash
+firebase login
+firebase use <your-project-id>
+```
+
+### 2. Deploy Database Configuration & Security Rules
+Deploy the Firestore rules, indexes, storage rules, and Realtime Database rules:
+```bash
+# Deploy Firestore rules and indexes
+firebase deploy --only firestore
+
+# Deploy Storage security rules
+firebase deploy --only storage
+
+# Deploy Realtime Database rules
+firebase deploy --only database
+```
+
+### 3. Deploy Backend Cloud Functions
+Deploy NestJS backend API wrapper and all Firestore trigger functions:
+```bash
+firebase deploy --only functions
+```
+
+### 4. Deploy Frontend Client Hosting
+Build the client production bundle and push the static files to Firebase Hosting:
+```bash
+# Build the client files
+cd client
+npm run build
+cd ..
+
+# Deploy to Firebase Hosting
+firebase deploy --only hosting
+```
+
+---
+

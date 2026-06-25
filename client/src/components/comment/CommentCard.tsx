@@ -38,7 +38,7 @@ export default function CommentCard({
     <>
       <div
         className={`flex items-start gap-3 p-3 text-left rounded-xl border border-transparent hover:border-muted/60 bg-card transition-all ${
-          isCommentDeleted ? "opacity-60 select-none" : ""
+          isCommentDeleted ? "opacity-60" : ""
         }`}
       >
         {isAuthorDeleted ? (
@@ -176,7 +176,7 @@ export default function CommentCard({
                 </span>
               )
             )}
-            {!isCommentDeleted && currentUserId && (
+            {currentUserId && (
               <div
                 className="flex gap-1 cursor-pointer hover:text-foreground"
                 onClick={() => onReply(comment)}

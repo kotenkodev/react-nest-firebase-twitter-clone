@@ -17,8 +17,11 @@ import { ChevronLeftIcon, MailIcon, AlertTriangleIcon } from "lucide-react";
 import { completeEmailVerification } from "@/services/authService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { syncUserData } from "@/utils/syncUserData";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 export default function VerifyEmail() {
+  useDocumentTitle("Verify Email / Birb");
+
   const [isLoading, setIsLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const oobCode = searchParams.get("oobCode");
@@ -58,8 +61,6 @@ export default function VerifyEmail() {
 
   return (
     <Container className="min-h-[80vh] flex items-center justify-center py-12">
-      <title>Verify Email / Birb</title>
-
       <Card className="w-full max-w-md shadow-lg border-muted/40">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">

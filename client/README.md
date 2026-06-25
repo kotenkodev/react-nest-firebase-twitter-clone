@@ -91,3 +91,29 @@ npm run lint
 # Format code with Prettier
 npm run format
 ```
+
+---
+
+## 🚀 Deployment
+
+The client application is deployed to **Firebase Hosting** from the root workspace directory.
+
+> [!IMPORTANT]
+> **Before Deploying the Frontend**:
+> Ensure that all Firestore rules, indexes, storage rules, and backend functions are deployed first. The frontend interacts directly with these services, and deploying the client before the database configurations can lead to permission errors or broken feeds.
+>
+> Refer to the main [README.md](../README.md#2-deploy-database-configuration--security-rules) in the root directory for the complete multi-service deployment priority guide.
+
+To build and deploy only the client hosting:
+```bash
+# 1. Navigate to the client directory and build the production bundle
+cd client
+npm run build
+
+# 2. Go back to the root directory
+cd ..
+
+# 3. Deploy hosting assets to Firebase
+firebase deploy --only hosting
+```
+

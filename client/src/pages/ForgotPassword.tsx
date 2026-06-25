@@ -36,11 +36,13 @@ import {
   CheckCircle2Icon,
 } from "lucide-react";
 import TransitionLink from "@/components/TransitionLink";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 type ResetFormValues = z.infer<typeof forgetPasswordSchema>;
 type SendEmailValues = z.infer<typeof sendResetEmailSchema>;
 
 export default function ForgotPassword() {
+  useDocumentTitle("Forgot Password / Birb");
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [searchParams] = useSearchParams();
@@ -102,8 +104,6 @@ export default function ForgotPassword() {
 
   return (
     <Container className="min-h-[80vh] flex items-center justify-center py-12">
-      <title>Forgot Password / Birb</title>
-
       <Card className="w-full max-w-md shadow-lg border-muted/40">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">

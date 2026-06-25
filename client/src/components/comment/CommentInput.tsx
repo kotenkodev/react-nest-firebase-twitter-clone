@@ -50,7 +50,6 @@ export default function CommentInput({ postId, onSuccess }: CommentInputProps) {
           onSuccess: () => {
             setContent("");
             clearCommentState();
-            toast.success("Comment updated successfully!");
             onSuccess?.();
           },
           onError: () => {
@@ -71,7 +70,6 @@ export default function CommentInput({ postId, onSuccess }: CommentInputProps) {
           onSuccess: () => {
             setContent("");
             clearCommentState();
-            toast.success("Comment posted successfully!");
             onSuccess?.();
           },
           onError: () => {
@@ -107,7 +105,9 @@ export default function CommentInput({ postId, onSuccess }: CommentInputProps) {
   if (!user) {
     return (
       <div className="w-full border-t border-muted/80 bg-background p-4 flex flex-col items-center justify-center gap-3">
-        <p className="text-sm font-medium text-muted-foreground">Sign in to leave a comment</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          Sign in to leave a comment
+        </p>
         <div className="flex items-center space-x-2">
           <TransitionLink to="/signin">
             <Button variant="outline" size="sm">
@@ -115,9 +115,7 @@ export default function CommentInput({ postId, onSuccess }: CommentInputProps) {
             </Button>
           </TransitionLink>
           <TransitionLink to="/signup">
-            <Button size="sm">
-              Sign Up
-            </Button>
+            <Button size="sm">Sign Up</Button>
           </TransitionLink>
         </div>
       </div>

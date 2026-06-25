@@ -3,14 +3,22 @@ import PostList from "@/components/post/PostList";
 import SearchBar from "@/components/SearchBar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home as HomeIcon, Compass as CompassIcon } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 export default function Home() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "home";
+
   return (
     <Container className="p-0 sm:px-6 lg:px-8">
-      <Tabs defaultValue="home" className="w-full max-w-2xl mx-auto">
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setSearchParams({ tab: value })}
+        className="w-full max-w-2xl mx-auto"
+      >
         <TabsList
           variant="line"
-          className="w-full border-b border-border flex rounded-none p-0 h-12 gap-0 sticky top-[71.5px] z-20 bg-white"
+          className="w-full border-b border-l border-r border-border flex rounded-none p-0 h-12 gap-0 sticky top-[65px] z-20 bg-white"
         >
           <TabsTrigger
             value="home"
@@ -34,7 +42,7 @@ export default function Home() {
 
         <TabsContent
           value="explore"
-          className="mt-6 focus-visible:outline-none space-y-6"
+          className="mt-1 focus-visible:outline-none space-y-6"
         >
           <SearchBar />
         </TabsContent>

@@ -78,13 +78,29 @@ npm run lint
 npm run format
 ```
 
----
-
 ## ☁️ Deployment
 
-The project is deployed via the Firebase CLI from the repository root directory:
+The backend application is deployed from the repository root directory.
+
+> [!IMPORTANT]
+> **Priority Order**: Make sure that you deploy Firestore rules, indexes, storage rules, and Realtime Database rules *before* or alongside your Cloud Functions deployment.
+> 
+> Security rules configure access control for database writes and reads that your functions trigger and authorize.
+
+To build and deploy the backend functions and security configurations:
 
 ```bash
-# Deploy all functions (both the API wrapper and the triggers)
+# 1. Build the NestJS project first (functions require a compiled output to deploy)
+cd functions
+npm run build
+cd ..
+
+# 2. Deploy rules & indexes
+firebase deploy --only firestore
+firebase deploy --only storage
+firebase deploy --only database
+
+# 3. Deploy functions (both NestJS API and event triggers)
 firebase deploy --only functions
 ```
+

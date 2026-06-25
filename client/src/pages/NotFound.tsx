@@ -2,12 +2,13 @@ import { BirdSpinner } from "@/components/ui/bird-spinner";
 import { Container } from "@/components/ui/container";
 import TransitionLink from "@/components/TransitionLink";
 import { Button } from "@/components/ui/button";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 export default function NotFound() {
+  useDocumentTitle("404 / Birb");
+
   return (
     <Container className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-12 animate-in fade-in zoom-in duration-500">
-      <title>Birb - Page Not Found</title>
-
       <div className="flex flex-col items-center">
         <h1 className="text-[10rem] leading-none font-black text-muted-foreground/10 select-none">
           404

@@ -19,8 +19,11 @@ import { uploadAvatar } from "@/services/storageService";
 import { useNavigate } from "react-router-dom";
 import { deleteAccount } from "@/services/authService";
 import { useUpdateUser } from "@/hooks/users/useUpdateUser";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 export default function Profile() {
+  useDocumentTitle("Settings / Birb");
+
   const { user, setUser } = useAuthStore();
   const navigate = useNavigate();
   const { updateUser } = useUpdateUser();
@@ -64,8 +67,6 @@ export default function Profile() {
 
   return (
     <Container className="mt-8 mb-12 max-w-6xl mx-auto">
-      <title>Profile Settings / Birb</title>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Profile Settings</CardTitle>

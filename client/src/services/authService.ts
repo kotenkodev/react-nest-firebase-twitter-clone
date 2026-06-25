@@ -201,7 +201,7 @@ export const sendNewEmailVerification = async () => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error("No authenticated user found.");
-    const response = await apiClient.post("/auth/verify-email", {
+    await apiClient.post("/auth/verify-email", {
       email: user.email!,
     });
   } catch (error) {
@@ -224,7 +224,7 @@ export const completeEmailVerification = async (oobCode: string) => {
 
 export const sendNewPasswordResetEmail = async (email: string) => {
   try {
-    const response = await apiClient.post("/auth/forgot-password", { email });
+    await apiClient.post("/auth/forgot-password", { email });
   } catch (error) {
     console.error("Password Reset Error:", error);
     throw error;

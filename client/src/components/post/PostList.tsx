@@ -13,6 +13,7 @@ import { useDeletePost } from "@/hooks/posts/useDeletePost";
 import { usePosts } from "@/hooks/posts/usePosts";
 import type { LikeType } from "@/types/like.types";
 import type { PostSortBy } from "@/types/post.types";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 type PostListProps = {
   userId?: string;
@@ -25,6 +26,7 @@ export default function PostList({
   sortBy,
   emptyMessage = "No posts found.",
 }: PostListProps) {
+  useDocumentTitle("Home / Birb");
   const { user } = useAuthStore();
   const [postToDelete, setPostToDelete] = useState<Post | null>(null);
   const { setPostDialogOpen, setEditingPost } = useUIStore();

@@ -2,11 +2,13 @@ import DescriptionBlock from "@/components/DescriptionBlock";
 import PhoneSignIn from "@/components/forms/PhoneSignInForm";
 import SignInForm from "@/components/forms/SignInForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 export default function SignIn() {
+  useDocumentTitle("Sign In / Birb");
+
   return (
     <div className="relative min-h-screen w-full grid lg:grid-cols-[1fr_2fr] lg:px-0">
-      <title>Sign In / Birb</title>
       <DescriptionBlock />
 
       <div className="flex items-center justify-center p-8">
